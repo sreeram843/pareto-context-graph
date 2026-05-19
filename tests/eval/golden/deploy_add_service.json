@@ -1,0 +1,38 @@
+{
+  "case_id": "deploy_add_service",
+  "repo_key": "deploy",
+  "repo_root": "/Users/sriram.mentey/Desktop/Teladoc/deploy",
+  "seed_files": [
+    "legacy/ucp-availability-service-api/chart/values.yaml"
+  ],
+  "query": "update ucp availability service deployment chart",
+  "expected_top_files": [
+    "legacy/ucp-availability-service-api/chart/Chart.yaml"
+  ],
+  "returned_paths": [
+    "legacy/ucp-availability-service-api/chart/Chart.yaml",
+    "legacy/rte-service/chart/templates/deployment-karafka.yaml",
+    "legacy/service-test-ar-final-mysql-kafka-redis1/chart/templates/deployment-kafka-consumer.yaml",
+    "legacy/service-test-ar-final-mysql-kafka-redis/chart/templates/deployment-kafka-consumer.yaml",
+    "legacy/service-water-melon-ruby-peaps-test-3/chart/templates/deployment-kafka-consumer.yaml",
+    "legacy/service-service-service-water-melon-ruby-peaps-test-2/chart/templates/deployment-kafka-consumer.yaml",
+    "legacy/service-ar-test-demo-ruby/chart/templates/deployment-kafka-consumer.yaml",
+    "legacy/oms/chart/templates/deployment.yaml",
+    "legacy/eligibility/chart/templates/deployment-karafka.yml",
+    "legacy/eligibility/chart/templates/deployment-sidekiq.yml",
+    "legacy/fs-peaps-ccm-bundle-test-2/chart/templates/deployment-kafka-consumer.yaml",
+    "legacy/fs-peaps-ccm-bundle-test/chart/templates/deployment-kafka-consumer.yaml",
+    "legacy/fs-ar-test-ruby-all/chart/templates/deployment-kafka-consumer.yaml",
+    "legacy/fs-water-melon-ruby-fullstack-peaps-test-3/chart/templates/deployment-kafka-consumer.yaml",
+    "legacy/fs-generation-test/chart/templates/deployment-kafka-consumer.yaml",
+    "docs/pages/deploymentAnalyzer.md"
+  ],
+  "returned_count": 16,
+  "files_available": 16,
+  "files_included": 16,
+  "tokens_used": 582,
+  "recall_at_5": 1.0,
+  "mrr": 1.0,
+  "ndcg_at_10": 1.0,
+  "notes": "Chart metadata should stay coupled to the local values file."
+}

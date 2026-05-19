@@ -1,0 +1,39 @@
+{
+  "cases": [
+    {
+      "case_id": "telapp_patients_controller_endpoint",
+      "repo_key": "telapp",
+      "seed_files": ["app/controllers/api/v4/patients_controller.rb"],
+      "query": "patient controller API endpoint",
+      "expected_top_files": [
+        "mobile_api/config/routes/teladoc_routes.rb",
+        "dependencies/request_a_visit_flows/config/routes.rb",
+        "dependencies/athena/app/services/athena/creators/patient.rb",
+        "dependencies/athena/spec/services/athena/creators/patient_spec.rb"
+      ],
+      "notes": "Routes and patient model should rank ahead of unrelated specs."
+    },
+    {
+      "case_id": "deploy_add_service",
+      "repo_key": "deploy",
+      "seed_files": ["legacy/ucp-availability-service-api/chart/values.yaml"],
+      "query": "update ucp availability service deployment chart",
+      "expected_top_files": [
+        "legacy/ucp-availability-service-api/chart/Chart.yaml"
+      ],
+      "notes": "Chart metadata should stay coupled to the local values file."
+    },
+    {
+      "case_id": "nova_transform_fix_join",
+      "repo_key": "nova-transform",
+      "seed_files": ["models/staging/zus_teladochealth_relational/ods_zus_teladochealth_relational__patient.sql"],
+      "query": "fix patient join logic in dbt model",
+      "expected_top_files": [
+        "models/staging/zus_teladochealth_relational/ods_zus_teladochealth_relational__patient_address.sql",
+        "models/staging/zus_teladochealth_relational/ods_zus_teladochealth_relational__patient_identifier.sql",
+        "models/consumption/clinical/dim_patient.sql"
+      ],
+      "notes": "Upstream staging model and downstream mart should surface."
+    }
+  ]
+}

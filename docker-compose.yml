@@ -1,0 +1,11 @@
+services:
+  code-graph-mcp:
+    build:
+      context: .
+    image: code-graph-mcp:latest
+    stdin_open: true
+    tty: false
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    command: ["--repo", "/workspace", "serve", "--transport", "stdio"]

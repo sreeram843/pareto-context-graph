@@ -1,0 +1,40 @@
+{
+  "case_id": "telapp_patients_controller_endpoint",
+  "repo_key": "telapp",
+  "repo_root": "/Users/sriram.mentey/Desktop/Teladoc/telapp",
+  "seed_files": [
+    "app/controllers/api/v4/patients_controller.rb"
+  ],
+  "query": "patient controller API endpoint",
+  "expected_top_files": [
+    "mobile_api/config/routes/teladoc_routes.rb",
+    "dependencies/request_a_visit_flows/config/routes.rb",
+    "dependencies/athena/app/services/athena/creators/patient.rb",
+    "dependencies/athena/spec/services/athena/creators/patient_spec.rb"
+  ],
+  "returned_paths": [
+    "mobile_api/config/routes/teladoc_routes.rb",
+    "dependencies/request_a_visit_flows/config/routes.rb",
+    "dependencies/athena/app/services/athena/creators/patient.rb",
+    "tas/lib/api_docs/README.md",
+    "dependencies/athena/spec/services/athena/creators/patient_spec.rb",
+    "dependencies/messaging/spec/workers/messaging/patient_case_worker_spec.rb",
+    "dependencies/health_info_flows/spec/controllers/health_info_flows/api/v2/teladoc/members/screens/electronic_health_records_controller_spec.rb",
+    "dependencies/messaging/spec/jobs/messaging/patient_case_job_spec.rb",
+    "mobile_api/spec/controllers/api/v2/teladoc/members/base_members_controller_spec.rb",
+    "dependencies/request_a_visit_flows/spec/controllers/request_a_visit_flows/api/v2/teladoc/members/base_members_controller_spec.rb",
+    "dependencies/flow_ui_registration/spec/controllers/flow_ui_registration/screens/registrations_controller_spec.rb",
+    "dependencies/teladoc_erx/backend/spec/requests/v4/interop/patients_spec.rb",
+    "mobile_api/spec/requests/api/v2/teladoc/members/screens/sdk/video_room_spec.rb",
+    "member/spec/controllers/video_controller_spec.rb",
+    "dependencies/visit_scheduler/visit_scheduler_js/tests/src/contexts/upcoming-visits/use-upcoming-visits.test.js"
+  ],
+  "returned_count": 15,
+  "files_available": 15,
+  "files_included": 15,
+  "tokens_used": 635,
+  "recall_at_5": 1.0,
+  "mrr": 1.0,
+  "ndcg_at_10": 0.994,
+  "notes": "Routes and patient model should rank ahead of unrelated specs."
+}

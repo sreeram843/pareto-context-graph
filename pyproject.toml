@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "code-graph-mcp"
+version = "0.1.0"
+description = "Git-based blast-radius analysis for token-efficient AI code reviews"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.scripts]
+code-graph-mcp = "code_graph_mcp.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/code_graph_mcp"]
