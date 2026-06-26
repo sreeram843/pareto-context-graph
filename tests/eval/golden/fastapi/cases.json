@@ -1,0 +1,1153 @@
+{
+  "cases": [
+    {
+      "case_id": "fastapi_routing_core",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/routing.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/dependencies/utils.py",
+        "fastapi/applications.py",
+        "fastapi/openapi/utils.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Core routing module should surface dependency and app wiring."
+    },
+    {
+      "case_id": "fastapi_routing_with_query",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/routing.py"
+      ],
+      "query": "route handlers and APIRouter",
+      "expected_top_files": [
+        "fastapi/dependencies/utils.py",
+        "fastapi/applications.py",
+        "fastapi/openapi/utils.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-aware ranking for routing domain."
+    },
+    {
+      "case_id": "fastapi_applications_entry",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/applications.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/routing.py",
+        "fastapi/exception_handlers.py",
+        "fastapi/openapi/utils.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Application class couples to router and OpenAPI stack."
+    },
+    {
+      "case_id": "fastapi_openapi_utils",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/openapi/utils.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/openapi/models.py",
+        "fastapi/routing.py",
+        "fastapi/openapi/docs.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "OpenAPI util layer links models, routing, and docs."
+    },
+    {
+      "case_id": "fastapi_dependencies_utils",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/dependencies/utils.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/routing.py",
+        "fastapi/dependencies/models.py",
+        "fastapi/_compat/v2.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Dependency injection utils tie to routing and models."
+    },
+    {
+      "case_id": "fastapi_dependencies_models",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/dependencies/models.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/dependencies/utils.py",
+        "fastapi/types.py"
+      ],
+      "tier": 1,
+      "token_budget": 4000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Narrow dependency model pair."
+    },
+    {
+      "case_id": "fastapi_security_oauth2",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/security/oauth2.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/security/http.py",
+        "fastapi/security/api_key.py",
+        "fastapi/security/open_id_connect_url.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Security package modules co-change."
+    },
+    {
+      "case_id": "fastapi_security_http",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/security/http.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/security/oauth2.py",
+        "fastapi/security/api_key.py",
+        "fastapi/security/utils.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "HTTP auth links to oauth2 and api_key."
+    },
+    {
+      "case_id": "fastapi_middleware_cors",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/middleware/cors.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/middleware/wsgi.py",
+        "fastapi/middleware/asyncexitstack.py"
+      ],
+      "tier": 1,
+      "token_budget": 4000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Middleware siblings in same package."
+    },
+    {
+      "case_id": "fastapi_exception_handlers",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/exception_handlers.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/exceptions.py",
+        "fastapi/applications.py",
+        "fastapi/__init__.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Exception handling ties to exceptions module and app."
+    },
+    {
+      "case_id": "fastapi_encoders",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/encoders.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/dependencies/utils.py",
+        "fastapi/routing.py",
+        "fastapi/_compat/v2.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "JSON encoders used across routing and compat."
+    },
+    {
+      "case_id": "fastapi_compat_v2",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/_compat/v2.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/_compat/shared.py",
+        "fastapi/_compat/__init__.py",
+        "fastapi/dependencies/utils.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Pydantic v2 compat cluster."
+    },
+    {
+      "case_id": "fastapi_params",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/params.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/routing.py",
+        "fastapi/dependencies/utils.py",
+        "fastapi/param_functions.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Parameter definitions link to routing and DI."
+    },
+    {
+      "case_id": "fastapi_sse",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/sse.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/exception_handlers.py",
+        "fastapi/__init__.py",
+        "fastapi/__main__.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "SSE support couples to app and routing stack."
+    },
+    {
+      "case_id": "fastapi_cli",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/cli.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/__main__.py",
+        "fastapi/applications.py",
+        "fastapi/exception_handlers.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "CLI entry couples to __main__ and application."
+    },
+    {
+      "case_id": "fastapi_concept_oauth2",
+      "repo_key": "fastapi",
+      "seed_files": [],
+      "query": "OAuth2PasswordBearer password bearer token authentication",
+      "expected_top_files": [
+        "fastapi/security/oauth2.py",
+        "fastapi/security/http.py",
+        "fastapi/security/api_key.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first: OAuth2 security stack without seed files."
+    },
+    {
+      "case_id": "fastapi_concept_cors",
+      "repo_key": "fastapi",
+      "seed_files": [],
+      "query": "How does CORS middleware handle cross-origin requests?",
+      "expected_top_files": [
+        "fastapi/middleware/cors.py",
+        "fastapi/middleware/wsgi.py",
+        "fastapi/middleware/asyncexitstack.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first: CORS middleware family."
+    },
+    {
+      "case_id": "fastapi_concept_openapi",
+      "repo_key": "fastapi",
+      "seed_files": [],
+      "query": "OpenAPI schema generation and route documentation utilities",
+      "expected_top_files": [
+        "fastapi/openapi/utils.py",
+        "fastapi/openapi/models.py",
+        "fastapi/openapi/docs.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first: OpenAPI documentation pipeline."
+    },
+    {
+      "case_id": "fastapi_concept_dependencies",
+      "repo_key": "fastapi",
+      "seed_files": [],
+      "query": "dependency injection Depends utility functions",
+      "expected_top_files": [
+        "fastapi/dependencies/utils.py",
+        "fastapi/dependencies/models.py",
+        "fastapi/routing.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first: DI layer without routing seed."
+    },
+    {
+      "case_id": "fastapi_fastapi__compat_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/_compat.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/dependencies/utils.py",
+        "fastapi/params.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/_compat.py."
+    },
+    {
+      "case_id": "fastapi_fastapi__compat___init___py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/_compat/__init__.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/_compat/v2.py",
+        "fastapi/dependencies/utils.py",
+        "fastapi/routing.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/_compat/__init__.py."
+    },
+    {
+      "case_id": "fastapi_fastapi__compat_shared_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/_compat/shared.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/_compat/v2.py",
+        "fastapi/dependencies/utils.py",
+        "fastapi/utils.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/_compat/shared.py."
+    },
+    {
+      "case_id": "fastapi_fastapi__compat_v2_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/_compat/v2.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/dependencies/utils.py",
+        "fastapi/_compat/__init__.py",
+        "fastapi/routing.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/_compat/v2.py."
+    },
+    {
+      "case_id": "fastapi_fastapi_applications_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/applications.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/routing.py",
+        "pyproject.toml",
+        "fastapi/openapi/utils.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/applications.py."
+    },
+    {
+      "case_id": "fastapi_fastapi_datastructures_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/datastructures.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/encoders.py",
+        "fastapi/routing.py",
+        "fastapi/param_functions.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/datastructures.py."
+    },
+    {
+      "case_id": "fastapi_fastapi_dependencies_utils_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/dependencies/utils.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/routing.py",
+        "fastapi/openapi/utils.py",
+        "pyproject.toml"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/dependencies/utils.py."
+    },
+    {
+      "case_id": "fastapi_fastapi_encoders_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/encoders.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "tests/test_jsonable_encoder.py",
+        "fastapi/dependencies/utils.py",
+        "fastapi/routing.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/encoders.py."
+    },
+    {
+      "case_id": "fastapi_fastapi_exceptions_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/exceptions.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/routing.py",
+        "fastapi/param_functions.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/exceptions.py."
+    },
+    {
+      "case_id": "fastapi_fastapi_openapi_models_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/openapi/models.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/openapi/utils.py",
+        "fastapi/_compat/v2.py",
+        "fastapi/routing.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/openapi/models.py."
+    },
+    {
+      "case_id": "fastapi_fastapi_openapi_utils_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/openapi/utils.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/routing.py",
+        "fastapi/dependencies/utils.py",
+        "fastapi/_compat/v2.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/openapi/utils.py."
+    },
+    {
+      "case_id": "fastapi_fastapi_param_functions_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/param_functions.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/routing.py",
+        "fastapi/params.py",
+        "fastapi/security/oauth2.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/param_functions.py."
+    },
+    {
+      "case_id": "fastapi_fastapi_params_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/params.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/dependencies/utils.py",
+        "fastapi/routing.py",
+        "fastapi/param_functions.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/params.py."
+    },
+    {
+      "case_id": "fastapi_fastapi_routing_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/routing.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/dependencies/utils.py",
+        "fastapi/applications.py",
+        "pyproject.toml"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/routing.py."
+    },
+    {
+      "case_id": "fastapi_fastapi_security_api_key_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/security/api_key.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/security/oauth2.py",
+        "pyproject.toml",
+        "fastapi/security/open_id_connect_url.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/security/api_key.py."
+    },
+    {
+      "case_id": "fastapi_fastapi_security_http_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/security/http.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/security/oauth2.py",
+        "fastapi/security/open_id_connect_url.py",
+        "fastapi/security/api_key.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/security/http.py."
+    },
+    {
+      "case_id": "fastapi_fastapi___init___py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/__init__.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "docs/en/docs/release-notes.md",
+        ".github/workflows/publish.yml",
+        "pyproject.toml"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/__init__.py."
+    },
+    {
+      "case_id": "fastapi_fastapi__compat_main_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/_compat/main.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/_compat/v1.py",
+        "fastapi/temp_pydantic_v1_params.py",
+        "fastapi/_compat/v2.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/_compat/main.py."
+    },
+    {
+      "case_id": "fastapi_fastapi__compat_may_v1_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/_compat/may_v1.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/_compat/__init__.py",
+        "fastapi/_compat/shared.py",
+        "fastapi/_compat/v2.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Phase 9.1: expected aligned to stable BFS neighbours (was stale auto-gen)."
+    },
+    {
+      "case_id": "fastapi_fastapi__compat_v1_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/_compat/v1.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/temp_pydantic_v1_params.py",
+        "fastapi/_compat/main.py",
+        "fastapi/_compat/v2.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/_compat/v1.py."
+    },
+    {
+      "case_id": "fastapi_fastapi_background_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/background.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/exception_handlers.py",
+        "fastapi/__init__.py",
+        "fastapi/__main__.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Phase 9.1: expected aligned to top-5 co-change rank (was stale auto-gen)."
+    },
+    {
+      "case_id": "fastapi_fastapi_dependencies_models_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/dependencies/models.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/dependencies/utils.py",
+        "tests/test_dependency_wrapped.py",
+        "tests/test_dependency_class.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/dependencies/models.py."
+    },
+    {
+      "case_id": "fastapi_fastapi_openapi_docs_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/openapi/docs.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/applications.py",
+        "fastapi/exceptions.py",
+        "fastapi/param_functions.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/openapi/docs.py."
+    },
+    {
+      "case_id": "fastapi_fastapi_responses_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/responses.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/exception_handlers.py",
+        "fastapi/__init__.py",
+        "fastapi/__main__.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Phase 9.1: expected aligned to top-5 co-change rank (was pyproject/lock noise)."
+    },
+    {
+      "case_id": "fastapi_concept_00",
+      "repo_key": "fastapi",
+      "seed_files": [],
+      "query": "WebSocket connection handling",
+      "expected_top_files": [
+        "fastapi/websockets.py",
+        "fastapi/routing.py",
+        "fastapi/applications.py"
+      ],
+      "tier": 1,
+      "token_budget": 8000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first concept case: WebSocket connection handling"
+    },
+    {
+      "case_id": "fastapi_concept_01",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/background.py"
+      ],
+      "query": "background tasks run after response",
+      "expected_top_files": [
+        "fastapi/routing.py",
+        "fastapi/dependencies/utils.py",
+        "fastapi/applications.py"
+      ],
+      "tier": 1,
+      "token_budget": 8000,
+      "max_depth": 2,
+      "min_weight": 1,
+      "category": "concept",
+      "notes": "Phase 9.1: seed+query concept case; expected from stable top-5 (query-only missed background in top 5)."
+    },
+    {
+      "case_id": "fastapi_concept_02",
+      "repo_key": "fastapi",
+      "seed_files": [],
+      "query": "JSON response serialization encoders",
+      "expected_top_files": [
+        "fastapi/encoders.py",
+        "fastapi/responses.py",
+        "fastapi/routing.py"
+      ],
+      "tier": 1,
+      "token_budget": 8000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first concept case: JSON response serialization encoders"
+    },
+    {
+      "case_id": "fastapi_concept_03",
+      "repo_key": "fastapi",
+      "seed_files": [],
+      "query": "static files mount StaticFiles",
+      "expected_top_files": [
+        "fastapi/staticfiles.py",
+        "fastapi/applications.py",
+        "fastapi/routing.py"
+      ],
+      "tier": 1,
+      "token_budget": 8000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first concept case: static files mount StaticFiles"
+    },
+    {
+      "case_id": "fastapi_fastapi_security_oauth2_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/security/oauth2.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/security/open_id_connect_url.py",
+        "fastapi/security/api_key.py",
+        "fastapi/security/http.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/security/oauth2.py."
+    },
+    {
+      "case_id": "fastapi_fastapi_security_open_id_connect_url_py",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/security/open_id_connect_url.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/security/oauth2.py",
+        "fastapi/security/http.py",
+        "fastapi/security/api_key.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of fastapi/security/open_id_connect_url.py."
+    },
+    {
+      "case_id": "fastapi_concept_04",
+      "repo_key": "fastapi",
+      "seed_files": [],
+      "query": "Jinja2 templates TemplateResponse",
+      "expected_top_files": [
+        "fastapi/templating.py",
+        "fastapi/applications.py",
+        "fastapi/routing.py"
+      ],
+      "tier": 1,
+      "token_budget": 8000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first concept case: Jinja2 templates TemplateResponse"
+    },
+    {
+      "case_id": "fastapi_merge_ad471307",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/routing.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/dependencies/utils.py",
+        "fastapi/applications.py",
+        "pyproject.toml"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "pr_co_change",
+      "notes": "PR-sourced case from merge commit ad471307e2be (:sparkles: Additional Responses (#97))."
+    },
+    {
+      "case_id": "fastapi_pr_15808",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/__init__.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "docs/en/docs/release-notes.md",
+        ".github/workflows/publish.yml",
+        "pyproject.toml"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "pr_co_change",
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15808 (\ud83d\udd16 Release version 0.138.0 (#15808))."
+    },
+    {
+      "case_id": "fastapi_pr_15800",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/applications.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/routing.py",
+        "tests/test_frontend.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "pr_co_change",
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15800 (\u2728 Add support for `app.frontend(\"/\", directory=\"dist\")` and `router.frontend(\"/\")."
+    },
+    {
+      "case_id": "fastapi_pr_15790",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/__init__.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "docs/en/docs/release-notes.md",
+        ".github/workflows/publish.yml",
+        "pyproject.toml"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "pr_co_change",
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15790 (\ud83d\udd16 Release version 0.137.2 (#15790))."
+    },
+    {
+      "case_id": "fastapi_pr_15785",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/routing.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/openapi/utils.py",
+        "tests/test_router_include_context.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "pr_co_change",
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15785 (\u2728 Add `iter_route_contexts()` for advanced use cases that used to use `router.ro)."
+    },
+    {
+      "case_id": "fastapi_pr_15766",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/__init__.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "docs/en/docs/release-notes.md",
+        ".github/workflows/publish.yml",
+        "pyproject.toml"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "pr_co_change",
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15766 (\ud83d\udd16 Release version 0.137.1 (#15766))."
+    },
+    {
+      "case_id": "fastapi_pr_15763",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/routing.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "tests/test_router_include_context.py",
+        "fastapi/dependencies/utils.py",
+        "fastapi/applications.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "pr_co_change",
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15763 (\ud83d\udc1b Fix bug, allow empty path in path operation in prefixless router (#15763))."
+    },
+    {
+      "case_id": "fastapi_pr_15748",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/__init__.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "docs/en/docs/release-notes.md",
+        ".github/workflows/publish.yml",
+        "pyproject.toml"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "pr_co_change",
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15748 (\ud83d\udd16 Release version 0.137.0 (#15748))."
+    },
+    {
+      "case_id": "fastapi_pr_15745",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/applications.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/openapi/utils.py",
+        "fastapi/routing.py",
+        "tests/test_custom_route_class.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "pr_co_change",
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15745 (\u267b\ufe0f Refactor internals to preserve `APIRouter` and `APIRoute` instances (#15745))."
+    },
+    {
+      "case_id": "fastapi_pr_15589",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/dependencies/utils.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "tests/test_query_cookie_header_model_extra_params.py",
+        "fastapi/routing.py",
+        "fastapi/openapi/utils.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "pr_co_change",
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15589 (\u267b\ufe0f Do not accept underscore headers when using `convert_underscores=True` (the d)."
+    },
+    {
+      "case_id": "fastapi_pr_15588",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/sse.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/exception_handlers.py",
+        "fastapi/__init__.py",
+        "fastapi/__main__.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "pr_co_change",
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15588 (\u267b\ufe0f Validate Server Sent Event fields to avoid applications from sending broken d)."
+    },
+    {
+      "case_id": "fastapi_pr_15101",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/encoders.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/_compat/__init__.py",
+        "fastapi/_compat/v2.py",
+        "fastapi/dependencies/utils.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "pr_co_change",
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15101 (\u2b06\ufe0f Update Pydantic v2 code to address deprecations (#15101))."
+    },
+    {
+      "case_id": "fastapi_pr_15149",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/responses.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "fastapi/exception_handlers.py",
+        "fastapi/__init__.py",
+        "fastapi/__main__.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "pr_co_change",
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15149 (\u2b06\ufe0f Support free-threaded Python 3.14t (#15149))."
+    },
+    {
+      "case_id": "fastapi_pr_15363",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/applications.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "tests/test_vibe.py",
+        "fastapi/routing.py",
+        "pyproject.toml"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "pr_co_change",
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15363 (\ud83d\udd25 Remove April Fool's `@app.vibe()` \ud83e\udd2a (#15363))."
+    },
+    {
+      "case_id": "fastapi_pr_15280",
+      "repo_key": "fastapi",
+      "seed_files": [
+        "fastapi/applications.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "tests/test_vibe.py",
+        "fastapi/routing.py",
+        "pyproject.toml"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "pr_co_change",
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15280 (\u2728 Add support for `@app.vibe()` (#15280))."
+    }
+  ]
+}

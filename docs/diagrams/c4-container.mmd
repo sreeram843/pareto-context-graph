@@ -1,0 +1,20 @@
+C4Container
+    title Containers — pareto-context-graph
+
+    Person(dev, "Developer")
+    System_Ext(ide, "AI IDE", "Agent host")
+
+    Container_Boundary(sys, "pareto-context-graph") {
+        Container(cli, "CLI", "Python", "build, update, doctor, eval, bench")
+        Container(mcp, "MCP Server", "Python", "pareto_context_graph tool + context pipeline")
+        ContainerDb(store, "graph.db", "SQLite + WAL", "edges, indexes, feedback, session")
+    }
+
+    System_Ext(git, "Git CLI", "History + file list")
+
+    Rel(dev, ide, "Uses")
+    Rel(ide, mcp, "JSON-RPC over stdio")
+    Rel(cli, store, "Read / write")
+    Rel(mcp, store, "Read pool, concurrent context")
+    Rel(cli, git, "subprocess")
+    Rel(mcp, git, "subprocess")

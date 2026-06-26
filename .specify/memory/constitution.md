@@ -1,12 +1,12 @@
-# code-graph-mcp Constitution
+# pareto-context-graph Constitution
 
 ## Core Principles
 
 ### I. Stay Embeddable
-The library must work without a running MCP server. Every feature exposed via the MCP server must also be accessible through the `CodeGraph` Python API (`src/code_graph_mcp/api.py`). No feature may require a long-lived daemon or network socket to function. Solutions that couple functionality exclusively to the server transport layer are rejected.
+The library must work without a running MCP server. Every feature exposed via the MCP server must also be accessible through the `ParetoContextGraph` Python API (`src/pareto_context_graph/api.py`). No feature may require a long-lived daemon or network socket to function. Solutions that couple functionality exclusively to the server transport layer are rejected.
 
 ### II. Eval-Driven
-Retrieval quality is measured, not assumed. Any change to context ranking, graph traversal, or embedding must be validated against `tests/eval/cases.json` before merging. New retrieval behaviors require a new eval case. Subjective impressions of "better results" are not sufficient — the eval harness must confirm it.
+Retrieval quality is measured, not assumed. Any change to context ranking, graph traversal, or embedding must be validated against `tests/eval/golden/<repo>/cases.json` (run `make eval`) before merging. New retrieval behaviors require a new eval case. Subjective impressions of "better results" are not sufficient — the eval harness must confirm it.
 
 ### III. Token-Honest
 The system must never return more context than it declares. Token budgets set by the caller are hard limits, not suggestions. Truncation must be explicit and logged. Solutions that silently exceed `max_tokens` or that hide token counts from callers are rejected.

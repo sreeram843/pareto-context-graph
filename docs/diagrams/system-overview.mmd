@@ -1,0 +1,21 @@
+flowchart TB
+    subgraph inputs [Inputs]
+        GIT[git log]
+        Q[user query]
+        SEED[seed files]
+    end
+
+    subgraph build [Build time]
+        GIT --> GRAPH[(graph.db)]
+        GRAPH --> CACHE[top_neighbours]
+    end
+
+    subgraph query [Query time]
+        SEED --> S1[Expand]
+        Q --> S1
+        CACHE --> S1
+        S1 --> RANK[Rank + pack]
+        RANK --> TIER[context_files]
+    end
+
+    TIER --> AI[AI assistant]

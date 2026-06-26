@@ -1,6 +1,6 @@
 """Test two-stage retrieval pipeline (Task 8)."""
-from code_graph_mcp.server import _stage1_candidates
-from code_graph_mcp.store import Store
+from pareto_context_graph.context_ranking import stage1_candidates as _stage1_candidates
+from pareto_context_graph.store import Store
 
 
 def test_stage1_respects_cap(tmp_path):

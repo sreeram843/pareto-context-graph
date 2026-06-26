@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant U as User
+    participant A as AI agent
+    participant M as pareto_context_graph MCP
+    participant G as graph.db
+
+    U->>A: prompt
+    A->>M: context tier 1
+    M->>G: expand rank pack
+    G-->>M: ranked summaries
+    M-->>A: ~30 tok per file
+    A->>M: context tier 3 on picks
+    M-->>A: chunks within budget
+    A-->>U: answer

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from code_graph_mcp.graph import build_graph
-from code_graph_mcp.store import DB_DIR, DB_NAME
+from pareto_context_graph.graph import build_graph
+from pareto_context_graph.store import DB_DIR, DB_NAME
 
 
 def test_build_smoke_high_signal_pair(synthetic_repo_factory):

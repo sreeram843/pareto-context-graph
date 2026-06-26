@@ -3,7 +3,7 @@
 [code-review-graph](https://github.com/tirth8205/code-review-graph) is a mature
 open-source project (16.8k stars, v2.3.3) that solves an overlapping problem from
 a different angle.  This document catalogs the features most worth incorporating
-into `code-graph-mcp`, skipping anything already covered by the Production Roadmap
+into `pareto-context-graph`, skipping anything already covered by the Production Roadmap
 (tree-sitter symbol index → Phase 3 Task 3.1; BM25 → Phase 3 Task 3.2; embeddings
 → Phase 3 Task 3.3; VS Code extension → Phase 5 Task 5.7).
 
@@ -54,7 +54,7 @@ These are already approved for Phase 3.
    ```
 5. Expose `edge_kind` filter on `neighbours` and `blast` commands.
 
-**Feature flag**: `CGMCP_FEATURE_STRUCTURAL_EDGES`
+**Feature flag**: `PCG_FEATURE_STRUCTURAL_EDGES`
 
 ---
 
@@ -86,7 +86,7 @@ are useful for onboarding and for scoping context calls.
    files) by re-running Leiden on the sub-graph.
 5. Return community label and modularity score in the response.
 
-**Feature flag**: `CGMCP_FEATURE_LEIDEN`
+**Feature flag**: `PCG_FEATURE_LEIDEN`
 
 ---
 
@@ -118,7 +118,7 @@ def to_cypher(store: Store, path: str) -> None: ...   # Neo4j LOAD CSV / MERGE s
 def to_obsidian(store: Store, vault_path: str) -> None: ...  # one .md per file-node
 ```
 
-Expose as CLI subcommand: `code-graph export --format graphml|cypher|obsidian --out <path>`
+Expose as CLI subcommand: `pareto-context-graph export --format graphml|cypher|obsidian --out <path>`
 and as MCP command `export`.
 
 #### 3b  Local web UI (optional group)
@@ -130,7 +130,7 @@ and as MCP command `export`.
   partners in a side panel.
 - Gate behind `--ui` flag on `serve`.
 
-**Feature flag**: `CGMCP_FEATURE_EXPORT`, `CGMCP_FEATURE_UI`
+**Feature flag**: `PCG_FEATURE_EXPORT`, `PCG_FEATURE_UI`
 
 ---
 
@@ -209,9 +209,9 @@ requiring the user to know which tool to call.
    - `debug_issue(query)` — calls `search`, then `context`.
    - `onboard_file(file)` — calls `context` + `neighbours`.
    - `pre_merge_check(files)` — calls `blast` + `savings`.
-4. `CodeGraph` Python API gets a `run_prompt(name, **kwargs) -> str` method.
+4. `ParetoContextGraph` Python API gets a `run_prompt(name, **kwargs) -> str` method.
 
-**Feature flag**: `CGMCP_FEATURE_PROMPTS`
+**Feature flag**: `PCG_FEATURE_PROMPTS`
 
 ---
 
@@ -246,9 +246,9 @@ been intentionally broken.
      "community_shifts": [{"file": "auth.py", "was": 3, "now": 1}]
    }
    ```
-4. Expose as MCP command `detect_changes` and CLI `code-graph diff --since <ref>`.
+4. Expose as MCP command `detect_changes` and CLI `pareto-context-graph diff --since <ref>`.
 
-**Feature flag**: `CGMCP_FEATURE_GRAPH_DIFF`
+**Feature flag**: `PCG_FEATURE_GRAPH_DIFF`
 
 ---
 
@@ -276,9 +276,9 @@ Prerequisite: Feature 1 (structural edges) must ship first.
    for now; fractional when we have per-function coverage data).
 3. Return top-N sorted by `risk_score`, including `co_change_degree`,
    `has_tests`, and `last_changed` fields.
-4. Expose as MCP command `knowledge_gaps` and `CodeGraph.knowledge_gaps()`.
+4. Expose as MCP command `knowledge_gaps` and `ParetoContextGraph.knowledge_gaps()`.
 
-**Feature flag**: `CGMCP_FEATURE_KNOWLEDGE_GAPS`
+**Feature flag**: `PCG_FEATURE_KNOWLEDGE_GAPS`
 
 ---
 
@@ -308,10 +308,10 @@ with co-change only.
    - `community_span`: number of distinct communities touched.
 3. Final score: weighted sum, clamped to [0, 1].
 4. Return `{"risk": 0.74, "components": {...}, "top_risky_files": [...]}`.
-5. Expose as MCP command `review_risk` and CLI `code-graph review-risk <file...>`.
+5. Expose as MCP command `review_risk` and CLI `pareto-context-graph review-risk <file...>`.
 6. GitHub Actions example in `docs/` showing how to call it in CI.
 
-**Feature flag**: `CGMCP_FEATURE_REVIEW_RISK`
+**Feature flag**: `PCG_FEATURE_REVIEW_RISK`
 
 ---
 
@@ -335,10 +335,10 @@ structurally critical.
 2. Algorithm: compute betweenness centrality on the co-change graph; flag nodes
    that are articulation points (vertex connectivity contribution).
 3. Return `{"file": "...", "betweenness": 0.91, "is_articulation_point": true}`.
-4. Expose as MCP command `bridges` and `CodeGraph.bridges()`.
+4. Expose as MCP command `bridges` and `ParetoContextGraph.bridges()`.
 5. Surface in `architecture_overview` prompt template (Feature 5).
 
-**Feature flag**: `CGMCP_FEATURE_BRIDGES`
+**Feature flag**: `PCG_FEATURE_BRIDGES`
 
 ---
 
@@ -349,7 +349,7 @@ structurally critical.
 | 1 – Structural edges | `tree-sitter` + grammar wheels (already approved) | No |
 | 2 – Leiden communities | `igraph>=0.11` | No |
 | 3a – Export formats | none | — |
-| 3b – Web UI | `flask>=3.0` or `fastapi + uvicorn` | Yes (`pip install code-graph-mcp[ui]`) |
+| 3b – Web UI | `flask>=3.0` or `fastapi + uvicorn` | Yes (`pip install pareto-context-graph[ui]`) |
 | 4 – Platform auto-config | none | — |
 | 5 – Prompt templates | none | — |
 | 6 – Graph diff | none | — |

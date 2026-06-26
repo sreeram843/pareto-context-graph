@@ -1,14 +1,197 @@
-# CI Snapshots
+# CI Snapshots — huge-repo onboarding
 
-Use CI to pre-build and publish `.code-graph` snapshots for large repos.
+Pre-built `.pareto-context-graph` tarballs avoid multi-hour cold builds on Tier 2/3 repos.
+**Default path for kubernetes and linux:** import a snapshot, then incremental `build`.
 
-## Suggested workflow
+| Repo tier | Cold build (measured) | Snapshot path |
+|-----------|----------------------|---------------|
+| T1 (fastapi, httpx) | ~1–2 s | Not needed — `pareto-context-graph build` |
+| T2 (kubernetes) | ~13 min | **Weekly CI artifact** (recommended) |
+| T3 (linux) | ~10.5 h | **Team export** or local backup (no CI artifact yet) |
 
-1. Nightly on default branch, run:
-   - `code-graph-mcp build --profile huge`
-   - `code-graph-mcp snapshot export ./graph-snapshot.tar.gz`
-2. Upload `graph-snapshot.tar.gz` to your artifact bucket.
-3. Developers bootstrap locally:
-   - `code-graph-mcp build --from-snapshot <url-or-path>`
+---
 
-This avoids rebuilding large histories from scratch on every machine.
+## When to use what
+
+```mermaid
+flowchart TD
+    A[New clone of huge repo] --> B{Have a snapshot?}
+    B -->|yes| C["build --from-snapshot"]
+    B -->|no k8s| D[Download CI artifact]
+    B -->|no linux| E[Ask team OR export from machine that built]
+    D --> C
+    E --> C
+    C --> F[pareto-context-graph doctor]
+    F --> G[serve / MCP]
+    B -->|must build from scratch| H["build --profile huge …"]
+```
+
+---
+
+## Kubernetes (T2) — recommended flow
+
+**Target:** snapshot import + incremental update **< 5 min** (vs ~13 min cold build).
+
+### 1. Clone the repo
+
+```bash
+git clone --filter=blob:none https://github.com/kubernetes/kubernetes.git bench/kubernetes
+cd bench/kubernetes
+sha=$(jq -r '.repos.kubernetes.sha' ../../tests/eval/pins.json)  # optional pin
+git checkout "$sha" 2>/dev/null || true
+```
+
+### 2. Get the CI snapshot
+
+**GitHub Actions:** **Actions → Bench T2 (Kubernetes) →** latest run → artifact **`kubernetes-graph-snapshot`**
+
+Download and extract (or use the `.tar.gz` directly):
+
+```bash
+# Example: artifact saved to ~/Downloads/kubernetes-graph-snapshot.tar.gz
+export PCG_SNAPSHOT_KEY='<same secret as CI>'   # if signed
+```
+
+### 3. Bootstrap from snapshot
+
+`build --from-snapshot` imports the tarball **and** runs an incremental update for commits since the snapshot.
+
+```bash
+pip install -e /path/to/pareto-context-graph[tiktoken]
+
+pareto-context-graph build --from-snapshot ~/Downloads/kubernetes-graph-snapshot.tar.gz
+```
+
+Also accepts HTTPS URLs:
+
+```bash
+pareto-context-graph build --from-snapshot https://example.com/kubernetes-graph-snapshot.tar.gz
+```
+
+### 4. Verify
+
+```bash
+pareto-context-graph stats
+pareto-context-graph doctor    # health + build estimate
+```
+
+### 5. Serve MCP
+
+```bash
+pareto-context-graph install --platform cursor
+pareto-context-graph serve --watch --interval 600
+```
+
+### Day-to-day updates
+
+```bash
+git pull
+pareto-context-graph build    # incremental only when HEAD advanced
+# or: pareto-context-graph update
+```
+
+---
+
+## Linux (T3) — team snapshot
+
+There is **no weekly linux CI artifact** today (build ~10.5 h). Options:
+
+### A. Import a teammate's export (fastest)
+
+Someone who already built shares:
+
+```bash
+git clone --filter=blob:none https://github.com/torvalds/linux.git bench/linux
+cd bench/linux
+
+export PCG_SNAPSHOT_KEY='<shared secret if signed>'
+pareto-context-graph build --from-snapshot /path/to/linux-graph-snapshot.tar.gz
+pareto-context-graph doctor
+```
+
+### B. Export after a one-time cold build (backup for the team)
+
+```bash
+make bench-linux   # hours — run once on a beefy machine
+
+pareto-context-graph snapshot export bench/backups/linux-graph-$(date +%Y%m%d).tar.gz
+# ~390 MB compressed for a ~1.2 GB graph.db — share tarball + .sig.json
+```
+
+### C. Cold build (last resort)
+
+```bash
+pareto-context-graph build --profile huge \
+  --since "24 months ago" \
+  --commits 100000 \
+  --shards 8
+```
+
+See [BENCHMARK_REPOS.md](BENCHMARK_REPOS.md) for measured timings.
+
+---
+
+## Signing and verification
+
+| Env var | Purpose |
+|---------|---------|
+| `PCG_SNAPSHOT_KEY` | HMAC key — CI signs exports; set locally to verify imports |
+| `PCG_REQUIRE_SIGNED_SNAPSHOTS=1` | Refuse unsigned snapshots |
+| `PCG_ED25519_KEY` | Optional Ed25519 (requires `pip install cryptography`) |
+
+Manual import/export:
+
+```bash
+pareto-context-graph snapshot export ./my-graph.tar.gz    # writes .sig.json
+pareto-context-graph snapshot import ./my-graph.tar.gz    # verifies when key set
+```
+
+CI verifies signatures after export when `PCG_SNAPSHOT_KEY` is configured (see `bench-t2.yml`).
+
+---
+
+## CI publisher (maintainers)
+
+Weekly workflow [`.github/workflows/bench-t2.yml`](../.github/workflows/bench-t2.yml):
+
+1. Build kubernetes graph (`--profile huge`, 5k commits, 4 shards).
+2. Eval regression (`eval-check-kubernetes`, `eval-audit-kubernetes`).
+3. Export:
+   ```bash
+   export PCG_SNAPSHOT_KEY='…'   # GitHub Actions secret
+   pareto-context-graph snapshot export ./kubernetes-graph-snapshot.tar.gz
+   ```
+4. Upload **`kubernetes-graph-snapshot`** artifact (14-day retention): tarball + `.sig.json`.
+
+---
+
+## Troubleshooting
+
+| Symptom | Fix |
+|---------|-----|
+| `snapshot signature verification failed` | Set `PCG_SNAPSHOT_KEY` to match CI secret, or use unsigned export without `PCG_REQUIRE_SIGNED_SNAPSHOTS` |
+| `missing snapshot source` on export | Run `pareto-context-graph build` first — `.pareto-context-graph/` must exist |
+| Import OK but stale graph | `git pull` then `pareto-context-graph build` (incremental) |
+| `doctor` shows 0 files | Wrong repo root — run commands from git toplevel |
+| Hub context slow | See [BENCHMARKS.md](BENCHMARKS.md) — should be sub-second on k8s/linux |
+
+---
+
+## Build profiling (optional)
+
+Where cold-build time goes:
+
+```bash
+make profile-build REPO=bench/kubernetes SHOW=1
+make profile-build REPO=bench/kubernetes REPLAY=1
+```
+
+Recorded breakdowns: [BENCHMARKS.md](BENCHMARKS.md).
+
+---
+
+## Related docs
+
+- [QUICKSTART.md](QUICKSTART.md) — install + editor wiring
+- [BENCHMARK_REPOS.md](BENCHMARK_REPOS.md) — tier recipes and disk estimates
+- [COMMANDS.md](COMMANDS.md) — `build --from-snapshot`, `snapshot export|import`

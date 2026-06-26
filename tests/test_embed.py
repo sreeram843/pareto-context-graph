@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from code_graph_mcp.embed import build_embeddings, load_embedding_index, query_embedding_scores
+from pareto_context_graph.embed import build_embeddings, load_embedding_index, query_embedding_scores
 
 
 def test_embed_build_creates_index(synthetic_repo_factory):

@@ -1,0 +1,5 @@
+flowchart TB
+    USER[Developer] --> AGENT[AI agent]
+    AGENT --> CG[pareto-context-graph]
+    CG --> REPO[(repo + graph.db)]
+    AGENT --> USER

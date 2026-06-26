@@ -1,0 +1,15 @@
+C4Component
+    title Component — context request path
+
+    Container(mcp, "MCP Server", "server.py")
+
+    Component(orch, "Orchestrator", "Query-first plan + retriever fusion")
+    Component(ret, "Retrievers", "Co-change, BM25, path, symbol")
+    Component(rank, "Rank + pack", "Hub penalty, MMR, tier 1/2/3, token budget")
+    ComponentDb(db, "Store", "graph.db top_neighbours + indexes")
+
+    Rel(mcp, orch, "context command")
+    Rel(orch, ret, "multi-retriever RRF")
+    Rel(ret, db, "expand candidates")
+    Rel(orch, rank, "score + pack")
+    Rel(rank, db, "neighbours, symbols, FTS")

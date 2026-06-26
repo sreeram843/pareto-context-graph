@@ -1,11 +1,25 @@
 services:
-  code-graph-mcp:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.109.0
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./deploy/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4318:4318"
+
+  pareto-context-graph:
     build:
       context: .
-    image: code-graph-mcp:latest
+    image: pareto-context-graph:latest
     stdin_open: true
     tty: false
     working_dir: /workspace
     volumes:
       - ./:/workspace
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_SERVICE_NAME: pareto-context-graph
     command: ["--repo", "/workspace", "serve", "--transport", "stdio"]
+    depends_on:
+      - otel-collector

@@ -4,16 +4,27 @@ dist/
 build/
 
 # Graph database (generated per-repo)
-.code-graph/
+.pareto-context-graph/
 
 # Python
 __pycache__/
 *.pyc
 *.pyo
+.coverage
+htmlcov/
 
 # IDE
 .vscode/
 .idea/
 
+# Cursor — commit .cursor/rules/; mcp.json is machine-local (pareto-context-graph install)
+.cursor/mcp.json
+
+# Legacy graph dir (renamed to .pareto-context-graph/)
+.code-graph/
+
 # OS
 .DS_Store
+
+# Phase 0 benchmark clones (large; use scripts/bench_setup.sh)
+bench/

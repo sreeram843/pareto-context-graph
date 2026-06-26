@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from code_graph_mcp.store import Store
+from pareto_context_graph.store import Store
 
 
 def test_top_neighbour_cache_ordering(tmp_path):

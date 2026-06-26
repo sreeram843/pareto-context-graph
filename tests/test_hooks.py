@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import json
 
-from code_graph_mcp.graph import build_graph
-from code_graph_mcp.server import _handle_tool_call
+from pareto_context_graph.graph import build_graph
+from pareto_context_graph.server import _handle_tool_call
 
 
 def test_secret_redaction_in_context(tmp_path):
@@ -29,7 +29,7 @@ def test_secret_redaction_in_context(tmp_path):
     payload = json.loads(
         _handle_tool_call(
             repo,
-            "code_graph",
+            "pareto_context_graph",
             {
                 "command": "context",
                 "files": ["src/a.py"],

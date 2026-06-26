@@ -1,7 +1,7 @@
 """Test hub suppression in context ranking (Task 5)."""
 import math
 
-from code_graph_mcp.store import Store
+from pareto_context_graph.store import Store
 
 
 def test_hub_file_ranked_below_focused_cluster(tmp_path):

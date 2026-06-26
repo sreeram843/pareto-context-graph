@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from code_graph_mcp.graph import build_graph
-from code_graph_mcp.snapshot import export_snapshot, import_snapshot
-from code_graph_mcp.store import Store
+from pareto_context_graph.graph import build_graph
+from pareto_context_graph.snapshot import export_snapshot, import_snapshot
+from pareto_context_graph.store import Store
 
 
 def _snapshot_rows(repo):

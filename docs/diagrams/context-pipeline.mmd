@@ -1,0 +1,12 @@
+flowchart TB
+    H[pre_context hooks] --> PLAN[orchestrator plan]
+    PLAN --> R1[Retrieve BFS/RWR]
+    R1 --> R2[Hybrid signals]
+    R2 --> R3[Filter already_have]
+    R3 --> R4[Rank + hub penalty]
+    R4 --> R5[MMR]
+    R5 --> R6[Pack tier 1/2/3]
+    R6 --> POST[post_context audit session]
+
+    SESS[(session.json)] -.-> R3
+    FB[(feedback weights)] -.-> R4

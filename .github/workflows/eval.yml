@@ -1,0 +1,96 @@
+name: Eval
+
+on:
+  pull_request:
+    paths:
+      - "src/pareto_context_graph/server.py"
+      - "src/pareto_context_graph/blast.py"
+      - "src/pareto_context_graph/chunks.py"
+      - "src/pareto_context_graph/walk.py"
+      - "src/pareto_context_graph/store.py"
+      - "src/pareto_context_graph/eval.py"
+      # Packing / budgets / compression (Phase 12.5)
+      - "src/pareto_context_graph/payload_compress.py"
+      - "src/pareto_context_graph/prune_learn.py"
+      - "src/pareto_context_graph/adaptive_cap.py"
+      - "src/pareto_context_graph/tokens.py"
+      - "src/pareto_context_graph/compress_stack.py"
+      - "src/pareto_context_graph/headroom_stack.py"
+      - "src/pareto_context_graph/tokenizer.py"
+      - "src/pareto_context_graph/retrievers.py"
+      - "src/pareto_context_graph/orchestrator.py"
+      - "src/pareto_context_graph/indexing.py"
+      - "src/pareto_context_graph/symbols.py"
+      - "src/pareto_context_graph/structural.py"
+      - "src/pareto_context_graph/community.py"
+      - "src/pareto_context_graph/savings.py"
+      - "src/pareto_context_graph/graph.py"
+      - "src/pareto_context_graph/feedback.py"
+      - "src/pareto_context_graph/feedback_replay.py"
+      - "src/pareto_context_graph/ranker.py"
+      - "src/pareto_context_graph/features.py"
+      - "src/pareto_context_graph/suggested_next.py"
+      - "src/pareto_context_graph/summary_prune.py"
+      - "src/pareto_context_graph/selective_hybrid.py"
+      - "src/pareto_context_graph/session.py"
+      - "tests/eval/**"
+  workflow_dispatch:
+
+jobs:
+  eval-t1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: pip install -e ".[dev,tiktoken,otel,policy]"
+
+      - name: Clone fastapi (pinned depth)
+        run: |
+          git clone --depth 5000 https://github.com/fastapi/fastapi.git bench/fastapi
+          sha=$(jq -r '.repos.fastapi.sha' tests/eval/pins.json)
+          if [ "$sha" != "TBD" ] && [ -n "$sha" ]; then
+            git -C bench/fastapi fetch --depth 5000 origin "$sha" || true
+            git -C bench/fastapi checkout "$sha" || true
+          fi
+
+      - name: Clone httpx (pinned depth)
+        run: |
+          git clone --depth 5000 https://github.com/encode/httpx.git bench/httpx
+          sha=$(jq -r '.repos.httpx.sha' tests/eval/pins.json)
+          if [ "$sha" != "TBD" ] && [ -n "$sha" ]; then
+            git -C bench/httpx fetch --depth 5000 origin "$sha" || true
+            git -C bench/httpx checkout "$sha" || true
+          fi
+
+      - name: Build fastapi graph
+        run: pareto-context-graph build --profile tiny --commits 5000
+        working-directory: bench/fastapi
+
+      - name: Build httpx graph
+        run: pareto-context-graph build --profile tiny --commits 5000
+        working-directory: bench/httpx
+
+      - name: Unit tests (eval metrics)
+        run: pytest -q tests/test_eval_metrics.py tests/test_tokenizer.py tests/test_feedback_events.py tests/test_ranker.py tests/test_features.py tests/test_hub_timeout.py tests/test_phase7.py tests/test_suggested_next.py tests/test_community_rank.py tests/test_feedback_hooks.py tests/test_audit_rotation.py tests/test_summary_prune.py tests/test_prune_learn.py tests/test_selective_hybrid.py tests/test_context_phase_metrics.py tests/test_policy.py tests/test_otel_tracing.py tests/test_phase11_gates.py tests/test_ranker_feedback_features.py tests/test_fastapi_symbol_search.py
+
+      - name: Run eval regression check
+        run: |
+          make eval-check REPOS="fastapi=${{ github.workspace }}/bench/fastapi httpx=${{ github.workspace }}/bench/httpx"
+
+      - name: Phase C compress stack gate
+        run: |
+          make eval-compress-check REPOS="fastapi=${{ github.workspace }}/bench/fastapi httpx=${{ github.workspace }}/bench/httpx"
+
+      - name: Zero-recall audit (Phase 9 gate)
+        run: |
+          make eval-audit REPOS="fastapi=${{ github.workspace }}/bench/fastapi httpx=${{ github.workspace }}/bench/httpx"
+
+      - name: Feedback replay gate (Phase 5)
+        run: |
+          pareto-context-graph eval --repo-map fastapi=${{ github.workspace }}/bench/fastapi --feedback-replay

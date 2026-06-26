@@ -1,16 +1,35 @@
-IMAGE   ?= code-graph-mcp:latest
+IMAGE   ?= pareto-context-graph:latest
 DOCKER  ?= docker
-NAME    ?= code-graph-mcp
+NAME    ?= pareto-context-graph
 
-.PHONY: help deploy build-image build-graph serve eval
+BENCH_DIR ?= $(CURDIR)/bench
+BASELINE  ?= tests/eval/baseline.json
+COMPRESS_BASELINE ?= tests/eval/baseline-compress.json
+PCG     ?= $(shell if [ -x "$(CURDIR)/.venv/bin/pareto-context-graph" ]; then echo "$(CURDIR)/.venv/bin/pareto-context-graph"; else echo pareto-context-graph; fi)
+PYTHON    ?= $(shell if [ -x "$(CURDIR)/.venv/bin/python" ]; then echo "$(CURDIR)/.venv/bin/python"; else echo python3; fi)
+
+.PHONY: help deploy build-image build-graph serve eval eval-baseline eval-check eval-compress-baseline eval-compress-check eval-check-kubernetes eval-audit eval-audit-kubernetes profile-build render-diagrams bench-setup-t1 bench-setup bench-huge bench-linux bench-smoke bench-stress
 
 help:
 	@echo "Targets:"
-	@echo "  make build-image  Build Docker image ($(IMAGE))"
-	@echo "  make build-graph  Build MCP graph in container for current repo"
-	@echo "  make serve        Start MCP server via Docker (stdio)"
-	@echo "  make deploy       Build image + build graph + start server"
-	@echo "  make eval         Run eval harness on all repos (pass REPOS=key=/path)"
+	@echo "  make build-image    Build Docker image ($(IMAGE))"
+	@echo "  make build-graph    Build MCP graph in container for current repo"
+	@echo "  make serve          Start MCP server via Docker (stdio)"
+	@echo "  make deploy         Build image + build graph + start server"
+	@echo "  make eval           Run eval (REPOS=fastapi=$(BENCH_DIR)/fastapi)"
+	@echo "  make eval-baseline  Refresh tests/eval/baseline.json (BASELINE= to override)"
+	@echo "  make eval-check     Fail if metrics regress vs baseline"
+	@echo "  make eval-compress-check  Phase C: recall + tier-3 compression gates"
+	@echo "  make eval-compress-baseline  Refresh tests/eval/baseline-compress.json"
+	@echo "  make profile-build  Show or run build phase profile (REPO=, SHOW=1, REPLAY=1)"
+	@echo "  make render-diagrams Regenerate docs/diagrams/*.svg from .mmd sources"
+	@echo "  make bench-setup-t1 Phase 0: clone + build fastapi + httpx"
+	@echo "  make bench-setup    Phase 0: clone + build + pin SHAs (TIER=1|2|3|all)"
+	@echo "                      Skip clone: make bench-setup TIER=2 SKIP_CLONE=1"
+	@echo "  make bench-huge     Tier 2/3 stress (REPOS=key=$(BENCH_DIR)/path)"
+	@echo "  make bench-linux    Tier 3: clone + build + bench torvalds/linux"
+	@echo "  make bench-smoke    stats + doctor on T1 clones"
+	@echo "  make bench-stress   Phase 6 synthetic huge-profile CI gate"
 
 build-image:
 	$(DOCKER) build -t $(IMAGE) .
@@ -26,5 +45,73 @@ serve: build-image
 deploy: build-image build-graph serve
 
 eval:
-	@if [ -z "$(REPOS)" ]; then echo "Usage: make eval REPOS=key=/path [or REPOS=telapp=/path/to/telapp ...]"; exit 1; fi
-	python3 -m code_graph_mcp.eval $(REPOS)
+	@if [ -z "$(REPOS)" ]; then echo "Usage: make eval REPOS=fastapi=$(BENCH_DIR)/fastapi"; exit 1; fi
+	$(PCG) eval $(foreach r,$(REPOS),--repo-map $(r))
+
+eval-baseline:
+	@if [ -z "$(REPOS)" ]; then echo "Usage: make eval-baseline REPOS='fastapi=$(BENCH_DIR)/fastapi httpx=$(BENCH_DIR)/httpx'"; exit 1; fi
+	$(PCG) eval $(foreach r,$(REPOS),--repo-map $(r)) --baseline $(BASELINE) --update-baseline
+
+eval-check:
+	@if [ -z "$(REPOS)" ]; then echo "Usage: make eval-check REPOS='fastapi=$(BENCH_DIR)/fastapi httpx=$(BENCH_DIR)/httpx'"; exit 1; fi
+	$(PCG) eval $(foreach r,$(REPOS),--repo-map $(r)) --baseline $(BASELINE) --check-baseline
+
+eval-compress-baseline:
+	@if [ -z "$(REPOS)" ]; then echo "Usage: make eval-compress-baseline REPOS='fastapi=$(BENCH_DIR)/fastapi httpx=$(BENCH_DIR)/httpx'"; exit 1; fi
+	$(PCG) eval $(foreach r,$(REPOS),--repo-map $(r)) --compress-stack --compress-baseline $(COMPRESS_BASELINE) --update-compress-baseline
+
+eval-compress-check:
+	@if [ -z "$(REPOS)" ]; then echo "Usage: make eval-compress-check REPOS='fastapi=$(BENCH_DIR)/fastapi httpx=$(BENCH_DIR)/httpx'"; exit 1; fi
+	$(PCG) eval $(foreach r,$(REPOS),--repo-map $(r)) --compress-stack --baseline $(BASELINE) --check-baseline --compress-baseline $(COMPRESS_BASELINE) --check-compress-baseline
+
+eval-check-kubernetes:
+	$(MAKE) eval-check REPOS='kubernetes=$(BENCH_DIR)/kubernetes' BASELINE=tests/eval/baseline-kubernetes.json
+
+eval-audit-kubernetes:
+	$(MAKE) eval-audit REPOS='kubernetes=$(BENCH_DIR)/kubernetes'
+
+eval-pr-cases:
+	@if [ -z "$(REPO)" ]; then echo "Usage: make eval-pr-cases REPO=$(BENCH_DIR)/fastapi"; exit 1; fi
+	PYTHONPATH=. $(PYTHON) scripts/expand_golden_from_prs.py --repo $(REPO) --min-new 10
+
+profile-build:
+	@if [ -z "$(REPO)" ]; then echo "Usage: make profile-build REPO=$(BENCH_DIR)/kubernetes [SHOW=1|REPLAY=1|BUILD=1]"; exit 1; fi
+	@if [ -n "$(SHOW)" ]; then PYTHONPATH=. $(PYTHON) scripts/profile_build.py --repo $(REPO) --show; \
+	elif [ -n "$(REPLAY)" ]; then PYTHONPATH=. $(PYTHON) scripts/profile_build.py --repo $(REPO) --replay-index; \
+	elif [ -n "$(BUILD)" ]; then PYTHONPATH=. $(PYTHON) scripts/profile_build.py --repo $(REPO) --build --commits $(or $(COMMITS),5000) --shards $(or $(SHARDS),1) $(if $(SINCE),--since '$(SINCE)',); \
+	else PYTHONPATH=. $(PYTHON) scripts/profile_build.py --repo $(REPO) --show; fi
+
+render-diagrams:
+	./scripts/render_diagrams.sh
+
+eval-audit:
+	@if [ -z "$(REPOS)" ]; then echo "Usage: make eval-audit REPOS='fastapi=$(BENCH_DIR)/fastapi httpx=$(BENCH_DIR)/httpx'"; exit 1; fi
+	PYTHONPATH=. $(PYTHON) scripts/audit_golden_cases.py $(foreach r,$(REPOS),--repo-map $(r))
+
+bench-setup-t1:
+	BENCH_DIR="$(BENCH_DIR)" PCG="$(PCG)" ./scripts/bench_setup.sh --tier 1
+
+bench-setup:
+	BENCH_DIR="$(BENCH_DIR)" PCG="$(PCG)" ./scripts/bench_setup.sh --tier $(or $(TIER),1) --update-pins $(if $(filter 1,$(SKIP_CLONE)),--skip-clone,)
+
+bench-huge:
+	@if [ -z "$(REPOS)" ]; then echo "Usage: make bench-huge REPOS=kubernetes=$(BENCH_DIR)/kubernetes"; exit 1; fi
+	PCG="$(PCG)" ./scripts/bench_huge.sh $(REPOS)
+
+bench-linux:
+	BENCH_DIR="$(BENCH_DIR)" PCG="$(PCG)" ./scripts/linux_bench.sh
+
+bench-smoke:
+	@for key in fastapi httpx; do \
+	  if [ -d "$(BENCH_DIR)/$$key/.git" ]; then \
+	    echo "=== $$key ==="; \
+	    (cd "$(BENCH_DIR)/$$key" && "$(PCG)" stats && "$(PCG)" doctor); \
+	  else \
+	    echo "skip $$key (run make bench-setup-t1 first)"; \
+	  fi; \
+	done
+
+bench-stress:
+	PYTHONPATH=. pytest -q tests/test_bench_stress.py
+	PYTHONPATH=. python tests/perf/bench_build.py
+	PYTHONPATH=. python tests/perf/bench_query.py

@@ -1,6 +1,6 @@
 """Test iterative retrieval loop (Task 13)."""
-from code_graph_mcp.server import _stage1_candidates
-from code_graph_mcp.store import Store
+from pareto_context_graph.context_ranking import stage1_candidates as _stage1_candidates
+from pareto_context_graph.store import Store
 
 
 def test_iterative_reaches_bridge_file(tmp_path):

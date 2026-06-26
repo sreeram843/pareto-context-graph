@@ -1,0 +1,11 @@
+C4Context
+    title System Context — pareto-context-graph
+
+    Person(dev, "Developer", "Works in an AI-enabled IDE")
+    System_Ext(ide, "AI IDE", "Cursor, VS Code, Claude Desktop")
+    System(cgmcp, "pareto-context-graph", "MCP server: ranked, budgeted file context from git history")
+    SystemDb_Ext(repo, "Git repository", "Source tree + commit history")
+
+    Rel(dev, ide, "Prompts, edits code")
+    Rel(ide, cgmcp, "context, search, blast, retrieve", "stdio MCP")
+    Rel(cgmcp, repo, "git log, tracked files")

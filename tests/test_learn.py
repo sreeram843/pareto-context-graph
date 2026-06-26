@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import json
 
-from code_graph_mcp.cli import cmd_learn
-from code_graph_mcp.store import Store
+from pareto_context_graph.cli import cmd_learn
+from pareto_context_graph.store import Store
 
 
 class _Args:
@@ -31,7 +31,7 @@ def test_learn_writes_weights(tmp_path, monkeypatch):
     monkeypatch.chdir(repo)
     cmd_learn(_Args())
 
-    weights = json.loads((repo / ".code-graph" / "weights.json").read_text())
+    weights = json.loads((repo / ".pareto-context-graph" / "weights.json").read_text())
     assert "src/a.py" in weights
     assert "src/b.py" in weights
     assert weights["src/a.py"] > weights["src/b.py"]

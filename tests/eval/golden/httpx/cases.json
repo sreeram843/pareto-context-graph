@@ -1,0 +1,160 @@
+{
+  "cases": [
+    {
+      "case_id": "httpx_httpx___init___py",
+      "repo_key": "httpx",
+      "seed_files": [
+        "httpx/__init__.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "httpx/_client.py",
+        "httpx/client.py",
+        "tests/client/test_redirects.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of httpx/__init__.py."
+    },
+    {
+      "case_id": "httpx_httpx___version___py",
+      "repo_key": "httpx",
+      "seed_files": [
+        "httpx/__version__.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "CHANGELOG.md",
+        "setup.py",
+        "README.md"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of httpx/__version__.py."
+    },
+    {
+      "case_id": "httpx_httpx__api_py",
+      "repo_key": "httpx",
+      "seed_files": [
+        "httpx/_api.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "httpx/_client.py",
+        "httpx/_config.py",
+        "httpx/_types.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of httpx/_api.py."
+    },
+    {
+      "case_id": "httpx_httpx__auth_py",
+      "repo_key": "httpx",
+      "seed_files": [
+        "httpx/_auth.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "httpx/_client.py",
+        "tests/client/test_auth.py",
+        "httpx/_models.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of httpx/_auth.py."
+    },
+    {
+      "case_id": "httpx_httpx__client_py",
+      "repo_key": "httpx",
+      "seed_files": [
+        "httpx/_client.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "httpx/_models.py",
+        "tests/client/test_client.py",
+        "httpx/_utils.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of httpx/_client.py."
+    },
+    {
+      "case_id": "httpx_httpx__compat_py",
+      "repo_key": "httpx",
+      "seed_files": [
+        "httpx/_compat.py"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "README.md",
+        "docs/index.md",
+        "httpx/_config.py"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of httpx/_compat.py."
+    },
+    {
+      "case_id": "httpx_concept_00",
+      "repo_key": "httpx",
+      "seed_files": [],
+      "query": "HTTP client connection pooling",
+      "expected_top_files": [
+        "httpx/_client.py",
+        "httpx/_transports/default.py",
+        "httpx/_config.py"
+      ],
+      "tier": 1,
+      "token_budget": 8000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first concept case: HTTP client connection pooling"
+    },
+    {
+      "case_id": "httpx_concept_01",
+      "repo_key": "httpx",
+      "seed_files": [],
+      "query": "async client request streaming",
+      "expected_top_files": [
+        "httpx/_client.py",
+        "httpx/_models.py",
+        "httpx/_transports/asgi.py"
+      ],
+      "tier": 1,
+      "token_budget": 8000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first concept case: async client request streaming"
+    },
+    {
+      "case_id": "httpx_concept_02",
+      "repo_key": "httpx",
+      "seed_files": [],
+      "query": "authentication BasicAuth DigestAuth",
+      "expected_top_files": [
+        "httpx/_auth.py",
+        "httpx/_client.py",
+        "httpx/_models.py"
+      ],
+      "tier": 1,
+      "token_budget": 8000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first concept case: authentication BasicAuth DigestAuth"
+    }
+  ]
+}

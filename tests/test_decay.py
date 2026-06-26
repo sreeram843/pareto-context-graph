@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 import time
 
-from code_graph_mcp.store import Store
+from pareto_context_graph.store import Store
 
 
 def test_apply_decay_prefers_recent_edge(tmp_path):

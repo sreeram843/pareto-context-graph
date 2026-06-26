@@ -5,9 +5,10 @@ import tempfile
 import time
 from pathlib import Path
 
+from pareto_context_graph.bench import latency_summary
+from pareto_context_graph.graph import build_graph
+from pareto_context_graph.server import _handle_tool_call
 from tests.fixtures.build_repo import create_synthetic_repo
-from code_graph_mcp.graph import build_graph
-from code_graph_mcp.server import _handle_tool_call
 
 
 def run() -> None:
@@ -20,28 +21,29 @@ def run() -> None:
         "auth endpoint change",
         "test updates",
         "model service import",
+        "routing handler",
+        "middleware cors",
     ]
 
     times = []
     for query in queries:
-        start = time.perf_counter()
-        _handle_tool_call(
-            repo,
-            "code_graph",
-            {
-                "command": "context",
-                "files": ["src/a.py"],
-                "query": query,
-                "tier": 1,
-                "token_budget": 5000,
-            },
-        )
-        times.append(time.perf_counter() - start)
+        for _ in range(3):
+            start = time.perf_counter()
+            _handle_tool_call(
+                repo,
+                "pareto_context_graph",
+                {
+                    "command": "context",
+                    "files": ["src/a.py"],
+                    "query": query,
+                    "tier": 1,
+                    "token_budget": 5000,
+                    "profile": "large",
+                },
+            )
+            times.append(time.perf_counter() - start)
 
-    times.sort()
-    p50 = times[len(times) // 2]
-    p95 = times[-1]
-    print(json.dumps({"p50": p50, "p95": p95, "samples": len(times)}, indent=2))
+    print(json.dumps(latency_summary(times), indent=2))
 
 
 if __name__ == "__main__":

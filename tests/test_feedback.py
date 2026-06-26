@@ -1,7 +1,7 @@
 """Test feedback logging and learn pipeline (Task 14)."""
 import math
 
-from code_graph_mcp.store import Store
+from pareto_context_graph.store import Store
 
 
 def test_feedback_logging(tmp_path):

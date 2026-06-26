@@ -1,0 +1,38 @@
+name: Bench Weekly
+
+on:
+  schedule:
+    # Sunday 06:00 UTC — Tier 1 synthetic stress
+    - cron: "0 6 * * 0"
+  workflow_dispatch:
+    inputs:
+      run_synthetic:
+        description: Run synthetic huge-profile stress test
+        type: boolean
+        default: true
+
+jobs:
+  synthetic-stress:
+    if: github.event_name == 'schedule' || inputs.run_synthetic
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: pip install -e ".[dev,tiktoken]"
+
+      - name: Synthetic huge-profile stress
+        run: pytest -q tests/test_bench_stress.py
+
+      - name: Perf micro-benchmarks
+        run: |
+          python tests/perf/bench_build.py
+          python tests/perf/bench_query.py
+
+  # Tier 2 kubernetes runs in .github/workflows/bench-t2.yml (Sunday 07:00 UTC).
+  # Trigger manually: Actions → Bench T2 (Kubernetes) → Run workflow

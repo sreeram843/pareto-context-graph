@@ -1,0 +1,6 @@
+flowchart TB
+    P[User prompt] --> Q{How pick files?}
+    Q -->|Without tool| G[grep / guess]
+    Q -->|With tool| C[co-change graph]
+    G --> W[Wrong files · high tokens]
+    C --> R[Ranked shortlist · targeted reads]

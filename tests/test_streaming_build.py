@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-import os
-
-from code_graph_mcp.graph import build_graph
-from code_graph_mcp.store import Store
+from pareto_context_graph.graph import build_graph
+from pareto_context_graph.store import Store
 
 
 def _snapshot_pairs(repo):

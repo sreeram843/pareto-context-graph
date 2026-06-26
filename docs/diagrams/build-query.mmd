@@ -1,0 +1,17 @@
+flowchart TB
+    subgraph build [Build time]
+        GIT[git log] --> PAIRS[co-change pairs]
+        PAIRS --> DB[(graph.db)]
+        PAIRS --> IDX[search indexes]
+    end
+
+    subgraph query [Query time]
+        IN[seeds + query] --> EXP[graph expansion]
+        EXP --> RNK[rank]
+        RNK --> PACK[tiered pack]
+        PACK --> OUT[context_files]
+    end
+
+    DB --> EXP
+    IDX --> EXP
+    OUT --> AI[AI assistant]

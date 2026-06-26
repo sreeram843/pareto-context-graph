@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from code_graph_mcp.graph import build_graph_sharded
-from code_graph_mcp.store import Store
+from pareto_context_graph.graph import build_graph_sharded
+from pareto_context_graph.store import Store
 
 
 def _rows(repo):

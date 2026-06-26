@@ -1,0 +1,119 @@
+name: Bench T2 (Kubernetes)
+
+on:
+  schedule:
+    # Sunday 07:00 UTC — after synthetic weekly bench
+    - cron: "0 7 * * 0"
+  workflow_dispatch:
+    inputs:
+      commits:
+        description: Max commits to scan (CI default 5000; local full T2 uses 50000)
+        type: string
+        default: "5000"
+      context_rounds:
+        description: Context latency samples per query
+        type: string
+        default: "2"
+      skip_build:
+        description: Skip graph build (measure latency on existing graph only)
+        type: boolean
+        default: false
+
+jobs:
+  kubernetes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: pip install -e ".[dev,tiktoken]"
+
+      - name: Clone kubernetes (pinned SHA, blob-less)
+        run: |
+          sha=$(jq -r '.repos.kubernetes.sha' tests/eval/pins.json)
+          git clone --filter=blob:none --depth 8000 \
+            https://github.com/kubernetes/kubernetes.git bench/kubernetes
+          if [ "$sha" != "TBD" ] && [ -n "$sha" ]; then
+            git -C bench/kubernetes fetch --depth 8000 origin "$sha" || true
+            git -C bench/kubernetes checkout "$sha" || true
+          fi
+
+      - name: Build graph (bounded for CI)
+        if: github.event_name == 'schedule' || github.event.inputs.skip_build != 'true'
+        run: |
+          pareto-context-graph build --profile huge \
+            --since "12 months ago" \
+            --commits "${{ inputs.commits || '5000' }}" \
+            --shards 4
+        working-directory: bench/kubernetes
+
+      - name: Record stress metrics
+        env:
+          SKIP_BUILD: "1"
+          SKIP_INCREMENTAL: "1"
+          CONTEXT_ROUNDS: ${{ inputs.context_rounds || '2' }}
+        run: |
+          make bench-huge REPOS=kubernetes=${{ github.workspace }}/bench/kubernetes
+
+      - name: Kubernetes eval regression (Phase 9.5)
+        if: github.event_name == 'schedule' || github.event.inputs.skip_build != 'true'
+        run: |
+          make eval-check-kubernetes
+          make eval-audit-kubernetes
+
+      - name: Export signed graph snapshot
+        if: github.event_name == 'schedule' || github.event.inputs.skip_build != 'true'
+        env:
+          PCG_SNAPSHOT_KEY: ${{ secrets.PCG_SNAPSHOT_KEY }}
+        run: |
+          pareto-context-graph snapshot export ${{ github.workspace }}/bench/kubernetes-graph-snapshot.tar.gz
+          if [ -n "${PCG_SNAPSHOT_KEY:-}" ]; then
+            test -f ${{ github.workspace }}/bench/kubernetes-graph-snapshot.tar.gz.sig.json
+            python3 -c "from pareto_context_graph.signing import verify_file; from pathlib import Path; p=Path('${{ github.workspace }}/bench/kubernetes-graph-snapshot.tar.gz'); assert verify_file(p), 'snapshot signature verify failed'"
+            echo "Snapshot signed and verified (HMAC-SHA256)"
+          else
+            echo "::warning::PCG_SNAPSHOT_KEY not set — snapshot exported unsigned"
+          fi
+        working-directory: bench/kubernetes
+
+      - name: Hub timeout integration (kubernetes)
+        run: pytest -q tests/test_hub_timeout.py -k kubernetes
+
+      - name: CI latency gate (hub-only p95)
+        run: |
+          python3 <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          data = json.loads(Path("tests/eval/bench_results.json").read_text())
+          entry = next(r for r in data["repos"] if r["repo_key"] == "kubernetes")
+          p95 = float(entry["context_latency"]["hub_only_context"]["p95_seconds"])
+          print(f"kubernetes hub-only context p95: {p95:.4f}s (CI budget < 1s)")
+          if p95 >= 1.0:
+              print(f"hub-only p95 {p95:.4f}s exceeds CI budget 1s", file=sys.stderr)
+              sys.exit(1)
+          PY
+
+      - name: Upload bench results
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-results-kubernetes
+          path: tests/eval/bench_results.json
+          if-no-files-found: error
+
+      - name: Upload kubernetes graph snapshot
+        if: github.event_name == 'schedule' || github.event.inputs.skip_build != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: kubernetes-graph-snapshot
+          path: |
+            bench/kubernetes-graph-snapshot.tar.gz
+            bench/kubernetes-graph-snapshot.tar.gz.sig.json
+          retention-days: 14
+          if-no-files-found: warn

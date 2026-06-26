@@ -1,6 +1,6 @@
 # Production Roadmap
 
-Handoff document for taking `code-graph-mcp` from prototype to a tool that serves
+Handoff document for taking `pareto-context-graph` from prototype to a tool that serves
 ~1000 engineers across multiple large repositories. Each phase is self-contained
 and can be assigned to a different agent / engineer. Read [Conventions](#conventions)
 and [Prerequisites](#prerequisites-from-the-owner) before picking up any task.
@@ -9,20 +9,20 @@ and [Prerequisites](#prerequisites-from-the-owner) before picking up any task.
 
 ## Why this exists
 
-A live trial on `telapp` with the question *"How does Axle integration work?"*
+A live trial on a large monorepo with a concept-only question (no seed files)
 revealed four reproducible failures and five systemic gaps. The full root-cause
 analysis is in chat history; the short version:
 
 | ID | Failure | Root cause | Phase that fixes it |
 |----|---------|------------|---------------------|
-| A | `search("axle")` finds nothing useful | Path-only FTS5 in [src/code_graph_mcp/store.py](../src/code_graph_mcp/store.py) `search_files` | Phase 3 |
-| B | `context` cannot answer a question without seed files | [src/code_graph_mcp/server.py](../src/code_graph_mcp/server.py) requires non-empty `files` | Phase 3 |
-| C | Hub-seeded `context` calls time out | No per-phase deadlines or I/O cap in [src/code_graph_mcp/server.py](../src/code_graph_mcp/server.py) | Phase 5 |
-| D | `tokens_used` overshoots `token_budget` | Budget enforced on estimate, reported on payload size in [src/code_graph_mcp/server.py](../src/code_graph_mcp/server.py); `BYTES_PER_TOKEN` heuristic in [src/code_graph_mcp/tokens.py](../src/code_graph_mcp/tokens.py) | Phase 2 |
+| A | `search("PatientResolver")` finds nothing useful | Path-only FTS5 in [src/pareto_context_graph/store.py](../src/pareto_context_graph/store.py) `search_files` | Phase 3 |
+| B | `context` cannot answer a question without seed files | [src/pareto_context_graph/server.py](../src/pareto_context_graph/server.py) requires non-empty `files` | Phase 3 |
+| C | Hub-seeded `context` calls time out | No per-phase deadlines or I/O cap in [src/pareto_context_graph/server.py](../src/pareto_context_graph/server.py) | Phase 5 |
+| D | `tokens_used` overshoots `token_budget` | Budget enforced on estimate, reported on payload size in [src/pareto_context_graph/server.py](../src/pareto_context_graph/server.py); `BYTES_PER_TOKEN` heuristic in [src/pareto_context_graph/tokens.py](../src/pareto_context_graph/tokens.py) | Phase 2 |
 | S1 | Feedback signal is mostly negative | `log_feedback(..., used=False)` for every result; `mark_used` rarely called | Phase 4 |
-| S2 | SQLite write contention at scale | Per-call commits in [src/code_graph_mcp/store.py](../src/code_graph_mcp/store.py); shared DB with `serve --watch` | Phase 5 |
-| S3 | Unsigned hooks + snapshot URLs | [src/code_graph_mcp/hooks.py](../src/code_graph_mcp/hooks.py), [src/code_graph_mcp/snapshot.py](../src/code_graph_mcp/snapshot.py) | Phase 5 |
-| S4 | No real eval suite | [tests/eval/cases.json](../tests/eval/cases.json) has 3 cases | Phase 1 |
+| S2 | SQLite write contention at scale | Per-call commits in [src/pareto_context_graph/store.py](../src/pareto_context_graph/store.py); shared DB with `serve --watch` | Phase 5 |
+| S3 | Unsigned hooks + snapshot URLs | [src/pareto_context_graph/hooks.py](../src/pareto_context_graph/hooks.py), [src/pareto_context_graph/snapshot.py](../src/pareto_context_graph/snapshot.py) | Phase 5 |
+| S4 | No real eval suite | Golden set under `tests/eval/golden/` is empty | Phase 1 |
 | S5 | No retrieval transparency | Response carries no per-candidate scores or rejection reasons | Phase 3 + Phase 4 |
 
 ---
@@ -34,7 +34,7 @@ These apply to **every** task.
 - **Branching**: one branch per task: `phase<N>/<task-slug>`. PRs target `main`.
 - **Feature flags**: every behavioural change ships behind an env var or
   request-level flag. Default off until eval clears it. Flag naming:
-  `CGMCP_FEATURE_<NAME>`.
+  `PCG_FEATURE_<NAME>`.
 - **Eval gate**: PRs that touch retrieval or ranking **must** report eval
   metrics (delta vs. baseline) in the PR description. CI fails if
   `recall@5`, `MRR`, or `nDCG@10` regress by more than 2 absolute points
@@ -70,8 +70,8 @@ either cannot start or will need to be redone.
    - `tiktoken` `cl100k_base` (GPT-4 family).
    - `tiktoken` `o200k_base` (GPT-4o / o-series).
    - Per-model selection by client (most accurate; more work).
-3. **Repos in the golden set** for Phase 1. `telapp` is in.
-   Confirm which other repos to add. Suggested: 2–4 active services.
+3. **Repos in the golden set** for Phase 1. Add 2–4 representative repos
+   from your organization.
 4. **Snapshot distribution**: internal artifact store URL + auth model
    (Artifactory? S3? GitHub Releases on an internal org?).
 5. **Signing key custody**: who owns the snapshot signing key, and what
@@ -86,7 +86,7 @@ either cannot start or will need to be redone.
 
 ### Decisions confirmed (2026-05-16)
 
-1. **Repos in golden set (initial)**: `telapp`.
+1. **Repos in golden set (initial)**: TBD — add per-repo cases under `tests/eval/golden/<repo>/`.
 2. **`tiktoken` dependency**: **yes**.
 3. **`tree-sitter` dependency**: **yes**.
 4. **Embedding backend**: **Ollama**.
@@ -127,14 +127,14 @@ ranking without flying blind.
 - Source from real PRs (`git log --name-only` for files actually touched)
   and from at least 5 incident postmortems per repo.
 - Store under `tests/eval/golden/<repo>/`.
-- Acceptance: ≥ 50 cases for `telapp`; schema documented in
+- Acceptance: ≥ 50 cases per primary golden repo; schema documented in
   `tests/eval/README.md`.
 
 ### Task 1.2 Metrics module
 - Implement `recall@k`, `MRR`, `nDCG@k`, plus two new metrics:
   - `token_efficiency = relevant_tokens / tokens_used`.
   - `budget_honesty   = 1 − |reported − actual| / budget`.
-- Location: `src/code_graph_mcp/eval.py` (extend; do not break existing).
+- Location: `src/pareto_context_graph/eval.py` (extend; do not break existing).
 - Acceptance: unit tests on synthetic cases; deterministic outputs.
 
 ### Task 1.3 CI integration
@@ -159,7 +159,7 @@ Goal: when the API says `token_budget = X`, the response uses ≤ X tokens
 of the client's tokenizer, and `tokens_used` reflects reality.
 
 ### Task 2.1 Pluggable tokenizer
-- New module `src/code_graph_mcp/tokenizer.py` with an interface:
+- New module `src/pareto_context_graph/tokenizer.py` with an interface:
   ```python
   class Tokenizer(Protocol):
       def count(self, text: str) -> int: ...
@@ -167,13 +167,13 @@ of the client's tokenizer, and `tokens_used` reflects reality.
 - Implementations: `BytesPerTokenTokenizer` (legacy, default off),
   `TiktokenTokenizer(encoding="cl100k_base"|"o200k_base")`.
 - Selection: request arg `tokenizer` on `context`, fall back to env
-  `CGMCP_TOKENIZER`, fall back to legacy.
+  `PCG_TOKENIZER`, fall back to legacy.
 - Acceptance: unit tests against canned strings; documented overhead
   budget (≤ 2 ms / 1KB).
 
 ### Task 2.2 Incremental packing
 - Replace Phase 5 of `_handle_tool_call` `context` branch in
-  [src/code_graph_mcp/server.py](../src/code_graph_mcp/server.py).
+  [src/pareto_context_graph/server.py](../src/pareto_context_graph/server.py).
 - For each candidate, build its entry, measure tokens against the
   selected tokenizer, accept only if `tokens_used + entry ≤ budget`.
 - Stop on first rejection; do **not** mutate `tokens_used` at the end.
@@ -207,21 +207,21 @@ finds concept matches, not just paths.
   `(symbol, kind, file, line, container_path)`.
 - Store in new SQLite table `symbols` with an FTS5 index over `symbol`
   tokenised on camelCase and snake_case.
-- Acceptance: `search("AxleVisitCreator")` returns the defining file
-  even if no path contains "axle".
+- Acceptance: `search("PatientVisitCreator")` returns the defining file
+  even if no path contains the symbol name.
 
 ### Task 3.2 BM25 content index
-- Replace `KeywordIndex` TF-IDF in [src/code_graph_mcp/chunks.py](../src/code_graph_mcp/chunks.py)
+- Replace `KeywordIndex` TF-IDF in [src/pareto_context_graph/chunks.py](../src/pareto_context_graph/chunks.py)
   with a BM25 inverted index over file contents.
 - Build incrementally during `build` / `update`; store in SQLite.
 - Acceptance: micro-bench shows ≥ 5× faster query, equal or better
   recall on the eval set.
 
 ### Task 3.3 RRF fusion + new retriever API
-- New module `src/code_graph_mcp/retrievers.py`:
+- New module `src/pareto_context_graph/retrievers.py`:
   - `PathRetriever`, `SymbolRetriever`, `BM25Retriever`, `EmbedRetriever`,
     `CoChangeRetriever`. Each returns ranked `(path, score)` tuples.
-- New module `src/code_graph_mcp/orchestrator.py`:
+- New module `src/pareto_context_graph/orchestrator.py`:
   - `plan(query)` → intent + retriever weights.
   - `retrieve(query, files)` → fused candidate pool via Reciprocal Rank
     Fusion (`k=60`).
@@ -233,9 +233,9 @@ finds concept matches, not just paths.
 - When `files` is empty, call `orchestrator.retrieve(query, [])` and use
   the top-K as virtual seeds.
 - When `files` is provided, current behaviour with seeds.
-- Behind flag `CGMCP_FEATURE_QUERY_FIRST` initially.
-- Acceptance: `context` with only `query="How does Axle integration work?"`
-  surfaces ≥ 3 of the curated Axle ground-truth files in the top 10.
+- Behind flag `PCG_FEATURE_QUERY_FIRST` initially.
+- Acceptance: `context` with only `query="How does authentication work?"`
+  surfaces ≥ 3 of the curated ground-truth files in the top 10.
 
 ### Task 3.5 Diagnostics mode
 - New request arg `diagnostics: true`.
@@ -255,7 +255,7 @@ Goal: ranking improves over time from real usage. Feedback is not all
 negative.
 
 ### Task 4.1 Feedback event log
-- New append-only file `.code-graph/events.jsonl` for: `view`, `cite`,
+- New append-only file `.pareto-context-graph/events.jsonl` for: `view`, `cite`,
   `accept`, `reject`, `dwell`.
 - New MCP commands: `feedback_view`, `feedback_cite`, `feedback_accept`,
   `feedback_reject`. Idempotent on `(request_id, path)`.
@@ -270,7 +270,7 @@ negative.
 - Acceptance: offline replay can reconstruct the request → ranking.
 
 ### Task 4.3 Learned re-ranker
-- New module `src/code_graph_mcp/ranker.py`.
+- New module `src/pareto_context_graph/ranker.py`.
 - Train a LambdaMART model nightly from `events.jsonl`:
   - Positives: `cite`, `accept`, `dwell ≥ 30s`.
   - Negatives: `reject`, `view` without follow-up.
@@ -298,24 +298,31 @@ Goal: this tool can be shipped to 1000 devs and run unattended.
 ### Task 5.2 Per-phase deadlines + cancellation
 - Each phase of `context` takes a deadline from a request-level
   `timeout_ms` (default 5000).
-- Honour MCP `$/cancelRequest`.
+- Deadline ticks inside retrieve, hybrid, rank, pack, BFS, and RWR loops.
+- **High-fanout fast path** (seed degree ≥ 500): BFS depth-1, cap 75,
+  skip hybrid/semantic/MMR, simple rank, pack cap 25.
+- Honour MCP `$/cancelRequest` (deferred — see LEFTOVERS.md).
 - Cap symbol extraction at 200 file reads per request; everything else
   must come from the precomputed symbol index.
-- Acceptance: hub-seeded query on `tas/app/models/consultation.rb`
-  returns within 5 s with a partial result and a `truncated: true` flag.
+- Acceptance: hub-seeded query on a high-degree file returns within 5 s
+  with a partial result and a `truncated: true` flag when the budget is
+  exceeded.
+- **Measured:** kubernetes `go.mod` hub-only p95 **0.006s** (was 2.41s pre-7.2);
+  linux `MAINTAINERS` hub-only **0.006s** (was 280s); `truncated_samples=0` at
+  `timeout_ms=5000`.
 
 ### Task 5.3 Signed snapshots
 - `snapshot export` writes a signature file alongside the tarball,
   using an org-managed Ed25519 key.
 - `snapshot import` verifies the signature and refuses unsigned
-  snapshots when `CGMCP_REQUIRE_SIGNED_SNAPSHOTS=1`.
+  snapshots when `PCG_REQUIRE_SIGNED_SNAPSHOTS=1`.
 - Acceptance: tampered snapshot is refused; signed snapshot loads.
 
 ### Task 5.4 Hook allowlist
 - Hooks load only if their SHA-256 appears in an org policy file
-  (`/etc/code-graph/policy.yaml` or `$CGMCP_POLICY`).
+  (`/etc/pareto-context-graph/policy.yaml` or `$PCG_POLICY`).
 - `no_safety` requires the policy to set `allow_no_safety: true`.
-- Acceptance: arbitrary hook in `.code-graph/hooks/` is ignored unless
+- Acceptance: arbitrary hook in `.pareto-context-graph/hooks/` is ignored unless
   hashed in policy.
 
 ### Task 5.5 Audit log
@@ -374,7 +381,7 @@ Files to read first:
   - <path>
 Acceptance criteria:
   - <bullet>
-Feature flag:  CGMCP_FEATURE_<NAME> (default off)
+Feature flag:  PCG_FEATURE_<NAME> (default off)
 Eval impact:   <which metric, expected direction>
 Risks:         <bullet>
 Out of scope:  <bullet>
@@ -384,7 +391,7 @@ Out of scope:  <bullet>
 
 ## Open questions to revisit after Phase 1
 
-- Do we replace the single-tool `code_graph` schema with named tools
+- Do we replace the single-tool `pareto_context_graph` schema with named tools
   per command? Single-tool saves prompt tokens; named tools improve
   client-side validation.
 - Should we support multi-repo queries in one call (cross-service

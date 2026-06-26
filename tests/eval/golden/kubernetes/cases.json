@@ -1,0 +1,420 @@
+{
+  "cases": [
+    {
+      "case_id": "k8s_cluster_images_etcd_migrate_options_go",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "cluster/images/etcd/migrate/options.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "build/dependencies.yaml",
+        "cluster/images/etcd/Makefile"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of cluster/images/etcd/migrate/options.go."
+    },
+    {
+      "case_id": "k8s_cmd_kube-proxy_app_server_go",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "cmd/kube-proxy/app/server.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "pkg/proxy/node.go",
+        "pkg/proxy/node_test.go"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of cmd/kube-proxy/app/server.go."
+    },
+    {
+      "case_id": "k8s_cmd_kube-proxy_app_server_linux_go",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "cmd/kube-proxy/app/server_linux.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "cmd/kube-proxy/app/server.go",
+        "pkg/proxy/iptables/proxier.go",
+        "pkg/proxy/winkernel/proxier.go"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of cmd/kube-proxy/app/server_linux.go."
+    },
+    {
+      "case_id": "k8s_cmd_kubeadm_app_constants_constants_go",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "cmd/kubeadm/app/constants/constants.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "build/dependencies.yaml",
+        "test/utils/image/manifest.go",
+        "cluster/gce/manifests/etcd.manifest"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of cmd/kubeadm/app/constants/constants.go."
+    },
+    {
+      "case_id": "k8s_cmd_kubelet_app_server_go",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "cmd/kubelet/app/server.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "pkg/kubelet/kubelet.go",
+        "pkg/kubelet/kubelet_test.go",
+        "pkg/kubelet/server/server.go"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of cmd/kubelet/app/server.go."
+    },
+    {
+      "case_id": "k8s_pkg_api_pod_util_go",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "pkg/api/pod/util.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "pkg/apis/core/validation/validation.go",
+        "pkg/apis/core/validation/validation_test.go",
+        "pkg/api/pod/util_test.go"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of pkg/api/pod/util.go."
+    },
+    {
+      "case_id": "k8s_cmd_kube-controller-manager_app_controller_descriptor_go",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "cmd/kube-controller-manager/app/controller_descriptor.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "cmd/kube-controller-manager/app/controllermanager_test.go",
+        "cmd/kube-controller-manager/app/core.go",
+        "cmd/kube-controller-manager/app/options/options_test.go"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of cmd/kube-controller-manager/app/controller_descriptor.go."
+    },
+    {
+      "case_id": "k8s_cmd_kube-controller-manager_app_controllermanager_go",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "cmd/kube-controller-manager/app/controllermanager.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "cmd/kube-controller-manager/app/options/options.go",
+        "cmd/kube-controller-manager/app/controller_descriptor.go",
+        "cmd/kube-controller-manager/app/discovery.go"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of cmd/kube-controller-manager/app/controllermanager.go."
+    },
+    {
+      "case_id": "k8s_cmd_kube-controller-manager_app_core_go",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "cmd/kube-controller-manager/app/core.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "cmd/kube-controller-manager/app/options/options.go",
+        "cmd/kube-controller-manager/app/controller_descriptor.go",
+        "pkg/quota/v1/evaluator/core/resource_claims.go"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of cmd/kube-controller-manager/app/core.go."
+    },
+    {
+      "case_id": "k8s_concept_00",
+      "repo_key": "kubernetes",
+      "seed_files": [],
+      "query": "kubelet pod lifecycle sync",
+      "expected_top_files": [
+        "pkg/kubelet/lifecycle/doc.go",
+        "pkg/kubelet/active_deadline.go",
+        "pkg/kubelet/util/format/pod.go"
+      ],
+      "tier": 1,
+      "token_budget": 8000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first concept case: kubelet pod lifecycle sync"
+    },
+    {
+      "case_id": "k8s_concept_01",
+      "repo_key": "kubernetes",
+      "seed_files": [],
+      "query": "kube-apiserver admission plugins",
+      "expected_top_files": [
+        "staging/src/k8s.io/apiserver/pkg/admission/plugins.go",
+        "staging/src/k8s.io/apiserver/pkg/server/plugins.go",
+        "staging/src/k8s.io/apiserver/pkg/admission/plugin/webhook/initializer/initializer.go"
+      ],
+      "tier": 1,
+      "token_budget": 8000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first concept case: kube-apiserver admission plugins"
+    },
+    {
+      "case_id": "k8s_cmd_kube-controller-manager_app_options_options_go",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "cmd/kube-controller-manager/app/options/options.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "cmd/kube-controller-manager/app/options/options_test.go",
+        "cmd/kube-controller-manager/app/core.go",
+        "cmd/kube-controller-manager/app/config/config.go"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of cmd/kube-controller-manager/app/options/options.go."
+    },
+    {
+      "case_id": "k8s_cmd_kube-controller-manager_app_storageversionmigrator_go",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "cmd/kube-controller-manager/app/storageversionmigrator.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "pkg/controller/storageversionmigrator/storageversionmigrator.go",
+        "pkg/controller/storageversionmigrator/resourceversion.go",
+        "pkg/controller/storageversionmigrator/resourceversion_test.go"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of cmd/kube-controller-manager/app/storageversionmigrator.go."
+    },
+    {
+      "case_id": "k8s_cmd_kube-controller-manager_app_testing_testserver_go",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "cmd/kube-controller-manager/app/testing/testserver.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "test/integration/serving/serving_test.go",
+        "cmd/kube-scheduler/app/testing/testserver.go"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of cmd/kube-controller-manager/app/testing/testserver.go."
+    },
+    {
+      "case_id": "k8s_cmd_kube-proxy_app_conntrack_go",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "cmd/kube-proxy/app/conntrack.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "cmd/kube-proxy/app/server_linux.go",
+        "cmd/kube-proxy/app/conntrack_test.go"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of cmd/kube-proxy/app/conntrack.go."
+    },
+    {
+      "case_id": "k8s_cmd_kube-scheduler_app_server_go",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "cmd/kube-scheduler/app/server.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "test/integration/scheduler/serving/endpoints_test.go",
+        "cmd/kube-controller-manager/app/controllermanager.go",
+        "cmd/kube-proxy/app/server.go"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 1,
+      "category": "co_change",
+      "notes": "Auto-generated from graph neighbours of cmd/kube-scheduler/app/server.go."
+    },
+    {
+      "case_id": "k8s_concept_02",
+      "repo_key": "kubernetes",
+      "seed_files": [],
+      "query": "scheduler pod scheduling framework",
+      "expected_top_files": [
+        "pkg/scheduler/scheduler.go",
+        "pkg/scheduler/framework/interface.go",
+        "pkg/scheduler/core/generic_scheduler.go"
+      ],
+      "tier": 1,
+      "token_budget": 8000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first concept case: scheduler pod scheduling framework"
+    },
+    {
+      "case_id": "k8s_concept_03",
+      "repo_key": "kubernetes",
+      "seed_files": [],
+      "query": "controller manager shared informers",
+      "expected_top_files": [
+        "staging/src/k8s.io/controller-manager/app/controllercontext.go",
+        "staging/src/k8s.io/controller-manager/controller/interfaces.go",
+        "staging/src/k8s.io/controller-manager/pkg/leadermigration/migrator.go"
+      ],
+      "tier": 1,
+      "token_budget": 8000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first concept case: controller manager shared informers"
+    },
+    {
+      "case_id": "k8s_concept_04",
+      "repo_key": "kubernetes",
+      "seed_files": [],
+      "query": "kubectl get pods command",
+      "expected_top_files": [
+        "staging/src/k8s.io/kubectl/pkg/cmd/top/top.go",
+        "staging/src/k8s.io/kubectl/pkg/cmd/set/set_image.go",
+        "staging/src/k8s.io/kubectl/pkg/cmd/set/set_serviceaccount.go"
+      ],
+      "tier": 1,
+      "token_budget": 8000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first concept case: kubectl get pods command"
+    },
+    {
+      "case_id": "k8s_concept_05",
+      "repo_key": "kubernetes",
+      "seed_files": [],
+      "query": "deployment rolling update strategy",
+      "expected_top_files": [
+        "staging/src/k8s.io/client-go/applyconfigurations/apps/v1/deploymentstrategy.go",
+        "staging/src/k8s.io/client-go/applyconfigurations/apps/v1beta1/deploymentstrategy.go",
+        "staging/src/k8s.io/client-go/applyconfigurations/apps/v1beta2/deploymentstrategy.go"
+      ],
+      "tier": 1,
+      "token_budget": 8000,
+      "max_depth": 1,
+      "category": "concept",
+      "notes": "Query-first concept case: deployment rolling update strategy"
+    },
+    {
+      "case_id": "k8s_community_scheduler_00",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "pkg/scheduler/scheduler.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "pkg/scheduler/framework/runtime/framework.go",
+        "pkg/scheduler/schedule_one.go",
+        "pkg/scheduler/backend/queue/scheduling_queue.go"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 2,
+      "category": "community",
+      "notes": "Community cluster: pkg/scheduler module (co-change + Leiden boost)"
+    },
+    {
+      "case_id": "k8s_community_proxy_00",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "cmd/kube-proxy/app/server.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "cmd/kube-proxy/app/server_linux.go",
+        "pkg/proxy/node.go",
+        "pkg/proxy/iptables/proxier.go"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 2,
+      "category": "community",
+      "notes": "Community cluster: cmd/kube-proxy ↔ pkg/proxy"
+    },
+    {
+      "case_id": "k8s_community_kubelet_00",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "pkg/kubelet/kubelet.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "pkg/kubelet/allocation/allocation_manager.go",
+        "pkg/kubelet/kuberuntime/kuberuntime_manager.go",
+        "pkg/kubelet/kubelet_pods.go"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 2,
+      "category": "community",
+      "notes": "Community cluster: pkg/kubelet subsystem"
+    },
+    {
+      "case_id": "k8s_community_apiserver_00",
+      "repo_key": "kubernetes",
+      "seed_files": [
+        "staging/src/k8s.io/apiserver/pkg/server/config.go"
+      ],
+      "query": "",
+      "expected_top_files": [
+        "staging/src/k8s.io/apiserver/pkg/server/genericapiserver.go",
+        "staging/src/k8s.io/apiserver/pkg/server/options/serving.go",
+        "staging/src/k8s.io/apiserver/pkg/server/options/coreapi.go"
+      ],
+      "tier": 1,
+      "token_budget": 6000,
+      "max_depth": 2,
+      "category": "community",
+      "notes": "Community cluster: apiserver staging module"
+    }
+  ]
+}

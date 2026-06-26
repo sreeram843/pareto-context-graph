@@ -4,7 +4,7 @@
 .pytest_cache
 __pycache__
 *.pyc
-.code-graph
+.pareto-context-graph
 dist
 build
 *.egg-info

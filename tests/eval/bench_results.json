@@ -1,0 +1,426 @@
+{
+  "repos": [
+    {
+      "repo_key": "fastapi",
+      "path": "bench/fastapi",
+      "sha": "219ac634ab82b6321492ef97fb223b618ce13948",
+      "build_seconds": 2,
+      "tracked_files": 2993,
+      "graph_db_bytes": 24821760,
+      "stats": {
+        "files": 3568,
+        "edges": 269659,
+        "p95_degree": 397,
+        "top_hubs": [
+          {
+            "path": "docs/en/mkdocs.yml",
+            "degree": 1104
+          },
+          {
+            "path": "pyproject.toml",
+            "degree": 891
+          },
+          {
+            "path": "scripts/docs.py",
+            "degree": 706
+          },
+          {
+            "path": "docs/tr/docs/index.md",
+            "degree": 695
+          },
+          {
+            "path": "docs/fr/docs/index.md",
+            "degree": 694
+          },
+          {
+            "path": "docs/es/docs/index.md",
+            "degree": 683
+          },
+          {
+            "path": "docs/ja/docs/index.md",
+            "degree": 681
+          },
+          {
+            "path": "docs/ko/docs/index.md",
+            "degree": 679
+          },
+          {
+            "path": "docs/pt/docs/index.md",
+            "degree": 668
+          },
+          {
+            "path": "docs/ru/docs/index.md",
+            "degree": 658
+          }
+        ],
+        "repo": "bench/fastapi",
+        "last_build_commits": "1056",
+        "total_commits_scanned": "5000",
+        "build_strategy": "sharded-v1:1",
+        "last_build_since": ""
+      },
+      "built_at": "2026-06-24T05:21:37.766508+00:00"
+    },
+    {
+      "repo_key": "httpx",
+      "path": "bench/httpx",
+      "sha": "b5addb64f0161ff6bfe94c124ef76f6a1fba5254",
+      "build_seconds": 1,
+      "tracked_files": 125,
+      "graph_db_bytes": 1146880,
+      "stats": {
+        "files": 315,
+        "edges": 10562,
+        "p95_degree": 162,
+        "top_hubs": [
+          {
+            "path": "tests/client/test_redirects.py",
+            "degree": 195
+          },
+          {
+            "path": "tests/test_config.py",
+            "degree": 193
+          },
+          {
+            "path": "tests/client/test_auth.py",
+            "degree": 191
+          },
+          {
+            "path": "tests/models/test_responses.py",
+            "degree": 188
+          },
+          {
+            "path": "httpx/__init__.py",
+            "degree": 185
+          },
+          {
+            "path": "tests/test_decoders.py",
+            "degree": 185
+          },
+          {
+            "path": "tests/models/test_url.py",
+            "degree": 175
+          },
+          {
+            "path": "tests/client/test_client.py",
+            "degree": 172
+          },
+          {
+            "path": "tests/client/test_async_client.py",
+            "degree": 171
+          },
+          {
+            "path": "tests/client/test_cookies.py",
+            "degree": 170
+          }
+        ],
+        "repo": "bench/httpx",
+        "last_build_commits": "800",
+        "total_commits_scanned": "1482",
+        "build_strategy": "sharded-v1:1",
+        "last_build_since": ""
+      },
+      "built_at": "2026-06-24T05:21:38.138966+00:00"
+    },
+    {
+      "repo_key": "kubernetes",
+      "path": "bench/kubernetes",
+      "sha": "e62c2b04709d77f028b2d2dd3b57be567b4e7a60",
+      "profile": "huge",
+      "build_seconds": null,
+      "tracked_files": 30523,
+      "graph_db_bytes": 303210496,
+      "incremental_update": {
+        "seconds": null,
+        "skipped": true
+      },
+      "context_latency": {
+        "hub_seed": "go.mod",
+        "timeout_ms": 5000,
+        "truncated_samples": 0,
+        "total_samples": 18,
+        "context": {
+          "samples": 9,
+          "p50_seconds": 0.005,
+          "p95_seconds": 0.0502,
+          "max_seconds": 0.08
+        },
+        "hub_only_context": {
+          "samples": 9,
+          "p50_seconds": 0.0046,
+          "p95_seconds": 0.0055,
+          "max_seconds": 0.0057
+        }
+      },
+      "stats": {
+        "files": 10494,
+        "edges": 504385,
+        "p95_degree": 223,
+        "top_hubs": [
+          {
+            "path": "go.mod",
+            "degree": 2262
+          },
+          {
+            "path": "vendor/modules.txt",
+            "degree": 2187
+          },
+          {
+            "path": "go.sum",
+            "degree": 2013
+          },
+          {
+            "path": "staging/src/k8s.io/kube-scheduler/go.sum",
+            "degree": 1879
+          },
+          {
+            "path": "staging/src/k8s.io/dynamic-resource-allocation/go.sum",
+            "degree": 1811
+          },
+          {
+            "path": "staging/src/k8s.io/kube-controller-manager/go.sum",
+            "degree": 1802
+          },
+          {
+            "path": "staging/src/k8s.io/dynamic-resource-allocation/go.mod",
+            "degree": 1764
+          },
+          {
+            "path": "staging/src/k8s.io/kubelet/go.sum",
+            "degree": 1746
+          },
+          {
+            "path": "pkg/generated/openapi/zz_generated.openapi.go",
+            "degree": 1710
+          },
+          {
+            "path": "staging/src/k8s.io/apiextensions-apiserver/go.sum",
+            "degree": 1684
+          }
+        ],
+        "repo": "bench/kubernetes",
+        "last_build_commits": null,
+        "total_commits_scanned": "5150",
+        "build_strategy": "sharded-v1:4",
+        "last_build_since": "12 months ago"
+      },
+      "built_at": "2026-06-25T02:02:34.955328+00:00"
+    },
+    {
+      "repo_key": "linux",
+      "path": "/Users/srirammentey/AI/pareto-context-graph/bench/linux",
+      "sha": "840ef6c78e6a2f694b578ecb9063241c992aaa9e",
+      "profile": "huge",
+      "build_seconds": null,
+      "tracked_files": 94752,
+      "graph_db_bytes": 1254965248,
+      "incremental_update": {
+        "seconds": null,
+        "skipped": true
+      },
+      "context_latency": {
+        "hub_seed": "MAINTAINERS",
+        "timeout_ms": 5000,
+        "truncated_samples": 0,
+        "total_samples": 18,
+        "context": {
+          "samples": 9,
+          "p50_seconds": 0.1149,
+          "p95_seconds": 0.1776,
+          "max_seconds": 0.213
+        },
+        "hub_only_context": {
+          "samples": 9,
+          "p50_seconds": 0.1165,
+          "p95_seconds": 0.1317,
+          "max_seconds": 0.1343
+        },
+        "token_savings": {
+          "samples": [
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 86676,
+              "reduction_vs_agent": 38.23,
+              "query": "syscall scheduler",
+              "hub_only": false
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 47368,
+              "reduction_vs_agent": 20.89,
+              "query": "",
+              "hub_only": true
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 86676,
+              "reduction_vs_agent": 38.23,
+              "query": "syscall scheduler",
+              "hub_only": false
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 47368,
+              "reduction_vs_agent": 20.89,
+              "query": "",
+              "hub_only": true
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 86676,
+              "reduction_vs_agent": 38.23,
+              "query": "syscall scheduler",
+              "hub_only": false
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 47368,
+              "reduction_vs_agent": 20.89,
+              "query": "",
+              "hub_only": true
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 338630,
+              "reduction_vs_agent": 149.37,
+              "query": "driver probe init",
+              "hub_only": false
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 47368,
+              "reduction_vs_agent": 20.89,
+              "query": "",
+              "hub_only": true
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 338630,
+              "reduction_vs_agent": 149.37,
+              "query": "driver probe init",
+              "hub_only": false
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 47368,
+              "reduction_vs_agent": 20.89,
+              "query": "",
+              "hub_only": true
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 338630,
+              "reduction_vs_agent": 149.37,
+              "query": "driver probe init",
+              "hub_only": false
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 47368,
+              "reduction_vs_agent": 20.89,
+              "query": "",
+              "hub_only": true
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 123791,
+              "reduction_vs_agent": 54.61,
+              "query": "memory cgroup",
+              "hub_only": false
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 47368,
+              "reduction_vs_agent": 20.89,
+              "query": "",
+              "hub_only": true
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 123791,
+              "reduction_vs_agent": 54.61,
+              "query": "memory cgroup",
+              "hub_only": false
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 47368,
+              "reduction_vs_agent": 20.89,
+              "query": "",
+              "hub_only": true
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 123791,
+              "reduction_vs_agent": 54.61,
+              "query": "memory cgroup",
+              "hub_only": false
+            },
+            {
+              "graph_tokens": 2267,
+              "agent_baseline_tokens": 47368,
+              "reduction_vs_agent": 20.89,
+              "query": "",
+              "hub_only": true
+            }
+          ],
+          "mean_reduction_vs_agent": 50.81
+        }
+      },
+      "stats": {
+        "files": 40019,
+        "edges": 684541,
+        "p95_degree": 174,
+        "top_hubs": [
+          {
+            "path": "MAINTAINERS",
+            "degree": 3341
+          },
+          {
+            "path": "drivers/gpu/drm/amd/display/dc/core/dc.c",
+            "degree": 564
+          },
+          {
+            "path": "drivers/gpu/drm/amd/display/dc/core/dc_resource.c",
+            "degree": 540
+          },
+          {
+            "path": "lib/crypto/Kconfig",
+            "degree": 499
+          },
+          {
+            "path": "drivers/gpu/drm/amd/display/dc/dc.h",
+            "degree": 481
+          },
+          {
+            "path": "lib/crypto/Makefile",
+            "degree": 475
+          },
+          {
+            "path": "arch/mips/configs/mtx1_defconfig",
+            "degree": 463
+          },
+          {
+            "path": "include/linux/fs.h",
+            "degree": 448
+          },
+          {
+            "path": "security/selinux/hooks.c",
+            "degree": 390
+          },
+          {
+            "path": "drivers/gpu/drm/amd/display/dc/hwss/dcn401/dcn401_hwseq.c",
+            "degree": 389
+          }
+        ],
+        "repo": "/Users/srirammentey/AI/pareto-context-graph/bench/linux",
+        "last_build_commits": null,
+        "total_commits_scanned": "100000",
+        "build_strategy": "sharded-v1:8",
+        "last_build_since": "24 months ago"
+      },
+      "built_at": "2026-06-25T16:31:01.696063+00:00"
+    }
+  ],
+  "updated_at": "2026-06-25T16:31:01.696063+00:00"
+}

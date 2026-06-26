@@ -1,0 +1,15 @@
+{
+  "summary": {
+    "mean_recall_at_5": 0.7387,
+    "compress_stack": {
+      "cases": 35,
+      "mean_graph_tokens": 7174.8,
+      "mean_compressed_tokens": 3415.63,
+      "mean_stack_reduction_vs_graph": 4.25,
+      "mean_compressed_savings_ratio": 0.53,
+      "methods": [
+        "prune_v1"
+      ]
+    }
+  }
+}

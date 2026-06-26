@@ -1,5 +1,5 @@
 """Test MMR diversity selection (Task 7)."""
-from code_graph_mcp.server import _mmr_select
+from pareto_context_graph.context_ranking import mmr_select as _mmr_select
 
 
 def test_mmr_limits_near_duplicate_specs():

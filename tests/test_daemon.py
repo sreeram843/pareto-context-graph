@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import time
 
-from code_graph_mcp.daemon import GraphWatcher
-from code_graph_mcp.graph import build_graph
-from code_graph_mcp.store import Store
+from pareto_context_graph.daemon import GraphWatcher
+from pareto_context_graph.graph import build_graph
+from pareto_context_graph.store import Store
 
 
 def test_graph_watcher_starts_and_stops(synthetic_repo_factory):

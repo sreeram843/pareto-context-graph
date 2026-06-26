@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from code_graph_mcp.store import Store
-from code_graph_mcp.walk import random_walk_with_restart
+from pareto_context_graph.store import Store
+from pareto_context_graph.walk import random_walk_with_restart
 
 
 def test_rwr_returns_connected_nodes(tmp_path):

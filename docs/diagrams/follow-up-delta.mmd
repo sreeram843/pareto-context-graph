@@ -1,0 +1,5 @@
+flowchart LR
+    T1[Turn 1 context] --> S[session.json]
+    T2[Turn 2 prompt] --> AH[already_have]
+    S -.-> AH
+    AH --> D[Delta only]
