@@ -19,7 +19,9 @@ def run() -> None:
     for name, (commits, files) in sizes.items():
         repo = create_synthetic_repo(root / name, commit_count=commits, file_count=files)
         start = time.perf_counter()
-        store = build_graph_sharded(repo, max_commits=commits + 50, shards=2 if name == "large" else 1)
+        store = build_graph_sharded(
+            repo, max_commits=commits + 50, shards=2 if name == "large" else 1
+        )
         store.close()
         elapsed = time.perf_counter() - start
         print(f"{name}: build {elapsed:.3f}s")

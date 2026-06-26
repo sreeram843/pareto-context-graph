@@ -8,12 +8,15 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import re
 import subprocess
 import sys
+from contextlib import contextmanager
 from dataclasses import dataclass, replace
 from pathlib import Path
 
+from .ablation import ABLATION_SIGNALS
 from .compress_stack import (
     aggregate_compress_stack,
     build_compress_stack_block,
@@ -772,6 +775,50 @@ def run_evaluation(
     }
 
 
+@contextmanager
+def ablation_env(signal: str):
+    """Temporarily ablate one retrieval signal via PCG_ABLATE_<SIGNAL>=1."""
+    key = f"PCG_ABLATE_{signal.upper()}"
+    prev = os.environ.get(key)
+    os.environ[key] = "1"
+    try:
+        yield
+    finally:
+        if prev is None:
+            os.environ.pop(key, None)
+        else:
+            os.environ[key] = prev
+
+
+def run_ablation_study(
+    repo_overrides: dict[str, Path],
+    golden_dir: Path | None = None,
+    *,
+    compress_stack: bool = False,
+) -> dict:
+    """Run golden eval with each signal ablated; report recall@5 deltas."""
+    baseline = run_evaluation(repo_overrides, golden_dir=golden_dir, compress_stack=compress_stack)
+    baseline_recall = float(baseline.get("summary", {}).get("mean_recall_at_5", 0.0))
+    rows: list[dict] = []
+    for signal in ABLATION_SIGNALS:
+        with ablation_env(signal):
+            result = run_evaluation(
+                repo_overrides, golden_dir=golden_dir, compress_stack=compress_stack
+            )
+        recall = float(result.get("summary", {}).get("mean_recall_at_5", 0.0))
+        rows.append(
+            {
+                "signal": signal,
+                "recall_at_5": recall,
+                "delta": round(recall - baseline_recall, 4),
+            }
+        )
+    return {
+        "baseline_recall_at_5": baseline_recall,
+        "ablations": rows,
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     """CLI entry point: python3 -m pareto_context_graph.eval [options] key=/path ..."""
     import argparse
@@ -810,6 +857,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="With --compress-stack: fail if tier-3 compression regresses vs compress baseline",
     )
+    parser.add_argument(
+        "--ablation",
+        action="store_true",
+        help="Run per-signal ablation study (PCG_ABLATE_*); prints recall@5 deltas",
+    )
     args = parser.parse_args(argv)
 
     if args.check_compress_baseline and not args.compress_stack:
@@ -825,6 +877,27 @@ def main(argv: list[str] | None = None) -> int:
     except ValueError as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1
+
+    if args.ablation:
+        ablation_result = run_ablation_study(
+            repo_overrides=repo_overrides,
+            golden_dir=args.golden_dir,
+            compress_stack=args.compress_stack,
+        )
+        if args.json:
+            print(json.dumps(ablation_result, indent=2))
+        else:
+            print("\n" + "=" * 72)
+            print("ABLATION STUDY (recall@5 vs baseline)")
+            print("=" * 72)
+            print(f"baseline recall@5: {ablation_result['baseline_recall_at_5']:.4f}")
+            for row in ablation_result["ablations"]:
+                print(
+                    f"  PCG_ABLATE_{row['signal'].upper():8s} "
+                    f"recall@5={row['recall_at_5']:.4f} delta={row['delta']:+.4f}"
+                )
+            print("=" * 72)
+        return 0
 
     result = run_evaluation(
         repo_overrides=repo_overrides,

@@ -9,9 +9,7 @@ from pathlib import Path
 from pareto_context_graph.server import _handle_tool_call
 from pareto_context_graph.store import Store
 
-EXAMPLE_HOOK = (
-    Path(__file__).resolve().parents[1] / "docs/examples/hooks/feedback_hints.py"
-)
+EXAMPLE_HOOK = Path(__file__).resolve().parents[1] / "docs/examples/hooks/feedback_hints.py"
 
 
 def test_feedback_hints_hook_enriches_context(tmp_path):

@@ -28,3 +28,23 @@ def test_low_confidence_sparse_no_hits():
     assert payload["level"] == "low"
     assert "sparse_graph" in payload["signals"]
     assert "no_orchestrator_hits" in payload["signals"]
+
+
+def test_fallback_telemetry_in_signals():
+    payload = build_retrieval_confidence(
+        sparse_graph=False,
+        truncated=False,
+        timed_out_phase="",
+        query_only=False,
+        orchestrator_hit_count=3,
+        files_included=5,
+        fallbacks={
+            "backend": "tfidf_capped",
+            "bm25_empty_fallback": True,
+            "leiden_fallback": True,
+            "ablations": ["embed"],
+        },
+    )
+    assert "fallback:bm25_to_tfidf" in payload["signals"]
+    assert "semantic:tfidf_capped" in payload["signals"]
+    assert payload["fallbacks"]["leiden_fallback"] is True

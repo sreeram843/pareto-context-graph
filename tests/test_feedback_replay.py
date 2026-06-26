@@ -62,7 +62,9 @@ def test_apply_learn_writes_weights_and_ranker(tmp_path):
         dedupe=False,
     )
     record_feedback(repo, kind="accept", request_id="r1", paths=["src/a.py", "src/b.py"], query="q")
-    record_feedback(repo, kind="reject", request_id="r1", paths=["src/f0.py", "src/f1.py"], query="q")
+    record_feedback(
+        repo, kind="reject", request_id="r1", paths=["src/f0.py", "src/f1.py"], query="q"
+    )
 
     result = apply_learn(repo)
     assert result["weights"] >= 1

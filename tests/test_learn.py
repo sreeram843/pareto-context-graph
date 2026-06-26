@@ -16,7 +16,9 @@ def test_learn_writes_weights(tmp_path, monkeypatch):
     import subprocess
 
     subprocess.run(["git", "init"], cwd=repo, check=True, capture_output=True)
-    subprocess.run(["git", "config", "user.email", "t@example.com"], cwd=repo, check=True, capture_output=True)
+    subprocess.run(
+        ["git", "config", "user.email", "t@example.com"], cwd=repo, check=True, capture_output=True
+    )
     subprocess.run(["git", "config", "user.name", "t"], cwd=repo, check=True, capture_output=True)
     (repo / "README.md").write_text("x\n")
     subprocess.run(["git", "add", "."], cwd=repo, check=True, capture_output=True)

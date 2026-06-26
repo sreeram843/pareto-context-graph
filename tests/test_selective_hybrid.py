@@ -15,7 +15,9 @@ from pareto_context_graph.selective_hybrid import (
     prefer_bm25_for_semantic,
     semantic_top_n,
 )
-from pareto_context_graph.context_ranking import semantic_search_capped_tfidf as _semantic_search_capped_tfidf
+from pareto_context_graph.context_ranking import (
+    semantic_search_capped_tfidf as _semantic_search_capped_tfidf,
+)
 
 
 def test_allow_seed_hybrid():

@@ -41,14 +41,30 @@ def test_fold_events_positive_and_negative(tmp_path):
         {"kind": "context_request", "request_id": "r1", "query": "auth", "candidates": []},
         dedupe=False,
     )
-    logger.append({"kind": "accept", "request_id": "r1", "path": "auth.py", "query": "auth"}, dedupe=True)
-    logger.append({"kind": "reject", "request_id": "r1", "path": "noise.py", "query": "auth"}, dedupe=True)
     logger.append(
-        {"kind": "dwell", "request_id": "r1", "path": "short.py", "query": "auth", "dwell_seconds": 5},
+        {"kind": "accept", "request_id": "r1", "path": "auth.py", "query": "auth"}, dedupe=True
+    )
+    logger.append(
+        {"kind": "reject", "request_id": "r1", "path": "noise.py", "query": "auth"}, dedupe=True
+    )
+    logger.append(
+        {
+            "kind": "dwell",
+            "request_id": "r1",
+            "path": "short.py",
+            "query": "auth",
+            "dwell_seconds": 5,
+        },
         dedupe=True,
     )
     logger.append(
-        {"kind": "dwell", "request_id": "r1", "path": "long.py", "query": "auth", "dwell_seconds": 45},
+        {
+            "kind": "dwell",
+            "request_id": "r1",
+            "path": "long.py",
+            "query": "auth",
+            "dwell_seconds": 45,
+        },
         dedupe=True,
     )
 
@@ -58,9 +74,7 @@ def test_fold_events_positive_and_negative(tmp_path):
     assert stats["negative"] >= 1
 
     store = Store(repo)
-    rows = store.conn.execute(
-        "SELECT file_path, used FROM feedback ORDER BY file_path"
-    ).fetchall()
+    rows = store.conn.execute("SELECT file_path, used FROM feedback ORDER BY file_path").fetchall()
     store.close()
     used_by_path = {path: bool(used) for path, used in rows}
     assert used_by_path["auth.py"] is True

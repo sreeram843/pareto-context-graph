@@ -52,12 +52,28 @@ def test_aggregate_results_empty():
 
 def test_aggregate_results_mean():
     results = [
-        {"recall_at_5": 1.0, "mrr": 1.0, "ndcg_at_10": 1.0, "tokens_used": 100,
-         "token_efficiency": 0.1, "budget_honesty": 1.0, "payload_honesty": 1.0,
-         "reduction_vs_corpus": 10.0, "reduction_vs_agent": 2.0},
-        {"recall_at_5": 0.5, "mrr": 0.5, "ndcg_at_10": 0.5, "tokens_used": 200,
-         "token_efficiency": 0.05, "budget_honesty": 0.8, "payload_honesty": 1.0,
-         "reduction_vs_corpus": 5.0, "reduction_vs_agent": 1.0},
+        {
+            "recall_at_5": 1.0,
+            "mrr": 1.0,
+            "ndcg_at_10": 1.0,
+            "tokens_used": 100,
+            "token_efficiency": 0.1,
+            "budget_honesty": 1.0,
+            "payload_honesty": 1.0,
+            "reduction_vs_corpus": 10.0,
+            "reduction_vs_agent": 2.0,
+        },
+        {
+            "recall_at_5": 0.5,
+            "mrr": 0.5,
+            "ndcg_at_10": 0.5,
+            "tokens_used": 200,
+            "token_efficiency": 0.05,
+            "budget_honesty": 0.8,
+            "payload_honesty": 1.0,
+            "reduction_vs_corpus": 5.0,
+            "reduction_vs_agent": 1.0,
+        },
     ]
     summary = aggregate_results(results)
     assert summary["cases"] == 2
@@ -75,7 +91,12 @@ def test_compare_to_baseline_pass_and_fail():
         ],
     }
     improved = {
-        "summary": {"cases": 2, "mean_recall_at_5": 0.85, "mean_mrr": 0.75, "mean_ndcg_at_10": 0.65},
+        "summary": {
+            "cases": 2,
+            "mean_recall_at_5": 0.85,
+            "mean_mrr": 0.75,
+            "mean_ndcg_at_10": 0.65,
+        },
         "results": [
             {"case_id": "a", "recall_at_5": 0.85, "mrr": 0.75, "ndcg_at_10": 0.65},
             {"case_id": "b", "recall_at_5": 0.85, "mrr": 0.75, "ndcg_at_10": 0.65},
@@ -103,10 +124,20 @@ def test_agent_grep_top_files_on_fixture_repo(tmp_path: Path):
     (repo / "readme.md").write_text("no match here\n")
 
     import subprocess
+
     subprocess.run(["git", "init"], cwd=repo, check=True, capture_output=True)
     subprocess.run(["git", "add", "."], cwd=repo, check=True, capture_output=True)
     subprocess.run(
-        ["git", "-c", "user.email=test@example.com", "-c", "user.name=Test User", "commit", "-m", "init"],
+        [
+            "git",
+            "-c",
+            "user.email=test@example.com",
+            "-c",
+            "user.name=Test User",
+            "commit",
+            "-m",
+            "init",
+        ],
         cwd=repo,
         check=True,
         capture_output=True,

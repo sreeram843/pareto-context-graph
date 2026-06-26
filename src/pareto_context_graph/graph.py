@@ -23,9 +23,7 @@ _NOISY_COMMIT_RE = re.compile(
 _EDGE_FLUSH_SIZE = 10_000
 _COMMIT_CACHE_NAME = "commit_window_cache.json"
 _COMMIT_CACHE_VERSION = 2
-_COMMIT_CACHE_TTL_SECONDS = int(
-    os.environ.get("PCG_COMMIT_CACHE_TTL_SECONDS", str(7 * 24 * 3600))
-)
+_COMMIT_CACHE_TTL_SECONDS = int(os.environ.get("PCG_COMMIT_CACHE_TTL_SECONDS", str(7 * 24 * 3600)))
 BUILD_WINDOW_META = "build_window_key"
 
 

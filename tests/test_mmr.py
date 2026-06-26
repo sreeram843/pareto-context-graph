@@ -1,4 +1,5 @@
 """Test MMR diversity selection (Task 7)."""
+
 from pareto_context_graph.context_ranking import mmr_select as _mmr_select
 
 
@@ -12,20 +13,34 @@ def test_mmr_limits_near_duplicate_specs():
     candidates = []
     # 10 spec files in same directory — high path and symbol similarity to each other
     for i in range(10):
-        candidates.append({
-            "path": f"spec/models/user_spec_{i}.rb",
-            "weight": 100,
-            "_relevance": 100.0,
-            "_symbols": ["describe", "it", "expect", "User"],
-        })
+        candidates.append(
+            {
+                "path": f"spec/models/user_spec_{i}.rb",
+                "weight": 100,
+                "_relevance": 100.0,
+                "_symbols": ["describe", "it", "expect", "User"],
+            }
+        )
     # 3 diverse non-spec files with equal relevance
     diverse = [
-        {"path": "app/models/user.rb", "weight": 100, "_relevance": 100.0,
-         "_symbols": ["User", "has_many", "validates"]},
-        {"path": "app/controllers/users_controller.rb", "weight": 100, "_relevance": 100.0,
-         "_symbols": ["UsersController", "index", "show"]},
-        {"path": "db/migrate/create_users.rb", "weight": 100, "_relevance": 100.0,
-         "_symbols": ["CreateUsers", "change"]},
+        {
+            "path": "app/models/user.rb",
+            "weight": 100,
+            "_relevance": 100.0,
+            "_symbols": ["User", "has_many", "validates"],
+        },
+        {
+            "path": "app/controllers/users_controller.rb",
+            "weight": 100,
+            "_relevance": 100.0,
+            "_symbols": ["UsersController", "index", "show"],
+        },
+        {
+            "path": "db/migrate/create_users.rb",
+            "weight": 100,
+            "_relevance": 100.0,
+            "_symbols": ["CreateUsers", "change"],
+        },
     ]
     candidates.extend(diverse)
 

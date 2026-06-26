@@ -12,7 +12,7 @@ For commands and parameters, see [COMMANDS.md](COMMANDS.md).
 - **Git** CLI in `PATH`
 - A git repository with commit history (the repo you want context for)
 
-Optional extras: `pip install -e ".[tiktoken]"` for accurate token counts (recommended; included in Docker image).
+Optional extras: `pip install pareto-context-graph[tiktoken]` or `pip install -e ".[tiktoken]"` for accurate token counts (recommended; included in Docker image).
 
 Clear stale session paths between tasks: `pareto-context-graph session clear` or MCP `session_clear`.
 

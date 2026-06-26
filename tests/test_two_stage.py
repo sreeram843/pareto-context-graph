@@ -1,4 +1,5 @@
 """Test two-stage retrieval pipeline (Task 8)."""
+
 from pareto_context_graph.context_ranking import stage1_candidates as _stage1_candidates
 from pareto_context_graph.store import Store
 

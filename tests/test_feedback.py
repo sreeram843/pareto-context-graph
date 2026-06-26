@@ -1,4 +1,5 @@
 """Test feedback logging and learn pipeline (Task 14)."""
+
 import math
 
 from pareto_context_graph.store import Store
@@ -25,9 +26,7 @@ def test_mark_used(tmp_path):
     updated = store.mark_feedback_used(["a.py"])
     assert updated >= 1
 
-    used = store.conn.execute(
-        "SELECT used FROM feedback WHERE file_path = 'a.py'"
-    ).fetchone()
+    used = store.conn.execute("SELECT used FROM feedback WHERE file_path = 'a.py'").fetchone()
     assert used[0] == 1
     store.close()
 

@@ -95,7 +95,11 @@ def all_repo_files(repo_root: Path) -> set[str]:
         if not path.is_file():
             continue
         rel = path.relative_to(repo_root).as_posix()
-        if rel.startswith(".git/") or rel.startswith(".pareto-context-graph/") or rel.startswith(".venv/"):
+        if (
+            rel.startswith(".git/")
+            or rel.startswith(".pareto-context-graph/")
+            or rel.startswith(".venv/")
+        ):
             continue
         paths.add(rel)
     return paths
@@ -203,16 +207,25 @@ def semantic_search(
     *,
     prefer_bm25: bool = False,
     large_graph: bool = False,
-) -> list[tuple[str, float]]:
+) -> tuple[list[tuple[str, float]], dict[str, object]]:
     """BM25 when preferred and indexed; otherwise in-memory TF-IDF fallback."""
+    meta: dict[str, object] = {
+        "backend": "tfidf_full",
+        "prefer_bm25": prefer_bm25,
+        "index_present": store.has_search_index(),
+        "bm25_empty_fallback": False,
+    }
     if prefer_bm25 and store.has_search_index():
         results = store.search_content_bm25(query, limit=top_n)
         if results:
-            return results
+            meta["backend"] = "bm25"
+            return results, meta
+        meta["bm25_empty_fallback"] = True
     if large_graph:
-        return semantic_search_capped_tfidf(repo_root, store, query, top_n=top_n)
+        meta["backend"] = "tfidf_capped"
+        return semantic_search_capped_tfidf(repo_root, store, query, top_n=top_n), meta
     kw_index = build_keyword_index(repo_root, store)
-    return kw_index.query(query, top_n=top_n)
+    return kw_index.query(query, top_n=top_n), meta
 
 
 def node_degrees(repo_root: Path, store: Store) -> dict[str, int]:
@@ -457,6 +470,47 @@ def entry_diagnostics(
         diag["community_boost"] = r["_community_boost"]
     diag["hub_penalty_strength"] = hub_penalty_strength
     return diag
+
+
+def compress_pick_reason(
+    r: dict,
+    *,
+    files: list[str],
+    node_degrees: dict[str, int],
+    learned: dict[str, float],
+    embed_scores: dict[str, float],
+    hub_penalty_strength: float,
+) -> str:
+    """One-line human-readable reason a file was ranked (tier-1 default)."""
+    parts: list[str] = []
+    signal = r.get("signal")
+    if signal:
+        parts.append(str(signal))
+    weight = r.get("weight")
+    if weight and int(weight) > 1:
+        parts.append(f"co-change w={int(weight)}")
+    diag = entry_diagnostics(
+        r,
+        files=files,
+        node_degrees=node_degrees,
+        learned=learned,
+        embed_scores=embed_scores,
+        hub_penalty_strength=hub_penalty_strength,
+    )
+    for key, label in (("bm25", "bm25"), ("symbol", "symbol"), ("embed", "embed")):
+        val = diag.get(key)
+        if val is not None and float(val) > 0:
+            parts.append(f"{label}={val}")
+    orch = diag.get("orchestrator_score")
+    if orch is not None:
+        parts.append(f"orc={orch}")
+    if not parts:
+        rank = diag.get("rank_score")
+        if rank is not None:
+            parts.append(f"score={rank}")
+        else:
+            parts.append("ranked")
+    return " + ".join(parts)
 
 
 def candidate_features(

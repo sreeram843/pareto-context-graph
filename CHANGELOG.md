@@ -7,7 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
-- `LICENSE`, `CONTRIBUTING.md`, `CHANGELOG.md`, and `py.typed` for distribution and contribution hygiene.
+- PyPI publish workflow (`.github/workflows/publish.yml`) and README install one-liners.
+- Tier-1 `pick_reason` on default `context` responses (full `diagnostics` still opt-in).
+- `Candidate`, `ContextPipelineState`, and `PCG_ABLATE_*` ablation flags (`eval --ablation`).
+- Fallback telemetry in `retrieval_confidence` (BM25→TF-IDF, Leiden→components, semantic backend).
+- Context pipeline extracted to `context_pipeline.execute_context_pipeline()` (~700 lines moved out of `server.py`).
 - CI quality gates: ruff, mypy, and pytest coverage.
 - `taxonomy.py` — centralized query intent, file class, and noise-path rules.
 - `context_ranking.py` — testable context ranking/packing helpers extracted from `server.py`.

@@ -1,6 +1,10 @@
 """Tests for context ranking helpers."""
 
-from pareto_context_graph.context_ranking import apply_file_class_weight, build_mirror_groups, mmr_select
+from pareto_context_graph.context_ranking import (
+    apply_file_class_weight,
+    build_mirror_groups,
+    mmr_select,
+)
 
 
 def test_apply_file_class_weight_doc_deprioritized():

@@ -79,8 +79,10 @@ def apply_learned_tier1_prune(
     for entry in tail:
         path = str(entry.get("path", ""))
         signal = str(entry.get("signal", ""))
-        if path in seeds or signal in _KEEP_SIGNALS or tier1_keep_by_bias(
-            path, prune_weights, drop_below=drop_below
+        if (
+            path in seeds
+            or signal in _KEEP_SIGNALS
+            or tier1_keep_by_bias(path, prune_weights, drop_below=drop_below)
         ):
             kept_tail.append(entry)
         else:
@@ -104,7 +106,9 @@ def apply_learned_tier1_prune(
         "kept_count": len(kept),
         "protected_top": len(protected),
         "drop_below": drop_below,
-        "weighted_paths": sum(1 for entry in context_files if str(entry.get("path", "")) in prune_weights),
+        "weighted_paths": sum(
+            1 for entry in context_files if str(entry.get("path", "")) in prune_weights
+        ),
     }
     if dropped_paths:
         meta["dropped_paths"] = dropped_paths[:15]

@@ -74,12 +74,8 @@ def test_query_first_context_default_on(tmp_path: Path, monkeypatch: pytest.Monk
     subprocess.run(["git", "add", "."], cwd=repo, check=True, capture_output=True)
     subprocess.run(["git", "commit", "-m", "init"], cwd=repo, check=True, capture_output=True)
 
-    (repo / "main.py").write_text(
-        (repo / "main.py").read_text() + "\n# change\n", encoding="utf-8"
-    )
-    (repo / "util.py").write_text(
-        (repo / "util.py").read_text() + "\n# change\n", encoding="utf-8"
-    )
+    (repo / "main.py").write_text((repo / "main.py").read_text() + "\n# change\n", encoding="utf-8")
+    (repo / "util.py").write_text((repo / "util.py").read_text() + "\n# change\n", encoding="utf-8")
     subprocess.run(["git", "add", "."], cwd=repo, check=True, capture_output=True)
     subprocess.run(["git", "commit", "-m", "pair"], cwd=repo, check=True, capture_output=True)
 

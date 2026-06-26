@@ -12,6 +12,7 @@ def build_retrieval_confidence(
     orchestrator_hit_count: int,
     files_included: int,
     selective_hybrid: bool = False,
+    fallbacks: dict[str, object] | None = None,
 ) -> dict:
     """Return a 0–1 score and human-readable degradation signals."""
     score = 1.0
@@ -32,6 +33,19 @@ def build_retrieval_confidence(
     if selective_hybrid:
         signals.append("selective_hybrid")
 
+    fb = fallbacks or {}
+    if fb.get("bm25_empty_fallback"):
+        signals.append("fallback:bm25_to_tfidf")
+    backend = fb.get("backend") or fb.get("semantic_backend")
+    if backend and backend != "bm25":
+        signals.append(f"semantic:{backend}")
+    if fb.get("leiden_fallback"):
+        signals.append("fallback:leiden_to_components")
+    if fb.get("ablations"):
+        ablated = fb["ablations"]
+        if isinstance(ablated, list):
+            signals.append(f"ablated:{','.join(str(x) for x in ablated)}")
+
     score = max(0.0, min(1.0, score))
     if score >= 0.75:
         level = "high"
@@ -40,8 +54,11 @@ def build_retrieval_confidence(
     else:
         level = "low"
 
-    return {
+    payload: dict = {
         "score": round(score, 3),
         "level": level,
         "signals": signals,
     }
+    if fb:
+        payload["fallbacks"] = fb
+    return payload

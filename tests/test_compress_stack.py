@@ -62,8 +62,13 @@ def test_build_compress_stack_block_estimates_when_no_hash():
 
 def test_legacy_fields_mirror_canonical():
     block = build_compress_stack_block(
-        {"tokens_used": 500, "tokens_before_compress": 1000, "content_hash": "x",
-         "compression_method": COMPRESSION_METHOD, "context_files": []},
+        {
+            "tokens_used": 500,
+            "tokens_before_compress": 1000,
+            "content_hash": "x",
+            "compression_method": COMPRESSION_METHOD,
+            "context_files": [],
+        },
     )
     legacy = legacy_compress_stack_fields(block)
     assert legacy["headroom_tokens"] == block["compressed_tokens"]

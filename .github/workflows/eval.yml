@@ -3,7 +3,10 @@ name: Eval
 on:
   pull_request:
     paths:
-      - "src/pareto_context_graph/server.py"
+      - "src/pareto_context_graph/context_pipeline.py"
+      - "src/pareto_context_graph/context_confidence.py"
+      - "src/pareto_context_graph/context_ranking.py"
+      - "src/pareto_context_graph/ablation.py"
       - "src/pareto_context_graph/blast.py"
       - "src/pareto_context_graph/chunks.py"
       - "src/pareto_context_graph/walk.py"

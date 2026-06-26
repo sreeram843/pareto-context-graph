@@ -7,8 +7,28 @@ name = "pareto-context-graph"
 version = "0.1.0"
 description = "Pareto-ranked, token-budgeted context for AI coding assistants"
 readme = "README.md"
+license = { text = "MIT" }
 requires-python = ">=3.10"
+authors = [{ name = "Sriram Mentey" }]
+keywords = ["mcp", "context", "ai", "coding-assistant", "retrieval", "token-budget"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/sreeram843/pareto-context-graph"
+Repository = "https://github.com/sreeram843/pareto-context-graph"
+Documentation = "https://github.com/sreeram843/pareto-context-graph/blob/main/docs/QUICKSTART.md"
+Issues = "https://github.com/sreeram843/pareto-context-graph/issues"
 
 [project.optional-dependencies]
 dev = [

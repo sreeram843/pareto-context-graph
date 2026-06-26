@@ -34,9 +34,7 @@ def test_prometheus_text_exports_phase_quantiles():
 
 
 def test_context_phases_match_pipeline():
-    assert CONTEXT_PHASES == frozenset(
-        {"retrieve", "hybrid", "semantic", "rank", "pack", "filter"}
-    )
+    assert CONTEXT_PHASES == frozenset({"retrieve", "hybrid", "semantic", "rank", "pack", "filter"})
 
 
 def test_context_request_records_phase_histograms(synthetic_repo_factory):

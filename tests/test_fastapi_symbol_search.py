@@ -20,7 +20,9 @@ def fastapi_repo() -> Path:
     store = Store(FASTAPI_BENCH)
     try:
         if not store.has_search_index():
-            pytest.skip("fastapi search index missing (run: pareto-context-graph build on bench/fastapi)")
+            pytest.skip(
+                "fastapi search index missing (run: pareto-context-graph build on bench/fastapi)"
+            )
     finally:
         store.close()
     return FASTAPI_BENCH

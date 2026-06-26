@@ -1,4 +1,5 @@
 """Test hub suppression in context ranking (Task 5)."""
+
 import math
 
 from pareto_context_graph.store import Store

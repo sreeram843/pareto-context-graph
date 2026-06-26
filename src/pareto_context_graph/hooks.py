@@ -22,7 +22,9 @@ def load_hooks(repo_root: Path) -> list[ModuleType]:
     for py_file in sorted(hook_dir.glob("*.py")):
         if not hook_allowed(repo_root, py_file):
             continue
-        spec = importlib.util.spec_from_file_location(f"pareto_context_graph_hook_{py_file.stem}", py_file)
+        spec = importlib.util.spec_from_file_location(
+            f"pareto_context_graph_hook_{py_file.stem}", py_file
+        )
         if spec is None or spec.loader is None:
             continue
         module = importlib.util.module_from_spec(spec)

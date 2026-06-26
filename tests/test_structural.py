@@ -3,7 +3,11 @@ from __future__ import annotations
 from pathlib import Path
 
 from pareto_context_graph.savings import build_context_savings
-from pareto_context_graph.structural import extract_structural_edges, infer_test_target, is_test_path
+from pareto_context_graph.structural import (
+    extract_structural_edges,
+    infer_test_target,
+    is_test_path,
+)
 
 
 def test_is_test_path():

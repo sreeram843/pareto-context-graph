@@ -682,7 +682,9 @@ def _install_cursor(repo: Path) -> None:
         existing["mcpServers"] = servers
         mcp_path.write_text(json.dumps(existing, indent=2) + "\n")
     else:
-        mcp_path.write_text(json.dumps({"mcpServers": {"pareto-context-graph": entry}}, indent=2) + "\n")
+        mcp_path.write_text(
+            json.dumps({"mcpServers": {"pareto-context-graph": entry}}, indent=2) + "\n"
+        )
     print(f"  Cursor MCP config written to {mcp_path}")
 
 
@@ -973,7 +975,9 @@ def main() -> None:
 
     p_session = sub.add_parser("session", help="Session memory helpers")
     session_sub = p_session.add_subparsers(dest="session_command")
-    p_session_clear = session_sub.add_parser("clear", help="Clear .pareto-context-graph/session.json")
+    p_session_clear = session_sub.add_parser(
+        "clear", help="Clear .pareto-context-graph/session.json"
+    )
     p_session_clear.add_argument("--repo", default=None, help="Repository path (default: git root)")
 
     args = parser.parse_args()

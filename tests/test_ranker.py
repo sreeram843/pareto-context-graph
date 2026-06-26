@@ -28,7 +28,10 @@ def _labeled_events() -> list[dict]:
             "candidates": [
                 {"path": "good.py", "features": {"rank_score": 4.0, "co_change": 3.0, "bm25": 2.0}},
                 {"path": "bad.py", "features": {"rank_score": 9.0, "co_change": 1.0, "bm25": 0.5}},
-                {"path": "good2.py", "features": {"rank_score": 3.5, "co_change": 2.5, "bm25": 1.5}},
+                {
+                    "path": "good2.py",
+                    "features": {"rank_score": 3.5, "co_change": 2.5, "bm25": 1.5},
+                },
                 {"path": "bad2.py", "features": {"rank_score": 8.0, "co_change": 0.5, "bm25": 0.2}},
             ],
         },

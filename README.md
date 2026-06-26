@@ -13,6 +13,43 @@ detail only where needed.
 
 ---
 
+## Install
+
+```bash
+pip install pareto-context-graph
+# recommended: accurate token budgets
+pip install "pareto-context-graph[tiktoken]"
+# or from source
+pip install -e /path/to/pareto-context-graph
+pip install -e "/path/to/pareto-context-graph[tiktoken]"
+```
+
+**Cursor MCP** — in your repo:
+
+```bash
+cd /path/to/your-repo
+pareto-context-graph build
+pareto-context-graph install --platform cursor
+# restart Cursor
+```
+
+Or add to `.cursor/mcp.json` manually:
+
+```json
+{
+  "mcpServers": {
+    "pareto-context-graph": {
+      "command": "pareto-context-graph",
+      "args": ["serve", "--repo", "/absolute/path/to/your-repo"]
+    }
+  }
+}
+```
+
+Full setup: [docs/QUICKSTART.md](docs/QUICKSTART.md)
+
+---
+
 ## What problem this solves
 
 Every repo prompt needs context. Without guidance, agents **read too much**, **read too
