@@ -25,6 +25,7 @@ QUERY_INTENT_TERMS: dict[str, frozenset[str]] = {
     ),
     "schema": frozenset({"schema", "migration", "migrate", "column", "table", "db", "database"}),
     "docs": frozenset({"doc", "docs", "readme", "guide", "documentation"}),
+    "openapi": frozenset({"openapi", "swagger"}),
 }
 
 TEST_PATH_RE = re.compile(
@@ -86,7 +87,10 @@ def query_is_test_focused(query: str) -> bool:
 
 def classify_query_intent(query: str) -> str:
     """Classify a query into a lightweight ranking intent."""
-    terms = set(query.lower().split())
+    q_lower = query.lower()
+    if "openapi" in q_lower or "swagger" in q_lower:
+        return "openapi"
+    terms = set(q_lower.split())
     best_intent = "default"
     best_score = 0
     for intent, intent_terms in QUERY_INTENT_TERMS.items():

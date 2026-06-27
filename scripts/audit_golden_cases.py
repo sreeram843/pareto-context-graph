@@ -27,7 +27,11 @@ def main() -> int:
         key, _, path = item.partition("=")
         repo_overrides[key] = Path(path).resolve()
 
-    result = run_evaluation(repo_overrides=repo_overrides, golden_dir=args.golden_dir)
+    result = run_evaluation(
+        repo_overrides=repo_overrides,
+        golden_dir=args.golden_dir,
+        isolate_cases=True,
+    )
     zero = [r for r in result["results"] if float(r.get("recall_at_5", 0)) == 0.0]
     if zero:
         print("Cases with recall@5 = 0:", file=sys.stderr)

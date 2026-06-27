@@ -1,0 +1,51 @@
+# Example: run PCG affected tests on pull requests.
+# Copy to .github/workflows/pcg-affected.yml and ensure a graph exists
+# (build locally or import a CI snapshot — see docs/CI_SNAPSHOTS.md).
+
+name: PCG affected tests
+
+on:
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  affected:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pareto-context-graph
+        run: pip install -e .
+
+      # Optional: bootstrap from a team snapshot instead of cold build
+      # - name: Import graph snapshot
+      #   run: pareto-context-graph build --from-snapshot path/to/graph-snapshot.tar.gz
+
+      - name: List affected tests
+        run: |
+          git diff --name-only "origin/${{ github.base_ref }}"...HEAD \
+            | pareto-context-graph affected --stdin --quiet > /tmp/affected-tests.txt
+          echo "Tests suggested by PCG:"
+          cat /tmp/affected-tests.txt || true
+
+      - name: Run suggested Python tests (example)
+        if: hashFiles('/tmp/affected-tests.txt') != ''
+        run: |
+          mapfile -t tests < /tmp/affected-tests.txt
+          pytests=()
+          for t in "${tests[@]}"; do
+            case "$t" in
+              test_*.py|tests/test_*.py|*_test.py) pytests+=("$t") ;;
+            esac
+          done
+          if [ "${#pytests[@]}" -gt 0 ]; then
+            pytest -q "${pytests[@]}"
+          else
+            echo "No pytest targets in affected set"
+          fi

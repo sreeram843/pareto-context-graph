@@ -27,5 +27,11 @@ jobs:
       - name: Mypy
         run: mypy src/pareto_context_graph
 
+      - name: Configure git for synthetic test repos
+        run: |
+          git config --global core.fsmonitor false
+          git config --global core.preloadindex false
+          git config --global core.fsync all
+
       - name: Tests with coverage
         run: pytest --cov=pareto_context_graph --cov-report=term-missing

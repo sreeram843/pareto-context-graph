@@ -1,13 +1,13 @@
 # CI Snapshots — huge-repo onboarding
 
 Pre-built `.pareto-context-graph` tarballs avoid multi-hour cold builds on Tier 2/3 repos.
-**Default path for kubernetes and linux:** import a snapshot, then incremental `build`.
+**Default path for kubernetes and linux:** import a snapshot, then `sync` (or `build` for first import).
 
 | Repo tier | Cold build (measured) | Snapshot path |
 |-----------|----------------------|---------------|
-| T1 (fastapi, httpx) | ~1–2 s | Not needed — `pareto-context-graph build` |
+| T1 (fastapi, httpx) | ~1–2 s | Not needed — `pareto-context-graph init` or `build` |
 | T2 (kubernetes) | ~13 min | **Weekly CI artifact** (recommended) |
-| T3 (linux) | ~10.5 h | **Team export** or local backup (no CI artifact yet) |
+| T3 (linux) | ~1–2 h co-change (lazy index) | **Monthly CI artifact** (recommended) |
 
 ---
 
@@ -17,8 +17,8 @@ Pre-built `.pareto-context-graph` tarballs avoid multi-hour cold builds on Tier 
 flowchart TD
     A[New clone of huge repo] --> B{Have a snapshot?}
     B -->|yes| C["build --from-snapshot"]
-    B -->|no k8s| D[Download CI artifact]
-    B -->|no linux| E[Ask team OR export from machine that built]
+    B -->|no k8s| D[Download weekly k8s CI artifact]
+    B -->|no linux| E[Download monthly linux CI artifact]
     D --> C
     E --> C
     C --> F[pareto-context-graph doctor]
@@ -59,7 +59,8 @@ export PCG_SNAPSHOT_KEY='<same secret as CI>'   # if signed
 ```bash
 pip install -e /path/to/pareto-context-graph[tiktoken]
 
-pareto-context-graph build --from-snapshot ~/Downloads/kubernetes-graph-snapshot.tar.gz
+pareto-context-graph init --from-snapshot ~/Downloads/kubernetes-graph-snapshot.tar.gz --skip-install
+pareto-context-graph install --platform cursor
 ```
 
 Also accepts HTTPS URLs:
@@ -86,46 +87,50 @@ pareto-context-graph serve --watch --interval 600
 
 ```bash
 git pull
-pareto-context-graph build    # incremental only when HEAD advanced
+git pull
+pareto-context-graph sync --with-index   # incremental graph + index catch-up
 # or: pareto-context-graph update
 ```
 
 ---
 
-## Linux (T3) — team snapshot
+## Linux (T3) — monthly CI snapshot (recommended)
 
-There is **no weekly linux CI artifact** today (build ~10.5 h). Options:
+**Target:** snapshot import + incremental update in **minutes** (vs ~1–2 h co-change cold build).
 
-### A. Import a teammate's export (fastest)
+### 1. Get the CI snapshot
 
-Someone who already built shares:
+**GitHub Actions:** **Actions → Bench T3 (Linux) →** latest monthly run → artifact **`linux-graph-snapshot`**
+
+### 2. Bootstrap from snapshot
 
 ```bash
 git clone --filter=blob:none https://github.com/torvalds/linux.git bench/linux
 cd bench/linux
 
-export PCG_SNAPSHOT_KEY='<shared secret if signed>'
-pareto-context-graph build --from-snapshot /path/to/linux-graph-snapshot.tar.gz
+export PCG_SNAPSHOT_KEY='<same secret as CI>'   # if signed
+pareto-context-graph build --from-snapshot ~/Downloads/linux-graph-snapshot.tar.gz
 pareto-context-graph doctor
 ```
 
-### B. Export after a one-time cold build (backup for the team)
+### 3. Team export (fallback)
+
+If CI artifact is unavailable, import a teammate export:
 
 ```bash
-make bench-linux   # hours — run once on a beefy machine
-
-pareto-context-graph snapshot export bench/backups/linux-graph-$(date +%Y%m%d).tar.gz
-# ~390 MB compressed for a ~1.2 GB graph.db — share tarball + .sig.json
+pareto-context-graph build --from-snapshot /path/to/linux-graph-snapshot.tar.gz
 ```
 
-### C. Cold build (last resort)
+### 4. Cold build (last resort)
 
 ```bash
-pareto-context-graph build --profile huge \
+pareto-context-graph build --profile huge-full \
   --since "24 months ago" \
   --commits 100000 \
   --shards 8
 ```
+
+Phase 2 search index is lazy by default — run `pareto-context-graph index` when you need symbol search.
 
 See [BENCHMARK_REPOS.md](BENCHMARK_REPOS.md) for measured timings.
 
@@ -171,7 +176,7 @@ Weekly workflow [`.github/workflows/bench-t2.yml`](../.github/workflows/bench-t2
 |---------|-----|
 | `snapshot signature verification failed` | Set `PCG_SNAPSHOT_KEY` to match CI secret, or use unsigned export without `PCG_REQUIRE_SIGNED_SNAPSHOTS` |
 | `missing snapshot source` on export | Run `pareto-context-graph build` first — `.pareto-context-graph/` must exist |
-| Import OK but stale graph | `git pull` then `pareto-context-graph build` (incremental) |
+| Import OK but stale graph | `git pull` then `pareto-context-graph sync` (or `sync --with-index`) |
 | `doctor` shows 0 files | Wrong repo root — run commands from git toplevel |
 | Hub context slow | See [BENCHMARKS.md](BENCHMARKS.md) — should be sub-second on k8s/linux |
 
@@ -192,6 +197,6 @@ Recorded breakdowns: [BENCHMARKS.md](BENCHMARKS.md).
 
 ## Related docs
 
-- [QUICKSTART.md](QUICKSTART.md) — install + editor wiring
+- [QUICKSTART.md](QUICKSTART.md) — `init`, `sync`, editor wiring
 - [BENCHMARK_REPOS.md](BENCHMARK_REPOS.md) — tier recipes and disk estimates
-- [COMMANDS.md](COMMANDS.md) — `build --from-snapshot`, `snapshot export|import`
+- [COMMANDS.md](COMMANDS.md) — `init`, `build --from-snapshot`, `sync`, `snapshot export|import`

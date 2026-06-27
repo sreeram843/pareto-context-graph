@@ -56,15 +56,19 @@ See [CI_SNAPSHOTS.md](CI_SNAPSHOTS.md).
 
 ---
 
-## tree-sitter symbols (optional)
+## tree-sitter symbols (default when installed)
 
 ```bash
 pip install -e '.[treesitter]'
-export PCG_FEATURE_TREESITTER=1
-pareto-context-graph build   # re-index with tree-sitter for .py / .go
+pareto-context-graph build   # symbol index uses tree-sitter for .py / .go / TS
 ```
 
-Falls back to regex symbol extraction when disabled or grammars unavailable.
+Tree-sitter is **on by default** when grammars are installed (`PCG_FEATURE_TREESITTER=1`).
+Set `PCG_FEATURE_TREESITTER=0` to force regex-only symbol extraction.
+`doctor` reports symbol index mode and warns when running regex fallback.
+
+**Route edges** (FastAPI/Flask `@router.get`, `include_router`) are extracted automatically
+when `STRUCTURAL_EDGES` is on (default).
 
 ---
 
@@ -162,4 +166,4 @@ make bench-huge
 make help
 ```
 
-Roadmap: [PHASES.md](PHASES.md) · open items: [LEFTOVERS.md](LEFTOVERS.md)
+Roadmap: [PHASES.md](PHASES.md)

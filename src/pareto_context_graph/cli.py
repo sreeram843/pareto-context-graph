@@ -35,6 +35,69 @@ def _resolve_repo_root(path: Path | None = None) -> Path:
     return Path(result.stdout.strip())
 
 
+def _print_init_next_steps(repo: Path, *, from_snapshot: bool, installed: bool) -> None:
+    print("\nNext steps:")
+    print("  pareto-context-graph doctor")
+    if from_snapshot:
+        print("  pareto-context-graph sync          # after git pull")
+    else:
+        print("  pareto-context-graph sync          # keep graph fresh after commits")
+    print("  pareto-context-graph serve --watch # MCP with auto-sync")
+    if not installed:
+        print("  pareto-context-graph install       # configure Cursor/Claude MCP")
+    print(f"  Graph: {repo / '.pareto-context-graph/graph.db'}")
+
+
+def cmd_init(args: argparse.Namespace) -> None:
+    """One-shot onboarding: build (+ optional snapshot), install, next steps."""
+    cmd_build(args)
+    if not args.skip_install:
+        cmd_install(
+            argparse.Namespace(
+                repo=args.repo,
+                target=args.target,
+                location=args.location,
+                force=False,
+                print_config=None,
+                watch=args.watch,
+                yes=True,
+            )
+        )
+    repo = _resolve_repo_root(Path(args.repo) if args.repo else None)
+    _print_init_next_steps(
+        repo,
+        from_snapshot=bool(args.from_snapshot),
+        installed=not args.skip_install,
+    )
+
+
+def cmd_sync(args: argparse.Namespace) -> None:
+    """Incremental graph update (+ optional search index catch-up)."""
+    from .graph import incremental_update
+    from .indexing import SEARCH_INDEX_STATUS_META, count_pending_index_files, ensure_search_indexes
+    from .store import Store
+
+    repo = _resolve_repo_root(Path(args.repo) if args.repo else None)
+    profile_name = args.profile or autodetect_profile(repo)
+    store = incremental_update(repo)
+    print(f"Synced graph for {repo}")
+    print(f"  Files:  {store.file_count()}")
+    print(f"  Edges:  {store.edge_count()}")
+
+    if args.with_index:
+        stats = ensure_search_indexes(store, repo, profile_name=profile_name)
+        status = store.get_meta(SEARCH_INDEX_STATUS_META) or "unknown"
+        print(f"  Search index: {status} (indexed {stats.get('indexed', 0)})")
+
+    pending = count_pending_index_files(store, repo, profile_name=profile_name)
+    if pending:
+        print(
+            f"  Pending index: {pending} file(s) — "
+            "run `pareto-context-graph index` or `sync --with-index`"
+        )
+    store.close()
+
+
 def cmd_build(args: argparse.Namespace) -> None:
     """Build the co-change graph from git history."""
     from .graph import build_graph_sharded, incremental_update
@@ -47,10 +110,13 @@ def cmd_build(args: argparse.Namespace) -> None:
     commits = args.commits if args.commits is not None else profile.get("commits", 5000)
     since = args.since if args.since is not None else profile.get("since")
     shards = args.shards if args.shards is not None else profile.get("shards", 1)
+    search_mode = "eager" if getattr(args, "with_search_index", False) else None
 
     print(f"Building graph for {repo} ...")
     if profile_name:
         print(f"  Profile: {profile_name}")
+    if search_mode == "eager":
+        print("  Search index: eager (full symbol/content index during build)")
     if args.from_snapshot:
         snapshot_path = fetch_snapshot(
             args.from_snapshot,
@@ -69,15 +135,54 @@ def cmd_build(args: argparse.Namespace) -> None:
         max_commits=commits,
         since=since,
         shards=shards,
+        profile_name=profile_name,
+        search_index_mode=search_mode,
     )
     if store.get_meta("build_status") == "noop":
         print("  Graph up to date (skipped rebuild)")
+    else:
+        index_status = store.get_meta("search_index_status") or "unknown"
+        if index_status == "pending":
+            print("  Search index: deferred (run `pareto-context-graph index` or query `search`)")
+        elif index_status == "complete":
+            print("  Search index: complete")
     print(f"  Files:  {store.file_count()}")
     print(f"  Edges:  {store.edge_count()}")
     if since:
         print(f"  Since:  {since}")
     print(f"  Shards: {shards}")
     print(f"  Stored: {repo / '.pareto-context-graph/graph.db'}")
+    store.close()
+
+
+def cmd_index(args: argparse.Namespace) -> None:
+    """Build or resume deferred symbol/content search indexes."""
+    from .indexing import SEARCH_INDEX_STATUS_META, ensure_search_indexes
+    from .store import Store
+
+    repo = _resolve_repo_root(Path(args.repo) if args.repo else None)
+    profile_name = args.profile or autodetect_profile(repo)
+    store = Store(repo)
+    if store.file_count() == 0:
+        print("Error: graph not built — run `pareto-context-graph build` first", file=sys.stderr)
+        store.close()
+        sys.exit(1)
+
+    before = store.get_meta(SEARCH_INDEX_STATUS_META) or "pending"
+    stats = ensure_search_indexes(
+        store,
+        repo,
+        profile_name=profile_name,
+        force=getattr(args, "force", False),
+    )
+    after = store.get_meta(SEARCH_INDEX_STATUS_META) or "unknown"
+    if args.json:
+        print(json.dumps({"before": before, "after": after, **stats}, indent=2))
+    else:
+        print(f"Search index: {before} → {after}")
+        print(f"  Indexed:   {stats.get('indexed', 0)}")
+        print(f"  Unchanged: {stats.get('unchanged', 0)}")
+        print(f"  Skipped:   {stats.get('skipped', 0)}")
     store.close()
 
 
@@ -183,17 +288,24 @@ def cmd_serve(args: argparse.Namespace) -> None:
     """Start the MCP server."""
     from .daemon import GraphWatcher
     from .feedback import FeedbackFlusher
+    from .repo_registry import build_repo_registry
     from .server import run_server
 
     repo = _resolve_repo_root(Path(args.repo) if args.repo else None)
+    registry = build_repo_registry(repo, getattr(args, "repo_map", None) or [])
     watcher = None
     flusher = FeedbackFlusher(repo, interval=30)
     flusher.start()
     if args.watch:
-        watcher = GraphWatcher(repo, interval=args.interval)
+        debounce_ms = args.debounce_ms
+        if debounce_ms is None:
+            import os
+
+            debounce_ms = int(os.environ.get("PCG_WATCH_DEBOUNCE_MS", "2000"))
+        watcher = GraphWatcher(repo, interval=args.interval, debounce_ms=debounce_ms)
         watcher.start()
     try:
-        run_server(repo, transport=args.transport)
+        run_server(registry, transport=args.transport)
     finally:
         flusher.stop()
         if watcher is not None:
@@ -263,6 +375,22 @@ def cmd_doctor(args: argparse.Namespace) -> None:
         shards=args.shards,
     )
     print(format_doctor_text(report))
+
+
+def cmd_architecture_report(args: argparse.Namespace) -> None:
+    from .architecture_report import write_architecture_report
+
+    repo = _resolve_repo_root(Path(args.repo) if args.repo else None)
+    out = write_architecture_report(repo)
+    print(f"Wrote {out}")
+
+
+def cmd_detect_changes(args: argparse.Namespace) -> None:
+    from .graph_diff import detect_changes
+
+    repo = _resolve_repo_root(Path(args.repo) if args.repo else None)
+    payload = detect_changes(repo, base=args.base, max_depth=args.max_depth)
+    print(json.dumps(payload, indent=2))
 
 
 def cmd_snapshot_export(args: argparse.Namespace) -> None:
@@ -413,18 +541,96 @@ def cmd_session_clear(args: argparse.Namespace) -> None:
     print(f"Cleared {repo / '.pareto-context-graph' / 'session.json'}")
 
 
-def cmd_install(args: argparse.Namespace) -> None:
-    """Auto-configure for AI coding tools."""
+def cmd_affected(args: argparse.Namespace) -> None:
+    """Suggest tests to run for changed files (reverse structural walk)."""
+    from .affected import affected_from_git, compute_affected_tests, read_paths_from_stdin
+
     repo = _resolve_repo_root(Path(args.repo) if args.repo else None)
-    platform = getattr(args, "platform", None) or "all"
-    if platform in {"all", "copilot", "vscode"}:
-        _install_copilot(repo)
-    if platform in {"all", "cursor"}:
-        _install_cursor(repo)
-    if platform in {"all", "copilot", "cursor", "vscode"}:
-        _install_instructions(repo, force=getattr(args, "force", False))
+    paths = list(args.paths or [])
+    if args.stdin:
+        paths.extend(read_paths_from_stdin())
+
+    if paths:
+        from .store import Store
+
+        store = Store(repo)
+        try:
+            payload = compute_affected_tests(
+                store,
+                repo,
+                paths,
+                max_depth=args.max_depth,
+            )
+            payload["base"] = args.base
+        finally:
+            store.close()
+    else:
+        payload = affected_from_git(repo, base=args.base, max_depth=args.max_depth)
+
+    if args.quiet:
+        for test_path in payload.get("tests", []):
+            print(test_path)
+        return
+
+    if args.json:
+        print(json.dumps(payload, indent=2))
+        return
+
+    print(f"Changed: {len(payload.get('changed', []))} file(s)")
+    print(f"Tests to run: {payload.get('test_count', 0)}")
+    for test_path in payload.get("tests", [])[:40]:
+        print(f"  - {test_path}")
+    if payload.get("test_count", 0) > 40:
+        print(f"  ... and {payload['test_count'] - 40} more")
+
+
+def cmd_install(args: argparse.Namespace) -> None:
+    """Auto-configure MCP and steering markers for AI coding tools."""
+    from .agent_install import INSTALL_TARGETS, print_agent_config, install_agent
+
+    repo = _resolve_repo_root(Path(args.repo) if args.repo else None)
+    target = getattr(args, "target", None) or getattr(args, "platform", None) or "auto"
+    if target not in INSTALL_TARGETS:
+        print(f"Error: unknown target {target}", file=sys.stderr)
+        sys.exit(1)
+
+    if getattr(args, "print_config", None):
+        payload = print_agent_config(
+            repo,
+            args.print_config,
+            location=getattr(args, "location", "local"),
+            watch=getattr(args, "watch", False),
+        )
+        print(json.dumps(payload, indent=2))
+        return
+
+    messages = install_agent(
+        repo,
+        target,
+        location=getattr(args, "location", "local"),
+        force=getattr(args, "force", False),
+        watch=getattr(args, "watch", False),
+    )
+    for line in messages:
+        print(f"  {line}")
     print("Installed. Restart your editor to activate.")
     print("  Tip: pip install -e '.[tiktoken]' for accurate token budgets (recommended)")
+
+
+def cmd_uninstall(args: argparse.Namespace) -> None:
+    from .agent_install import INSTALL_TARGETS, uninstall_agent
+
+    repo = _resolve_repo_root(Path(args.repo) if args.repo else None)
+    target = getattr(args, "target", None) or getattr(args, "platform", None) or "all"
+    if target not in INSTALL_TARGETS:
+        print(f"Error: unknown target {target}", file=sys.stderr)
+        sys.exit(1)
+    messages = uninstall_agent(repo, target, location=getattr(args, "location", "local"))
+    if not messages:
+        print("Nothing to remove.")
+        return
+    for line in messages:
+        print(f"  {line}")
 
 
 def cmd_eval(args: argparse.Namespace) -> None:
@@ -452,6 +658,68 @@ def cmd_eval(args: argparse.Namespace) -> None:
         sys.exit(1)
 
     repo_overrides = parse_repo_overrides(args.repo_map)
+    if getattr(args, "agent_ab", False):
+        from .agent_ab import (
+            DEFAULT_AGENT_AB_BASELINE_PATH,
+            check_agent_ab_gate,
+            portable_agent_ab_payload,
+            run_agent_ab_study,
+        )
+
+        agent_ab_baseline_path = Path(
+            getattr(args, "agent_ab_baseline", DEFAULT_AGENT_AB_BASELINE_PATH)
+        ).resolve()
+        ab_result = run_agent_ab_study(repo_overrides=repo_overrides, golden_dir=golden_dir)
+
+        if getattr(args, "update_agent_ab_baseline", False):
+            agent_ab_baseline_path.parent.mkdir(parents=True, exist_ok=True)
+            agent_ab_baseline_path.write_text(
+                json.dumps(portable_agent_ab_payload(ab_result), indent=2) + "\n"
+            )
+            print(f"Agent A/B baseline written to {agent_ab_baseline_path}")
+
+        if args.json:
+            print(json.dumps(ab_result, indent=2))
+        else:
+            summary = ab_result["summary"]
+            pcg = summary["pcg"]
+            baseline = summary["baseline"]
+            delta = summary["pcg_vs_baseline"]
+            print(f"\n{'=' * 60}")
+            print("  Agent A/B harness (PCG vs grep+read baseline)")
+            print(f"{'=' * 60}\n")
+            print(f"  Cases:              {ab_result['cases']}")
+            print(f"  PCG tool calls:     {pcg['tool_calls']:.1f}  (baseline {baseline['tool_calls']:.1f})")
+            print(f"  PCG file reads:     {pcg['file_reads']:.1f}  (baseline {baseline['file_reads']:.1f})")
+            print(f"  PCG tokens:         {pcg['tokens']:.0f}  (baseline {baseline['tokens']:.0f})")
+            print(f"  PCG wall time ms:   {pcg['wall_time_ms']:.1f}  (baseline {baseline['wall_time_ms']:.1f})")
+            print(f"  PCG recall@5:       {pcg['recall_at_5']:.4f}  (baseline {baseline['recall_at_5']:.4f})")
+            if delta.get("tool_calls_reduction_pct") is not None:
+                print(f"  Tool call reduction:{delta['tool_calls_reduction_pct']:.1f}%")
+            if delta.get("tokens_reduction_pct") is not None:
+                print(f"  Token reduction:    {delta['tokens_reduction_pct']:.1f}%")
+            print(f"  Recall delta:       {delta.get('recall_at_5_delta', 0):+.4f}")
+
+        ab_exit = 0
+        if ab_result["cases"] == 0:
+            print("Error: no agent A/B cases ran", file=sys.stderr)
+            ab_exit = 1
+
+        if getattr(args, "check_agent_ab", False):
+            if not agent_ab_baseline_path.exists():
+                print(f"Error: agent A/B baseline missing at {agent_ab_baseline_path}", file=sys.stderr)
+                sys.exit(1)
+            stored = json.loads(agent_ab_baseline_path.read_text())
+            gate = check_agent_ab_gate(ab_result, stored)
+            if not args.json:
+                print(f"\nAgent A/B gate: {'PASS' if gate['passed'] else 'FAIL'}")
+                for item in gate.get("failures", []):
+                    print(f"  {item}")
+            if not gate["passed"]:
+                ab_exit = 1
+
+        sys.exit(ab_exit)
+
     if getattr(args, "feedback_replay", False):
         from .feedback_replay import (
             MIN_MRR_IMPROVEMENT,
@@ -635,142 +903,6 @@ def cmd_eval(args: argparse.Namespace) -> None:
     sys.exit(exit_code)
 
 
-def _install_copilot(repo: Path) -> None:
-    """Write MCP config for GitHub Copilot (VS Code)."""
-    mcp_dir = repo / ".vscode"
-    mcp_dir.mkdir(exist_ok=True)
-    settings_path = mcp_dir / "mcp.json"
-
-    config = {
-        "servers": {
-            "pareto-context-graph": {
-                "command": "pareto-context-graph",
-                "args": ["serve", "--repo", str(repo)],
-                "type": "stdio",
-            }
-        }
-    }
-
-    if settings_path.exists():
-        existing = json.loads(settings_path.read_text())
-        servers = existing.get("servers", {})
-        servers["pareto-context-graph"] = config["servers"]["pareto-context-graph"]
-        existing["servers"] = servers
-        settings_path.write_text(json.dumps(existing, indent=2) + "\n")
-    else:
-        settings_path.write_text(json.dumps(config, indent=2) + "\n")
-
-    print(f"  Copilot MCP config written to {settings_path}")
-
-
-def _install_cursor(repo: Path) -> None:
-    """Write MCP config for Cursor (project-local)."""
-    cursor_dir = repo / ".cursor"
-    cursor_dir.mkdir(exist_ok=True)
-    mcp_path = cursor_dir / "mcp.json"
-    entry = {
-        "command": "pareto-context-graph",
-        "args": ["serve", "--repo", str(repo.resolve())],
-    }
-    if mcp_path.exists():
-        try:
-            existing = json.loads(mcp_path.read_text())
-        except json.JSONDecodeError:
-            existing = {}
-        servers = existing.get("mcpServers", {})
-        servers["pareto-context-graph"] = entry
-        existing["mcpServers"] = servers
-        mcp_path.write_text(json.dumps(existing, indent=2) + "\n")
-    else:
-        mcp_path.write_text(
-            json.dumps({"mcpServers": {"pareto-context-graph": entry}}, indent=2) + "\n"
-        )
-    print(f"  Cursor MCP config written to {mcp_path}")
-
-
-def _install_instructions(repo: Path, force: bool = False) -> None:
-    """Write AI instructions that enforce get_context usage on every prompt."""
-    instructions_dir = repo / ".github"
-    instructions_dir.mkdir(exist_ok=True)
-    instructions_path = instructions_dir / "copilot-instructions.md"
-
-    instructions = """\
-# Code Graph MCP — Context Instructions
-
-## IMPORTANT: Always scope your context before acting
-
-Before answering any question or performing any task in this repository,
-call the `pareto_context_graph` MCP tool to get relevant context.
-
-### How to use:
-
-1. Identify which file(s) the user is asking about or working in.
-2. Call `pareto_context_graph` with command="context" and those file paths:
-   ```json
-   {"command": "context", "files": ["path/to/file.rb"], "query": "user's question", "tier": 1}
-   ```
-3. Tier 1 (default) gives summaries. If you need more detail on specific files,
-   call again with tier=2 (signatures) or tier=3 (code chunks).
-4. On follow-up prompts, pass `already_have` with files you already read:
-   ```json
-   {"command": "context", "files": [...], "already_have": ["file1.rb", "file2.rb"]}
-   ```
-5. Start a **new task** with a fresh session — call `session_clear` or
-   `pareto-context-graph session clear` so stale paths are not auto-merged:
-   ```json
-   {"command": "session_clear"}
-   ```
-6. Do NOT scan, grep, or read other files unless the tool's results are insufficient.
-
-### Why:
-This repository has a co-change graph built from git history plus import/keyword analysis.
-The tool identifies the files most likely to matter — ones that provably changed together,
-share imports, or follow naming conventions — so you read the right files, not random ones.
-Less noise = fewer hallucinations = more accurate answers.
-
-### Tiers:
-- tier=1: File paths + 1-line summaries (cheapest, use for orientation — ~30 tokens/file)
-- tier=2: Function/class signatures (use when you need API shape)
-- tier=3: Relevant code chunks (use when you need implementation details)
-
-### Delta context (multi-turn):
-On follow-up prompts, always pass `already_have` with files already in the conversation.
-This skips redundant re-reads and keeps each turn focused on new context only.
-For a **new user task**, call `session_clear` first (or CLI: `pareto-context-graph session clear`).
-
-### Token budgets:
-Install the tiktoken extra for honest budgets: `pip install -e '.[tiktoken]'`.
-Use `diagnostics: true` on context for per-candidate score breakdown.
-Every `context` response includes `suggested_next` (tier escalation / compression hints).
-
-### Other commands:
-- `search` — Find files by name/path (e.g. `{"command": "search", "query": "patient"}`)
-- `neighbours` — Co-change neighbours for a file (e.g. `{"command": "neighbours", "path": "app/models/patient.rb"}`)
-- `blast` — Files affected by current git diff
-- `stats` — File/edge counts for the graph
-- `hotspots` — Most co-changed files (top N)
-- `communities` — Detected file clusters (architectural modules)
-"""
-
-    if instructions_path.exists():
-        existing = instructions_path.read_text()
-        if "Code Graph MCP" not in existing:
-            # File exists but doesn't have our section — append
-            instructions_path.write_text(existing + "\n" + instructions)
-            print(f"  Instructions appended to {instructions_path}")
-        elif force:
-            # Replace our section in-place (everything from the header onward)
-            marker = "# Code Graph MCP"
-            idx = existing.index(marker)
-            instructions_path.write_text(existing[:idx] + instructions)
-            print(f"  Instructions updated in {instructions_path}")
-        else:
-            print(f"  Instructions already present in {instructions_path} (use --force to update)")
-    else:
-        instructions_path.write_text(instructions)
-        print(f"  Instructions written to {instructions_path}")
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="pareto-context-graph",
@@ -793,6 +925,72 @@ def main() -> None:
     p_build.add_argument(
         "--from-snapshot", help="Import snapshot (file or URL) and then incremental update"
     )
+    p_build.add_argument(
+        "--with-search-index",
+        action="store_true",
+        help="Build symbol/content FTS during cold build (default: lazy on huge profiles)",
+    )
+
+    # init (= build + optional install + next steps)
+    p_init = sub.add_parser("init", help="Build graph, install MCP, print next steps")
+    p_init.add_argument("--commits", type=int, help="Max commits to analyze")
+    p_init.add_argument(
+        "--since",
+        help='Git history window (for example: "12 months ago" or "2025-01-01")',
+    )
+    p_init.add_argument("--shards", type=int, help="Number of shard workers for build")
+    p_init.add_argument("--profile", choices=sorted(PROFILES.keys()), help="Build profile preset")
+    p_init.add_argument(
+        "--from-snapshot", help="Import snapshot (file or URL) and then incremental update"
+    )
+    p_init.add_argument(
+        "--with-search-index",
+        action="store_true",
+        help="Build symbol/content FTS during cold build (default: lazy on huge profiles)",
+    )
+    p_init.add_argument(
+        "--skip-install",
+        action="store_true",
+        help="Skip `install` step (build only)",
+    )
+    p_init.add_argument(
+        "--target",
+        choices=sorted(
+            {"all", "auto", "cursor", "copilot", "vscode", "claude", "codex", "gemini", "windsurf"}
+        ),
+        default="auto",
+        help="Agent/editor target for install (default: auto)",
+    )
+    p_init.add_argument(
+        "--location",
+        choices=["local", "global"],
+        default="local",
+        help="Write Cursor MCP config locally (.cursor/) or globally (~/.cursor/)",
+    )
+    p_init.add_argument(
+        "--watch",
+        action="store_true",
+        help="Add --watch to serve args in generated MCP config",
+    )
+
+    # sync (= incremental update + optional index catch-up)
+    p_sync = sub.add_parser("sync", help="Incremental graph update (+ optional index catch-up)")
+    p_sync.add_argument("--profile", choices=sorted(PROFILES.keys()), help="Profile for index catch-up")
+    p_sync.add_argument(
+        "--with-index",
+        action="store_true",
+        help="Also run deferred search index catch-up",
+    )
+
+    # index (Phase 2 search indexes)
+    p_index = sub.add_parser("index", help="Build or resume deferred search indexes")
+    p_index.add_argument("--profile", choices=sorted(PROFILES.keys()), help="Build profile preset")
+    p_index.add_argument(
+        "--force",
+        action="store_true",
+        help="Clear and rebuild all symbol/content indexes from scratch",
+    )
+    p_index.add_argument("--json", action="store_true", help="Output stats as JSON")
 
     # query
     p_query = sub.add_parser("query", help="Show blast radius and token savings")
@@ -811,26 +1009,106 @@ def main() -> None:
     p_serve = sub.add_parser("serve", help="Start MCP server")
     p_serve.add_argument("--repo", help="Path to git repository (default: current directory)")
     p_serve.add_argument(
+        "--repo-map",
+        action="append",
+        default=[],
+        metavar="KEY=PATH",
+        help="Additional named repos for monorepo serve (repeatable)",
+    )
+    p_serve.add_argument(
         "--transport", default="stdio", choices=["stdio"], help="Transport protocol"
     )
     p_serve.add_argument(
-        "--watch", action="store_true", help="Run periodic incremental updates while serving"
+        "--watch", action="store_true", help="Watch repo for edits and sync search index"
     )
     p_serve.add_argument(
-        "--interval", type=int, default=600, help="Watch update interval in seconds"
+        "--interval",
+        type=int,
+        default=600,
+        help="Co-change incremental update interval in seconds (default: 600)",
+    )
+    p_serve.add_argument(
+        "--debounce-ms",
+        type=int,
+        default=None,
+        help="File watcher debounce in ms (default: PCG_WATCH_DEBOUNCE_MS or 2000)",
     )
 
     # install
-    p_install = sub.add_parser("install", help="Auto-configure for AI coding tools")
+    p_install = sub.add_parser("install", help="Auto-configure MCP + steering markers")
+    p_install.add_argument("--repo", help="Path to git repository (default: current directory)")
     p_install.add_argument(
-        "--force", action="store_true", help="Overwrite existing Code Graph instructions"
+        "--force", action="store_true", help="Overwrite existing PCG steering markers"
     )
     p_install.add_argument(
+        "--target",
         "--platform",
-        choices=["all", "cursor", "copilot", "vscode"],
-        default="all",
-        help="Editor target (default: all)",
+        dest="target",
+        choices=sorted(
+            {"all", "auto", "cursor", "copilot", "vscode", "claude", "codex", "gemini", "windsurf"}
+        ),
+        default="auto",
+        help="Agent/editor target (default: auto = cursor+copilot+claude steering)",
     )
+    p_install.add_argument(
+        "--location",
+        choices=["local", "global"],
+        default="local",
+        help="Write Cursor MCP config locally (.cursor/) or globally (~/.cursor/)",
+    )
+    p_install.add_argument(
+        "--print-config",
+        metavar="AGENT",
+        help="Print MCP JSON for AGENT (cursor, claude, windsurf, …) without writing files",
+    )
+    p_install.add_argument(
+        "--watch",
+        action="store_true",
+        help="Add --watch to serve args in generated MCP config",
+    )
+    p_install.add_argument(
+        "--yes",
+        action="store_true",
+        help="Non-interactive install (reserved; install is non-interactive today)",
+    )
+
+    p_uninstall = sub.add_parser("uninstall", help="Remove PCG MCP entries and steering markers")
+    p_uninstall.add_argument("--repo", help="Path to git repository (default: current directory)")
+    p_uninstall.add_argument(
+        "--target",
+        "--platform",
+        dest="target",
+        choices=sorted(
+            {"all", "auto", "cursor", "copilot", "vscode", "claude", "codex", "gemini", "windsurf"}
+        ),
+        default="all",
+    )
+    p_uninstall.add_argument(
+        "--location",
+        choices=["local", "global"],
+        default="local",
+    )
+
+    # affected
+    p_affected = sub.add_parser(
+        "affected",
+        help="Suggest tests for changed files (reverse structural/import walk)",
+    )
+    p_affected.add_argument("--repo", help="Path to git repository (default: current directory)")
+    p_affected.add_argument("--base", default="main", help="Git base branch when inferring diff")
+    p_affected.add_argument(
+        "paths",
+        nargs="*",
+        help="Changed file paths (default: git diff vs --base)",
+    )
+    p_affected.add_argument(
+        "--stdin",
+        action="store_true",
+        help="Also read changed paths from stdin (e.g. git diff --name-only | pcg affected --stdin)",
+    )
+    p_affected.add_argument("--max-depth", type=int, default=3, help="Reverse walk depth limit")
+    p_affected.add_argument("--json", action="store_true", help="Emit JSON payload")
+    p_affected.add_argument("--quiet", action="store_true", help="Print one test path per line")
 
     # metrics
     p_metrics = sub.add_parser("metrics", help="Show or serve in-process Prometheus-style metrics")
@@ -903,6 +1181,26 @@ def main() -> None:
         default=None,
         help="Minimum held-out MRR gain required (default: 0.03)",
     )
+    p_eval.add_argument(
+        "--agent-ab",
+        action="store_true",
+        help="Headless agent A/B: PCG one-call vs grep+read baseline on golden cases",
+    )
+    p_eval.add_argument(
+        "--agent-ab-baseline",
+        default="tests/eval/baseline-agent-ab.json",
+        help="Agent A/B regression baseline (default: tests/eval/baseline-agent-ab.json)",
+    )
+    p_eval.add_argument(
+        "--update-agent-ab-baseline",
+        action="store_true",
+        help="Write agent A/B summary to --agent-ab-baseline",
+    )
+    p_eval.add_argument(
+        "--check-agent-ab",
+        action="store_true",
+        help="With --agent-ab: fail if PCG recall or tool-call savings regress vs baseline",
+    )
 
     # decay-sweep
     p_decay = sub.add_parser("decay-sweep", help="Apply decay and optional prune to edge weights")
@@ -925,6 +1223,17 @@ def main() -> None:
         "--since", help="Git since expression for estimate (e.g. '12 months ago')"
     )
     p_doctor.add_argument("--shards", type=int, help="Shard count for estimate")
+
+    p_arch = sub.add_parser(
+        "architecture-report",
+        help="Write ARCHITECTURE_REPORT.md from graph stats (no LLM)",
+    )
+    p_arch.add_argument("--repo", default=None, help="Repository path (default: git root)")
+
+    p_dc = sub.add_parser("detect-changes", help="Git diff blast radius + index staleness")
+    p_dc.add_argument("--repo", default=None, help="Repository path (default: git root)")
+    p_dc.add_argument("--base", default="main", help="Git base branch for diff")
+    p_dc.add_argument("--max-depth", type=int, default=2, help="Blast BFS depth")
 
     # snapshot export/import
     p_snap = sub.add_parser("snapshot", help="Export/import graph snapshot")
@@ -990,14 +1299,21 @@ def main() -> None:
 
     commands = {
         "build": cmd_build,
+        "init": cmd_init,
+        "sync": cmd_sync,
+        "index": cmd_index,
         "query": cmd_query,
         "serve": cmd_serve,
         "install": cmd_install,
+        "uninstall": cmd_uninstall,
+        "affected": cmd_affected,
         "metrics": cmd_metrics,
         "eval": cmd_eval,
         "decay-sweep": cmd_decay_sweep,
         "stats": cmd_stats,
         "doctor": cmd_doctor,
+        "architecture-report": cmd_architecture_report,
+        "detect-changes": cmd_detect_changes,
         "embed": cmd_embed,
         "bench": cmd_bench,
         "learn": cmd_learn,

@@ -4,9 +4,9 @@
       "repo_key": "fastapi",
       "path": "bench/fastapi",
       "sha": "219ac634ab82b6321492ef97fb223b618ce13948",
-      "build_seconds": 2,
+      "build_seconds": 17,
       "tracked_files": 2993,
-      "graph_db_bytes": 24821760,
+      "graph_db_bytes": 31068160,
       "stats": {
         "files": 3568,
         "edges": 269659,
@@ -53,13 +53,13 @@
             "degree": 658
           }
         ],
-        "repo": "bench/fastapi",
+        "repo": "/Users/srirammentey/AI/pareto-context-graph/bench/fastapi",
         "last_build_commits": "1056",
         "total_commits_scanned": "5000",
         "build_strategy": "sharded-v1:1",
         "last_build_since": ""
       },
-      "built_at": "2026-06-24T05:21:37.766508+00:00"
+      "built_at": "2026-06-26T04:57:51.762423+00:00"
     },
     {
       "repo_key": "httpx",
@@ -67,7 +67,7 @@
       "sha": "b5addb64f0161ff6bfe94c124ef76f6a1fba5254",
       "build_seconds": 1,
       "tracked_files": 125,
-      "graph_db_bytes": 1146880,
+      "graph_db_bytes": 2256896,
       "stats": {
         "files": 315,
         "edges": 10562,
@@ -114,13 +114,13 @@
             "degree": 170
           }
         ],
-        "repo": "bench/httpx",
+        "repo": "/Users/srirammentey/AI/pareto-context-graph/bench/httpx",
         "last_build_commits": "800",
         "total_commits_scanned": "1482",
         "build_strategy": "sharded-v1:1",
         "last_build_since": ""
       },
-      "built_at": "2026-06-24T05:21:38.138966+00:00"
+      "built_at": "2026-06-26T04:57:52.396602+00:00"
     },
     {
       "repo_key": "kubernetes",
@@ -213,7 +213,7 @@
       "profile": "huge",
       "build_seconds": null,
       "tracked_files": 94752,
-      "graph_db_bytes": 1254965248,
+      "graph_db_bytes": 83628032,
       "incremental_update": {
         "seconds": null,
         "skipped": true
@@ -225,202 +225,202 @@
         "total_samples": 18,
         "context": {
           "samples": 9,
-          "p50_seconds": 0.1149,
-          "p95_seconds": 0.1776,
-          "max_seconds": 0.213
+          "p50_seconds": 0.6053,
+          "p95_seconds": 0.8083,
+          "max_seconds": 0.8088
         },
         "hub_only_context": {
           "samples": 9,
-          "p50_seconds": 0.1165,
-          "p95_seconds": 0.1317,
-          "max_seconds": 0.1343
+          "p50_seconds": 0.5936,
+          "p95_seconds": 0.6431,
+          "max_seconds": 0.6525
         },
         "token_savings": {
           "samples": [
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 3568,
               "agent_baseline_tokens": 86676,
-              "reduction_vs_agent": 38.23,
+              "reduction_vs_agent": 24.29,
               "query": "syscall scheduler",
               "hub_only": false
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 3568,
               "agent_baseline_tokens": 47368,
-              "reduction_vs_agent": 20.89,
+              "reduction_vs_agent": 13.28,
               "query": "",
               "hub_only": true
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 3568,
               "agent_baseline_tokens": 86676,
-              "reduction_vs_agent": 38.23,
+              "reduction_vs_agent": 24.29,
               "query": "syscall scheduler",
               "hub_only": false
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 3568,
               "agent_baseline_tokens": 47368,
-              "reduction_vs_agent": 20.89,
+              "reduction_vs_agent": 13.28,
               "query": "",
               "hub_only": true
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 3568,
               "agent_baseline_tokens": 86676,
-              "reduction_vs_agent": 38.23,
+              "reduction_vs_agent": 24.29,
               "query": "syscall scheduler",
               "hub_only": false
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 3568,
               "agent_baseline_tokens": 47368,
-              "reduction_vs_agent": 20.89,
+              "reduction_vs_agent": 13.28,
               "query": "",
               "hub_only": true
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 7375,
               "agent_baseline_tokens": 338630,
-              "reduction_vs_agent": 149.37,
+              "reduction_vs_agent": 45.92,
               "query": "driver probe init",
               "hub_only": false
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 3568,
               "agent_baseline_tokens": 47368,
-              "reduction_vs_agent": 20.89,
+              "reduction_vs_agent": 13.28,
               "query": "",
               "hub_only": true
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 7375,
               "agent_baseline_tokens": 338630,
-              "reduction_vs_agent": 149.37,
+              "reduction_vs_agent": 45.92,
               "query": "driver probe init",
               "hub_only": false
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 3568,
               "agent_baseline_tokens": 47368,
-              "reduction_vs_agent": 20.89,
+              "reduction_vs_agent": 13.28,
               "query": "",
               "hub_only": true
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 7375,
               "agent_baseline_tokens": 338630,
-              "reduction_vs_agent": 149.37,
+              "reduction_vs_agent": 45.92,
               "query": "driver probe init",
               "hub_only": false
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 3568,
               "agent_baseline_tokens": 47368,
-              "reduction_vs_agent": 20.89,
+              "reduction_vs_agent": 13.28,
               "query": "",
               "hub_only": true
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 3568,
               "agent_baseline_tokens": 123791,
-              "reduction_vs_agent": 54.61,
+              "reduction_vs_agent": 34.69,
               "query": "memory cgroup",
               "hub_only": false
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 3568,
               "agent_baseline_tokens": 47368,
-              "reduction_vs_agent": 20.89,
+              "reduction_vs_agent": 13.28,
               "query": "",
               "hub_only": true
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 3568,
               "agent_baseline_tokens": 123791,
-              "reduction_vs_agent": 54.61,
+              "reduction_vs_agent": 34.69,
               "query": "memory cgroup",
               "hub_only": false
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 3568,
               "agent_baseline_tokens": 47368,
-              "reduction_vs_agent": 20.89,
+              "reduction_vs_agent": 13.28,
               "query": "",
               "hub_only": true
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 3568,
               "agent_baseline_tokens": 123791,
-              "reduction_vs_agent": 54.61,
+              "reduction_vs_agent": 34.69,
               "query": "memory cgroup",
               "hub_only": false
             },
             {
-              "graph_tokens": 2267,
+              "graph_tokens": 3568,
               "agent_baseline_tokens": 47368,
-              "reduction_vs_agent": 20.89,
+              "reduction_vs_agent": 13.28,
               "query": "",
               "hub_only": true
             }
           ],
-          "mean_reduction_vs_agent": 50.81
+          "mean_reduction_vs_agent": 24.12
         }
       },
       "stats": {
         "files": 40019,
-        "edges": 684541,
-        "p95_degree": 174,
+        "edges": 61470,
+        "p95_degree": 29,
         "top_hubs": [
           {
             "path": "MAINTAINERS",
-            "degree": 3341
+            "degree": 280
           },
           {
-            "path": "drivers/gpu/drm/amd/display/dc/core/dc.c",
-            "degree": 564
+            "path": "drivers/iio/accel/adxl372_i2c.c",
+            "degree": 210
           },
           {
-            "path": "drivers/gpu/drm/amd/display/dc/core/dc_resource.c",
-            "degree": 540
+            "path": "drivers/iio/dac/ad5696-i2c.c",
+            "degree": 210
           },
           {
-            "path": "lib/crypto/Kconfig",
-            "degree": 499
+            "path": "drivers/iio/pressure/mprls0025pa_i2c.c",
+            "degree": 210
           },
           {
-            "path": "drivers/gpu/drm/amd/display/dc/dc.h",
-            "degree": 481
+            "path": "drivers/iio/accel/adxl355_i2c.c",
+            "degree": 209
           },
           {
-            "path": "lib/crypto/Makefile",
-            "degree": 475
+            "path": "drivers/iio/pressure/rohm-bm1390.c",
+            "degree": 209
           },
           {
-            "path": "arch/mips/configs/mtx1_defconfig",
-            "degree": 463
+            "path": "drivers/iio/dac/ds4424.c",
+            "degree": 208
           },
           {
-            "path": "include/linux/fs.h",
-            "degree": 448
+            "path": "drivers/iio/health/afe4404.c",
+            "degree": 208
           },
           {
-            "path": "security/selinux/hooks.c",
-            "degree": 390
+            "path": "drivers/iio/accel/adxl345_i2c.c",
+            "degree": 207
           },
           {
-            "path": "drivers/gpu/drm/amd/display/dc/hwss/dcn401/dcn401_hwseq.c",
-            "degree": 389
+            "path": "drivers/iio/accel/adxl367_i2c.c",
+            "degree": 207
           }
         ],
         "repo": "/Users/srirammentey/AI/pareto-context-graph/bench/linux",
-        "last_build_commits": null,
+        "last_build_commits": "32132",
         "total_commits_scanned": "100000",
         "build_strategy": "sharded-v1:8",
         "last_build_since": "24 months ago"
       },
-      "built_at": "2026-06-25T16:31:01.696063+00:00"
+      "built_at": "2026-06-26T12:23:04.863011+00:00"
     }
   ],
-  "updated_at": "2026-06-25T16:31:01.696063+00:00"
+  "updated_at": "2026-06-26T12:23:04.863011+00:00"
 }

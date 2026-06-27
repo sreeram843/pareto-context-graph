@@ -81,14 +81,30 @@ CODE_EXTENSIONS = frozenset(
 
 
 def extract_symbol_records(
-    file_path: Path, *, max_bytes: int = 50_000, use_treesitter: bool = False
+    file_path: Path, *, max_bytes: int = 50_000, use_treesitter: bool | None = None
 ) -> list[dict]:
     """Return symbol records: symbol, kind, line, container."""
+    if use_treesitter is None:
+        use_treesitter = use_treesitter_for_symbols()
     if use_treesitter:
         ts_records = _extract_treesitter_records(file_path, max_bytes=max_bytes)
         if ts_records:
             return ts_records
     return _extract_regex_records(file_path, max_bytes=max_bytes)
+
+
+def treesitter_installed() -> bool:
+    return _treesitter_available()
+
+
+def use_treesitter_for_symbols() -> bool:
+    from .features import feature_enabled
+
+    return feature_enabled("TREESITTER") and _treesitter_available()
+
+
+def symbol_index_mode() -> str:
+    return "treesitter" if use_treesitter_for_symbols() else "regex"
 
 
 def _extract_regex_records(file_path: Path, *, max_bytes: int = 50_000) -> list[dict]:
@@ -149,19 +165,37 @@ def _treesitter_available() -> bool:
     return True
 
 
+def _typescript_treesitter_available() -> bool:
+    try:
+        import tree_sitter_typescript  # noqa: F401
+    except ImportError:
+        return False
+    return True
+
+
 def _parser_for_suffix(suffix: str):
     from tree_sitter import Language, Parser
 
+    language = None
     if suffix == ".py":
-        import tree_sitter_python as lang_mod
+        import tree_sitter_python as py_lang
 
-        language = Language(lang_mod.language())
+        language = Language(py_lang.language())
     elif suffix == ".go":
         try:
-            import tree_sitter_go as lang_mod
+            import tree_sitter_go as go_lang
         except ImportError:
             return None
-        language = Language(lang_mod.language())
+        language = Language(go_lang.language())
+    elif suffix in {".ts", ".tsx", ".js", ".jsx"}:
+        if not _typescript_treesitter_available():
+            return None
+        import tree_sitter_typescript as ts_lang
+
+        if suffix in {".tsx", ".jsx"}:
+            language = Language(ts_lang.language_tsx())
+        else:
+            language = Language(ts_lang.language_typescript())
     else:
         return None
     parser = Parser(language)
@@ -185,54 +219,52 @@ def _extract_treesitter_records(file_path: Path, *, max_bytes: int = 50_000) -> 
     tree = parser.parse(content)
     records: list[dict] = []
 
+    def _node_name(node) -> str | None:
+        name_node = node.child_by_field_name("name")
+        if name_node is None:
+            for child in node.children:
+                if child.type in ("type_identifier", "property_identifier", "identifier"):
+                    name_node = child
+                    break
+        if name_node is None:
+            return None
+        return content[name_node.start_byte : name_node.end_byte].decode("utf-8", errors="ignore")
+
     def walk(node, container: str = "") -> None:
         ntype = node.type
         if ntype in ("function_definition", "method_definition"):
-            name_node = node.child_by_field_name("name")
-            if name_node is not None:
-                name = content[name_node.start_byte : name_node.end_byte].decode(
-                    "utf-8", errors="ignore"
+            name = _node_name(node)
+            if name and name not in _SKIP_NAMES:
+                records.append(
+                    {
+                        "symbol": name,
+                        "kind": "function",
+                        "line": node.start_point[0] + 1,
+                        "container": container,
+                    }
                 )
-                if name and name not in _SKIP_NAMES:
-                    records.append(
-                        {
-                            "symbol": name,
-                            "kind": "function",
-                            "line": node.start_point[0] + 1,
-                            "container": container,
-                        }
-                    )
-        elif ntype in ("class_definition",):
-            name_node = node.child_by_field_name("name")
-            class_name = container
-            if name_node is not None:
-                class_name = content[name_node.start_byte : name_node.end_byte].decode(
-                    "utf-8", errors="ignore"
+        elif ntype in ("class_definition", "class_declaration"):
+            class_name = _node_name(node) or container
+            if class_name and class_name not in _SKIP_NAMES:
+                records.append(
+                    {
+                        "symbol": class_name,
+                        "kind": "class",
+                        "line": node.start_point[0] + 1,
+                        "container": container,
+                    }
                 )
-                if class_name and class_name not in _SKIP_NAMES:
-                    records.append(
-                        {
-                            "symbol": class_name,
-                            "kind": "class",
-                            "line": node.start_point[0] + 1,
-                            "container": container,
-                        }
-                    )
         elif ntype in ("function_declaration", "method_declaration"):
-            name_node = node.child_by_field_name("name")
-            if name_node is not None:
-                name = content[name_node.start_byte : name_node.end_byte].decode(
-                    "utf-8", errors="ignore"
+            name = _node_name(node)
+            if name and name not in _SKIP_NAMES:
+                records.append(
+                    {
+                        "symbol": name,
+                        "kind": "function",
+                        "line": node.start_point[0] + 1,
+                        "container": container,
+                    }
                 )
-                if name and name not in _SKIP_NAMES:
-                    records.append(
-                        {
-                            "symbol": name,
-                            "kind": "function",
-                            "line": node.start_point[0] + 1,
-                            "container": container,
-                        }
-                    )
         elif ntype in ("type_declaration",):
             for child in node.children:
                 if child.type == "type_spec":
@@ -250,13 +282,43 @@ def _extract_treesitter_records(file_path: Path, *, max_bytes: int = 50_000) -> 
                                     "container": container,
                                 }
                             )
-        child_container = container
-        if ntype in ("class_definition",):
-            name_node = node.child_by_field_name("name")
-            if name_node is not None:
-                child_container = content[name_node.start_byte : name_node.end_byte].decode(
+        elif ntype in (
+            "interface_declaration",
+            "type_alias_declaration",
+            "enum_declaration",
+        ):
+            name = _node_name(node)
+            if name and name not in _SKIP_NAMES:
+                records.append(
+                    {
+                        "symbol": name,
+                        "kind": "class",
+                        "line": node.start_point[0] + 1,
+                        "container": container,
+                    }
+                )
+        elif ntype == "lexical_declaration":
+            for child in node.children:
+                if child.type != "variable_declarator":
+                    continue
+                name_node = child.child_by_field_name("name")
+                if name_node is None:
+                    continue
+                name = content[name_node.start_byte : name_node.end_byte].decode(
                     "utf-8", errors="ignore"
                 )
+                if name and name not in _SKIP_NAMES:
+                    records.append(
+                        {
+                            "symbol": name,
+                            "kind": "function",
+                            "line": child.start_point[0] + 1,
+                            "container": container,
+                        }
+                    )
+        child_container = container
+        if ntype in ("class_definition", "class_declaration"):
+            child_container = _node_name(node) or container
         for child in node.children:
             walk(child, child_container)
 

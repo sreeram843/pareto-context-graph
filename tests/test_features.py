@@ -13,6 +13,8 @@ def test_default_on_features():
         "LEIDEN",
         "SESSION_MEMORY",
         "COMMUNITY_RANK",
+        "PRF_COCHANGE",
+        "TREESITTER",
     }
     for name in DEFAULT_ON_FEATURES:
         assert feature_enabled(name) is True

@@ -6,6 +6,7 @@ import re
 from pathlib import Path, PurePosixPath
 
 from .blast import extract_imports, resolve_import_to_file
+from .route_edges import extract_route_edges
 from .symbols import CODE_EXTENSIONS
 
 _INHERIT_PATTERNS = [
@@ -105,5 +106,8 @@ def extract_structural_edges(
                 if PurePosixPath(file_path_candidate).stem == parent:
                     add(file_path_candidate, "inherits", "EXTRACTED")
                     break
+
+    for edge in extract_route_edges(file_path, repo_path, all_files, content=content):
+        add(edge["dst_path"], edge["kind"], edge.get("confidence", "INFERRED"))
 
     return edges

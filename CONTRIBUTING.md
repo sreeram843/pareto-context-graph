@@ -23,6 +23,20 @@ make bench-setup-t1
 3. **Tests:** `pytest -q`
 4. **Eval gate** (when touching retrieval/packing):  
    `make eval-check REPOS='fastapi=bench/fastapi httpx=bench/httpx'`
+5. **Agent A/B** (optional, when touching agent UX / MCP):  
+   `make eval-agent-ab-check REPOS='fastapi=bench/fastapi httpx=bench/httpx'`
+
+## CI test selection (PCG `affected`)
+
+After `pareto-context-graph build` (or snapshot import), suggest tests for a PR diff:
+
+```bash
+git diff --name-only origin/main...HEAD | pareto-context-graph affected --stdin --quiet
+```
+
+Copy [`.github/workflows/pcg-affected.yml.example`](../.github/workflows/pcg-affected.yml.example) into your repo as `.github/workflows/pcg-affected.yml` and adapt the test runner.
+
+Pre-merge MCP flow: use the `pre_merge_check` prompt (`detect_changes` → `affected` → `savings`).
 
 ## Project layout
 

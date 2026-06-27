@@ -47,7 +47,7 @@ PROFILES = {
         "mmr_lambda": 0.65,
     },
     "huge": {
-        "commits": 80_000,
+        "commits": 20_000,
         "since": "12 months ago",
         "shards": 8,
         "min_weight": 3,
@@ -59,6 +59,22 @@ PROFILES = {
         "half_life_days": 180,
         "prune_below": 0.05,
         "mmr_lambda": 0.6,
+        "max_files_per_commit": 50,
+    },
+    "huge-full": {
+        "commits": 100_000,
+        "since": "24 months ago",
+        "shards": 8,
+        "min_weight": 3,
+        "max_depth": 2,
+        "hub_penalty_strength": 1.5,
+        "stage1_cap": 800,
+        "expansion": "rwr",
+        "iterations": 2,
+        "half_life_days": 180,
+        "prune_below": 0.05,
+        "mmr_lambda": 0.6,
+        "max_files_per_commit": 50,
     },
 }
 

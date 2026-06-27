@@ -67,6 +67,19 @@ Example response fragment:
 
 Full feedback loop: [FEEDBACK.md](FEEDBACK.md) · nightly `pareto-context-graph learn`
 
+When a returned path was rejected **≥3 times in the last 7 days**, `feedback_hints` also includes:
+
+```json
+"codify_suggestion": {
+  "path": "src/noisy.py",
+  "reject_count": 3,
+  "reason": "rejected 3× in last 7 days",
+  "hint": "Add a .cursor rule, docs snippet, or context-map entry for this area."
+}
+```
+
+(Phase 15.7 — closes the loop from feedback to durable codified context.)
+
 ### Hook policy (optional)
 
 When `.pareto-context-graph/policy.json` sets `allowed_hook_sha256`, only hooks whose
@@ -90,3 +103,49 @@ pareto-context-graph update --repo "$(git rev-parse --show-toplevel)" &
 
 This runs the incremental update in the background so it doesn't slow
 down your commit workflow.
+
+## Pre/post-change hooks (Phase 15)
+
+Examples for codified-context workflow:
+
+- [`docs/examples/hooks/pre_change.py`](examples/hooks/pre_change.py) — tier-1 defaults before edits
+- [`docs/examples/hooks/post_change.py`](examples/hooks/post_change.py) — surface `knowledge_gap` / `routing_hints`
+
+Optional repo config (copy into `.pareto-context-graph/`):
+
+- [`docs/examples/context-map.json`](examples/context-map.json) — subsystem → spec paths for `doctor` drift checks
+- [`docs/examples/routing.json`](examples/routing.json) — intent/path → specialist hints on `context`
+
+See [PHASES_CODIFIED_CONTEXT.md](PHASES_CODIFIED_CONTEXT.md).
+
+### Spec search (Phase 15.5)
+
+Indexed on every `build` / `update` (when markdown changes):
+
+- `docs/`, `doc/`, `.cursor/rules/`, `.github/`
+- Root: `AGENTS.md`, `README.md`, `CONTRIBUTING.md`, `CLAUDE.md`, …
+- Paths listed in `context-map.json` → `specs`
+
+```json
+{
+  "command": "context",
+  "query": "OAuth2 bearer authentication",
+  "files": ["fastapi/security/oauth2.py"],
+  "include_specs": true,
+  "spec_limit": 5
+}
+```
+
+Response includes `spec_context.snippets` (path, kind, title, snippet, score). The `search` command also returns `spec_hits`.
+
+### Subsystems (Phase 15.6)
+
+```json
+{ "command": "list_subsystems" }
+```
+
+```json
+{ "command": "subsystem_files", "subsystem": "src/pareto_context_graph", "file_limit": 50 }
+```
+
+Manual subsystems come from `context-map.json`; auto clusters group by directory prefix (`src/pkg`, `tests`, …).

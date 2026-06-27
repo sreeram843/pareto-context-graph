@@ -32,7 +32,8 @@ User-facing story + C4 zoom levels: [README § C4 model](../README.md#c4-model) 
 | Signal | Source | Role |
 |--------|--------|------|
 | **Co-change** (primary) | Git commit file pairs | Files that changed together are coupled |
-| **Import/require** | Regex over 7 language families | Static dependency edges |
+| **Import/require** | Regex + tree-sitter over 7 language families | Static dependency edges |
+| **Route edges** | FastAPI/Flask `@router.get`, `include_router` | Handler → route wiring |
 | **Naming pairs** | `foo.rb` ↔ `foo_spec.rb` | Test/impl pairing |
 | **Query-first fusion** | BM25 + co-change + path + symbol retrievers | Question-only context (no seed files) |
 | **TF-IDF / keyword index** | Lazy-built per repo | Query-term boosting (skipped on huge/high-fanout) |
@@ -82,7 +83,20 @@ src/pareto_context_graph/
 ├── profiles.py        # tiny/medium/large/huge presets + cached autodetect
 ├── tokenizer.py       # tiktoken / bytes heuristic token counting
 ├── embed.py           # Optional embeddings sidecar
-├── structural.py      # Structural edge extraction
+├── structural.py      # Structural + route edge extraction
+├── route_edges.py     # FastAPI/Flask route → handler edges
+├── repo_registry.py   # serve --repo-map multi-repo routing
+├── staleness.py       # Index staleness banners + catch-up on connect
+├── server_instructions.py  # MCP initialize agent playbook
+├── agent_install.py   # install / uninstall editor MCP configs
+├── agent_ab.py        # Headless PCG vs grep+read A/B harness
+├── affected.py        # Reverse-walk test selection for changed files
+├── watcher_health.py  # Watcher error metrics (no silent swallow)
+├── build_estimate.py  # doctor cold-build estimate
+├── neighbour_cache.py # In-memory top_neighbours (build hot path)
+├── repo_config.py     # Default path exclusions + lazy/eager index mode
+├── indexing.py        # Phased search index (lazy on huge profiles)
+├── symbols.py         # Tree-sitter (default) or regex symbol index
 ├── community.py       # Leiden communities (optional igraph)
 ├── payload_compress.py  # Query-aware prune + payload cache + retrieve
 ├── summary_prune.py   # Tier-1 post-pack summary/query mismatch prune (11.4)
@@ -97,7 +111,7 @@ src/pareto_context_graph/
 ├── tracing.py         # In-process spans + optional OTLP export for context phases
 ├── hooks.py           # Repo-local hook loading + secret redaction
 ├── snapshot.py        # Export/import .pareto-context-graph tarballs
-├── daemon.py          # serve --watch background updater
+├── daemon.py          # Native watcher + debounced incremental sync
 ├── api.py             # Python API (no MCP protocol)
 └── cli.py             # CLI entry point
 ```
@@ -153,7 +167,7 @@ service on port 4318.
 | [COMMANDS.md](COMMANDS.md) | `context` params, all commands, CLI, feature flags |
 | [OPTIONAL_FEATURES.md](OPTIONAL_FEATURES.md) | Embeddings, ranker, hooks, compression, Docker |
 | [CONTEXT_COMPRESSION.md](CONTEXT_COMPRESSION.md) | Built-in tier-3 prune + retrieve |
-| [TOKEN_REDUCTION_AGENT_RESEARCH.md](TOKEN_REDUCTION_AGENT_RESEARCH.md) | Paper mapping + roadmap |
+| [PHASES.md](PHASES.md) | Execution plan, milestones, open items |
 | [FEEDBACK.md](FEEDBACK.md) | Learn loop from agent usage |
 | [HOOKS.md](HOOKS.md) | Repo-local extension hooks |
 | [BENCHMARKS.md](BENCHMARKS.md) | Latency and build numbers |

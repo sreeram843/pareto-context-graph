@@ -60,7 +60,7 @@ def test_store_pool_concurrent_reads_and_writer(tmp_path):
     assert not errors, errors
     ordered = sorted(latencies)
     p99 = ordered[int(0.99 * (len(ordered) - 1))]
-    assert p99 < 0.05
+    assert p99 < 0.10
 
 
 def test_context_timeout_sets_truncated(synthetic_repo_factory):

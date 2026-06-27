@@ -34,7 +34,7 @@ def post_context(response: dict) -> dict:
     sample = paths[:_MAX_HINT_PATHS]
     primary = sample[0]
 
-    response["feedback_hints"] = {
+    hints: dict = {
         "request_id": request_id,
         "paths_in_response": sample,
         "commands": {
@@ -65,4 +65,19 @@ def post_context(response: dict) -> dict:
             "Strongest signal: mark_used. Schedule: pareto-context-graph learn"
         ),
     }
+
+    try:
+        from pathlib import Path
+
+        from pareto_context_graph.codify_suggestion import build_codify_suggestions
+
+        repo_root = Path(response.get("_repo_root", "."))
+        codify = build_codify_suggestions(repo_root, sample)
+        if codify:
+            hints["codify_suggestions"] = codify
+            hints["codify_suggestion"] = codify[0]
+    except Exception:
+        pass
+
+    response["feedback_hints"] = hints
     return response

@@ -25,6 +25,11 @@ def test_classify_query_intent_endpoint():
     assert classify_query_intent("API route controller handler") == "endpoint"
 
 
+def test_classify_query_intent_openapi_beats_route_tie():
+    query = "OpenAPI schema generation and route documentation utilities"
+    assert classify_query_intent(query) == "openapi"
+
+
 def test_looks_like_symbol_camelcase():
     assert looks_like_symbol("OAuth2PasswordBearer")
 

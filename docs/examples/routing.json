@@ -1,0 +1,26 @@
+{
+  "rules": [
+    {
+      "id": "openapi",
+      "match": { "intent": "openapi" },
+      "suggest": {
+        "hint": "Load OpenAPI/security rules before editing API routes.",
+        "rule": ".cursor/rules/openapi.mdc"
+      }
+    },
+    {
+      "id": "tests",
+      "match": { "intent": "test" },
+      "suggest": {
+        "hint": "Prefer test co-change neighbours; run the package test suite after edits."
+      }
+    },
+    {
+      "id": "high_hub",
+      "match": { "hub_degree_gte": 500 },
+      "suggest": {
+        "hint": "Hub seed: start tier=1 with timeout_ms, then escalate tier/compression."
+      }
+    }
+  ]
+}

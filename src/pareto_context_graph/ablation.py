@@ -12,6 +12,7 @@ ABLATION_SIGNALS = (
     "learned",
     "semantic",
     "import",
+    "prf",
 )
 
 _TRUTHY = frozenset({"1", "true", "yes", "on"})

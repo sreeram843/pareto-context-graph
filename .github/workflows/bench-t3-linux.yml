@@ -1,0 +1,75 @@
+name: Bench T3 (Linux)
+
+on:
+  schedule:
+    # 1st of each month 08:00 UTC — co-change snapshot for torvalds/linux
+    - cron: "0 8 1 * *"
+  workflow_dispatch:
+    inputs:
+      commits:
+        description: Max commits to scan (default 100000 for huge-full)
+        type: string
+        default: "100000"
+      skip_build:
+        description: Skip graph build (export existing graph only)
+        type: boolean
+        default: false
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: pip install -e ".[dev,tiktoken]"
+
+      - name: Clone linux (pinned SHA, blob-less)
+        run: |
+          sha=$(jq -r '.repos.linux.sha' tests/eval/pins.json)
+          git clone --filter=blob:none --depth 1 \
+            https://github.com/torvalds/linux.git bench/linux
+          if [ "$sha" != "TBD" ] && [ -n "$sha" ]; then
+            git -C bench/linux fetch --depth 1 origin "$sha" || true
+            git -C bench/linux checkout "$sha" || true
+          fi
+
+      - name: Build co-change graph (lazy search index)
+        if: github.event_name == 'schedule' || github.event.inputs.skip_build != 'true'
+        run: |
+          pareto-context-graph build --profile huge-full \
+            --since "24 months ago" \
+            --commits "${{ inputs.commits || '100000' }}" \
+            --shards 8
+        working-directory: bench/linux
+
+      - name: Export signed graph snapshot
+        if: github.event_name == 'schedule' || github.event.inputs.skip_build != 'true'
+        env:
+          PCG_SNAPSHOT_KEY: ${{ secrets.PCG_SNAPSHOT_KEY }}
+        run: |
+          pareto-context-graph snapshot export ${{ github.workspace }}/bench/linux-graph-snapshot.tar.gz
+          if [ -n "${PCG_SNAPSHOT_KEY:-}" ]; then
+            test -f ${{ github.workspace }}/bench/linux-graph-snapshot.tar.gz.sig.json
+            python3 -c "from pareto_context_graph.signing import verify_file; from pathlib import Path; p=Path('${{ github.workspace }}/bench/linux-graph-snapshot.tar.gz'); assert verify_file(p), 'snapshot signature verify failed'"
+            echo "Snapshot signed and verified (HMAC-SHA256)"
+          else
+            echo "::warning::PCG_SNAPSHOT_KEY not set — snapshot exported unsigned"
+          fi
+        working-directory: bench/linux
+
+      - name: Upload linux graph snapshot
+        if: github.event_name == 'schedule' || github.event.inputs.skip_build != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-graph-snapshot
+          path: |
+            bench/linux-graph-snapshot.tar.gz
+            bench/linux-graph-snapshot.tar.gz.sig.json
+          retention-days: 45
+          if-no-files-found: warn

@@ -31,7 +31,7 @@ REPO_BENCH_DEFAULTS: dict[str, dict[str, Any]] = {
         ],
     },
     "linux": {
-        "profile": "huge",
+        "profile": "huge-full",
         "since": "24 months ago",
         "commits": 100_000,
         "shards": 8,
@@ -247,6 +247,7 @@ def build_repo_graph(
     commits: int,
     since: str | None,
     shards: int,
+    profile_name: str | None = None,
 ) -> float:
     start = time.perf_counter()
     store = build_graph_sharded(
@@ -254,6 +255,7 @@ def build_repo_graph(
         max_commits=commits,
         since=since,
         shards=shards,
+        profile_name=profile_name,
     )
     store.close()
     return time.perf_counter() - start
@@ -327,6 +329,7 @@ def run_repo_benchmark(
             commits=commit_limit,
             since=since_window,
             shards=shard_count,
+            profile_name=profile_name,
         )
 
     hub_seed = pick_hub_seed(repo_root)

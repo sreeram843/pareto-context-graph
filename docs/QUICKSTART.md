@@ -21,18 +21,22 @@ Clear stale session paths between tasks: `pareto-context-graph session clear` or
 ## Standard setup (most repos)
 
 ```bash
-# 1. Install
+# 1. Install the package
 pip install -e /path/to/pareto-context-graph
 
-# 2. Build the graph (once per repo; ~30s for 5K commits)
+# 2. One-shot onboarding in your repo (build + MCP install + next steps)
 cd /path/to/your-repo
+pareto-context-graph init --platform cursor
+
+# 3. Restart the editor — the AI calls pareto_context_graph on every prompt
+```
+
+Equivalent manual steps:
+
+```bash
 pareto-context-graph build
-
-# 3. Auto-configure your editor
-pareto-context-graph install                    # VS Code / Copilot
-pareto-context-graph install --platform cursor  # Cursor
-
-# 4. Restart the editor — the AI calls pareto_context_graph on every prompt
+pareto-context-graph install --platform cursor
+pareto-context-graph serve --watch --interval 600   # optional background sync
 ```
 
 Verify the graph:
@@ -42,7 +46,17 @@ pareto-context-graph stats
 pareto-context-graph doctor
 ```
 
-`doctor` prints graph health and a **cold-build time estimate** for your repo profile.
+`doctor` prints graph health, **cross-file coverage**, symbol index mode, staleness, and a **cold-build time estimate** for your repo profile.
+
+### Day-to-day
+
+```bash
+git pull
+pareto-context-graph sync              # incremental graph update
+pareto-context-graph sync --with-index # also catch up deferred search index
+```
+
+Use `sync` instead of `build` when the graph already exists — it only processes new commits.
 
 ---
 
@@ -62,13 +76,16 @@ cd kubernetes
 export PCG_SNAPSHOT_KEY='<CI secret>'   # if signed
 
 # 2. Bootstrap (import + incremental update)
-pareto-context-graph build --from-snapshot ~/Downloads/kubernetes-graph-snapshot.tar.gz
+pareto-context-graph init --from-snapshot ~/Downloads/kubernetes-graph-snapshot.tar.gz \
+  --platform cursor --skip-install
+pareto-context-graph install --platform cursor
 
 # 3. Verify and serve
 pareto-context-graph doctor
-pareto-context-graph install --platform cursor
 pareto-context-graph serve --watch --interval 600
 ```
+
+Or: `build --from-snapshot …` then `install` (same as `init` without the printed next steps).
 
 ### Linux (team export)
 
@@ -76,15 +93,16 @@ pareto-context-graph serve --watch --interval 600
 git clone --filter=blob:none https://github.com/torvalds/linux.git
 cd linux
 pareto-context-graph build --from-snapshot /path/to/linux-graph-snapshot.tar.gz
+pareto-context-graph install --platform cursor
 ```
 
 Export after a one-time build: `pareto-context-graph snapshot export ./linux-graph.tar.gz`
 
-### Day-to-day
+### Day-to-day (T2/T3)
 
 ```bash
 git pull
-pareto-context-graph build   # incremental when HEAD moved
+pareto-context-graph sync --with-index
 ```
 
 ---
@@ -101,6 +119,7 @@ Import on another machine:
 
 ```bash
 pareto-context-graph snapshot import ./linux-graph-YYYYMMDD.tar.gz
+pareto-context-graph sync
 ```
 
 Signing: [CI_SNAPSHOTS.md](CI_SNAPSHOTS.md).
@@ -122,7 +141,7 @@ After `pareto-context-graph install`:
   "servers": {
     "pareto-context-graph": {
       "command": "pareto-context-graph",
-      "args": ["serve", "--repo", "/path/to/your/repo"],
+      "args": ["serve", "--repo", "/path/to/your/repo", "--watch"],
       "type": "stdio"
     }
   }
@@ -131,7 +150,7 @@ After `pareto-context-graph install`:
 
 Copilot instructions (`.github/copilot-instructions.md`) tell the AI to:
 
-1. Call `pareto_context_graph` with `command="context"` before answering
+1. Call `pareto_context_graph` with `command="context"` (or `explore` for query-only) before answering
 2. Start at tier 1; escalate only as needed
 3. Pass `already_have` on follow-ups; use `session_memory: false` on new tasks
 
@@ -142,13 +161,13 @@ Copilot instructions (`.github/copilot-instructions.md`) tell the AI to:
   "mcpServers": {
     "pareto-context-graph": {
       "command": "pareto-context-graph",
-      "args": ["serve", "--repo", "/path/to/your/repo"]
+      "args": ["serve", "--repo", "/path/to/your/repo", "--watch"]
     }
   }
 }
 ```
 
-Or: `pareto-context-graph install --platform cursor`
+Or: `pareto-context-graph install --platform cursor --watch`
 
 ---
 
@@ -184,10 +203,11 @@ result = cg.context(files=["src/main.py"], query="add logging", tier=1)
 | Understand `context` tiers and parameters | [README](../README.md) |
 | Architecture + C4 diagrams | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | Run golden eval / regression gate | [tests/eval/README.md](../tests/eval/README.md) |
+| Agent A/B harness (PCG vs grep+read) | [BENCHMARKS.md](BENCHMARKS.md) |
 | OSS benchmark clones | [BENCHMARK_REPOS.md](BENCHMARK_REPOS.md) |
 | Feedback + `learn` loop | [FEEDBACK.md](FEEDBACK.md) |
 
 ```bash
-make eval REPOS=fastapi=bench/fastapi
-make eval-check REPOS=fastapi=bench/fastapi
+make eval-check REPOS=fastapi=bench/fastapi httpx=bench/httpx
+make eval-agent-ab-check REPOS=fastapi=bench/fastapi httpx=bench/httpx
 ```

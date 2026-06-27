@@ -34,5 +34,5 @@ jobs:
           python tests/perf/bench_build.py
           python tests/perf/bench_query.py
 
-  # Tier 2 kubernetes runs in .github/workflows/bench-t2.yml (Sunday 07:00 UTC).
-  # Trigger manually: Actions → Bench T2 (Kubernetes) → Run workflow
+  # Tier 2 kubernetes: .github/workflows/bench-t2.yml (Sunday 07:00 UTC).
+  # Tier 3 linux: .github/workflows/bench-t3-linux.yml (monthly).

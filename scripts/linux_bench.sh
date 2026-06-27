@@ -25,11 +25,18 @@ SHA="$(git -C "$LINUX" rev-parse HEAD)"
 COMMITS="$(git -C "$LINUX" log --no-merges --since='24 months ago' -100000 --oneline | wc -l | tr -d ' ')"
 log "clone ready: $SHA ($COMMITS non-merge commits in 24mo)"
 
+log "pre-bench gate (ruff, mypy, pytest, eval)..."
+cd "$ROOT"
+export PCG_EDGE_DECAY=0
+./scripts/pre_bench.sh
+
 log "building graph (100k cap, 24mo, 8 shards)..."
 cd "$ROOT"
+export PCG_EDGE_DECAY=0
 make bench-setup TIER=3 SKIP_CLONE=1
 
 log "running latency bench..."
+export PCG_EDGE_DECAY=0
 SKIP_BUILD=1 SKIP_INCREMENTAL=1 make bench-huge REPOS=linux="$LINUX"
 
 log "done — see tests/eval/bench_results.json and docs/BENCHMARKS.md"

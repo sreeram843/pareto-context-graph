@@ -6,7 +6,7 @@ import json
 import math
 import re
 from collections.abc import Callable
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import cast
 
 from .blast import blast_radius, extract_imports, get_file_summary
@@ -79,6 +79,18 @@ def apply_file_class_weight(base_score: float, path: str, query_intent: str) -> 
     elif query_intent == "docs":
         if kind == "doc":
             return base_score * 2.0
+    elif query_intent == "openapi":
+        if "/openapi/" in path_lower:
+            multiplier = 3.5
+            if path_lower.endswith("openapi/models.py"):
+                multiplier = 4.5
+            return base_score * multiplier
+        pure = PurePosixPath(path_lower)
+        if pure.parts and pure.parts[0] == "fastapi" and "/openapi/" not in path_lower:
+            if len(pure.parts) == 2 or (len(pure.parts) == 3 and pure.parts[1] == "_compat"):
+                return base_score * 0.35
+        if path_lower.endswith("routing.py") or kind == "route":
+            return base_score * 0.5
     elif query_intent == "test":
         if kind == "test":
             return base_score * 2.0

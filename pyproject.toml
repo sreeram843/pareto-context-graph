@@ -46,9 +46,15 @@ otel = [
     "opentelemetry-exporter-otlp-proto-grpc>=1.27",
 ]
 tiktoken = ["tiktoken"]
-treesitter = ["tree-sitter>=0.22", "tree-sitter-python>=0.21", "tree-sitter-go>=0.21"]
+treesitter = [
+    "tree-sitter>=0.22",
+    "tree-sitter-python>=0.21",
+    "tree-sitter-go>=0.21",
+    "tree-sitter-typescript>=0.23",
+]
 igraph = ["igraph"]
 ranker = ["lightgbm>=4.0"]
+watcher = ["watchfiles>=0.21"]
 
 [tool.ruff]
 line-length = 100

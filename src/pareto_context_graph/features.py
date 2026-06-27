@@ -13,6 +13,8 @@ DEFAULT_ON_FEATURES = frozenset(
         "LEIDEN",
         "SESSION_MEMORY",
         "COMMUNITY_RANK",
+        "PRF_COCHANGE",
+        "TREESITTER",
     }
 )
 

@@ -24,7 +24,8 @@ def test_build_writes_profile_meta(synthetic_repo_factory):
 
 def test_profile_build_show_script(synthetic_repo_factory, tmp_path):
     repo = synthetic_repo_factory(commits=60, files=20, seed=12)
-    build_graph(repo, max_commits=80)
+    built = build_graph(repo, max_commits=80)
+    built.close()
     store = Store(repo)
     assert read_build_profile(store) is not None
     store.close()

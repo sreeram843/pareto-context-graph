@@ -81,18 +81,73 @@ def _snake_case(value: str) -> str:
     return step2.replace("-", "_").lower()
 
 
+_JS_EXTENSIONS = (
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx",
+    "/index.ts",
+    "/index.tsx",
+    "/index.js",
+    "/index.jsx",
+)
+
+
+def _relative_import_candidates(ref: str, from_path: str) -> list[str]:
+    base_parent = PurePosixPath(from_path).parent
+    relative = PurePosixPath(base_parent, ref).as_posix()
+    parts = PurePosixPath(relative).parts
+    normalized_parts: list[str] = []
+    for part in parts:
+        if part == "..":
+            if normalized_parts:
+                normalized_parts.pop()
+            continue
+        if part == ".":
+            continue
+        normalized_parts.append(part)
+    relative = "/".join(normalized_parts)
+    candidates: list[str] = [relative]
+    for ext in _JS_EXTENSIONS:
+        candidates.append(relative + ext)
+    return candidates
+
+
+def _scoped_package_candidates(ref: str) -> list[str]:
+    """Map @scope/pkg and @scope/pkg/subpath to common monorepo layouts."""
+    ref = ref.lstrip("@")
+    candidates = [
+        f"node_modules/@{ref}",
+        f"node_modules/@{ref}/index.ts",
+        f"node_modules/@{ref}/index.js",
+        f"packages/{ref}",
+        f"packages/{ref}/src/index.ts",
+        f"packages/{ref}/src/index.tsx",
+    ]
+    if "/" in ref:
+        scope, sub = ref.split("/", 1)
+        candidates.extend(
+            [
+                f"node_modules/@{scope}/{sub}",
+                f"node_modules/@{scope}/{sub}/index.ts",
+                f"packages/{sub}/src/index.ts",
+                f"libs/{sub}/src/index.ts",
+            ]
+        )
+    return candidates
+
+
 def resolve_import_to_file(
     ref: str, all_files: set[str], from_path: str | None = None
 ) -> str | None:
     """Try to resolve an import reference to an actual file in the repo."""
-    ref = ref.strip()
+    ref = ref.strip().strip("'\"")
     normalized = ref.replace("@/", "").replace("::", "/").replace(".", "/").lstrip("/")
 
     if "::" in ref:
         normalized = "/".join(_snake_case(part) for part in ref.split("::") if part)
 
-    # Try common patterns
-    candidates = [
+    candidates: list[str] = [
         normalized,
         normalized + ".py",
         normalized + ".rb",
@@ -105,18 +160,22 @@ def resolve_import_to_file(
     ]
 
     if from_path and ref.startswith("."):
-        base_parent = PurePosixPath(from_path).parent
-        relative = PurePosixPath(base_parent, ref).as_posix().replace("./", "")
-        relative = str(PurePosixPath(relative))
+        candidates = _relative_import_candidates(ref, from_path) + candidates
+
+    if ref.startswith("@/"):
+        alias_stem = ref[2:]
         candidates = [
-            relative,
-            relative + ".py",
-            relative + ".rb",
-            relative + ".ts",
-            relative + ".js",
-            relative + ".tsx",
-            relative + ".jsx",
+            f"src/{alias_stem}",
+            f"src/{alias_stem}.ts",
+            f"src/{alias_stem}.tsx",
+            f"src/{alias_stem}/index.ts",
+            f"lib/{alias_stem}",
+            f"lib/{alias_stem}.ts",
+            f"lib/{alias_stem}/index.ts",
         ] + candidates
+
+    if ref.startswith("@") and not ref.startswith("@/"):
+        candidates = _scoped_package_candidates(ref) + candidates
 
     if "::" in ref:
         candidates.extend(
@@ -132,12 +191,13 @@ def resolve_import_to_file(
     for c in candidates:
         if c in all_files:
             return c
-        # Check suffix match (e.g., "auth_service" matches "app/services/auth_service.rb")
         for f in all_files:
             if (
                 f.endswith("/" + c)
                 or f.endswith("/" + normalized + ".rb")
                 or f.endswith("/" + normalized + ".py")
+                or f.endswith("/" + normalized + ".ts")
+                or f.endswith("/" + normalized + ".tsx")
             ):
                 return f
     return None

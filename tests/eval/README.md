@@ -12,6 +12,7 @@ tests/eval/
 ├── bench_results.json  # merged OSS bench metrics (build + context latency)
 ├── baseline.json       # T1 regression gate (fastapi + httpx)
 ├── baseline-kubernetes.json  # T2 regression gate (kubernetes)
+├── baseline-agent-ab.json    # Agent A/B gate (PCG vs grep+read)
 └── golden/
     ├── fastapi/
     │   └── cases.json  # Tier 1 (CI smoke, 50 cases)
@@ -95,6 +96,11 @@ make eval-check-kubernetes   # T2 weekly in bench-t2.yml
 # Zero-recall gate (fails if any case has recall@5 = 0)
 make eval-audit REPOS='fastapi=bench/fastapi httpx=bench/httpx'
 make eval-audit-kubernetes
+
+# Agent A/B harness (one PCG call vs grep+read baseline)
+make eval-agent-ab-baseline REPOS='fastapi=bench/fastapi httpx=bench/httpx'
+make eval-agent-ab-check REPOS='fastapi=bench/fastapi httpx=bench/httpx'
+# Or: pareto-context-graph eval --repo-map fastapi=... --agent-ab --check-agent-ab
 ```
 
 ## Metrics
@@ -109,6 +115,8 @@ make eval-audit-kubernetes
 | `budget_honesty` | 1.0 when `tokens_used ≤ token_budget` |
 | `reduction_vs_corpus` | naive full-repo tokens / graph tokens |
 | `reduction_vs_agent` | grep-top-3 baseline tokens / graph tokens |
+| Agent A/B `tool_calls` | Median MCP tool calls: PCG (1) vs grep+read baseline |
+| Agent A/B `recall_at_5_delta` | PCG recall@5 minus baseline arm (gate: ≥ −2pp) |
 
 ## Regression policy
 
@@ -119,7 +127,7 @@ drop by **> 2 absolute points** vs the repo baseline (`baseline.json` for T1;
 
 `scripts/audit_golden_cases.py` fails on any case with `recall@5 = 0` (run via `make eval-audit`).
 
-See [docs/PHASES.md](../docs/PHASES.md) for the full execution plan.
+See [docs/PHASES.md](../docs/PHASES.md) for the execution plan and open items.
 
 ## Benchmark results (`bench_results.json`)
 

@@ -6,7 +6,9 @@ Zero-dependency MCP implementation using JSON-RPC 2.0 over stdin/stdout.
 
 from __future__ import annotations
 
+import copy
 import json
+import os
 import sys
 import uuid
 from pathlib import Path
@@ -41,41 +43,109 @@ from .hooks import (
     run_post_update_hooks,
     run_pre_context_hooks,
 )
+from .mcp_prompts import PROMPT_DESCRIPTORS, render_prompt
 from .metrics import METRICS, PhaseTimer
 from .policy import apply_context_policy, default_profile
 from .pool import close_store_pool, get_store_pool, open_store
 from .profiles import autodetect_profile, resolve_profile
-from .repo_caches import invalidate_caches
+from .repo_registry import RepoRegistry, build_repo_registry
 from .session import (
     clear_session,
     merge_session_already_have,
+)
+from .server_instructions import build_server_instructions
+from .staleness import (
+    catch_up_on_connect,
+    format_staleness_banner,
+    gather_staleness_report,
 )
 from .store import Store
 from .tokenizer import resolve_tokenizer
 from .tokens import compute_savings
 
+_STALE_COMMANDS = frozenset({"context", "explore", "search", "retrieve"})
+
+
+def resolve_mcp_commands() -> frozenset[str] | None:
+    raw = os.environ.get("PCG_MCP_COMMANDS", "").strip()
+    if not raw:
+        return None
+    return frozenset(part.strip() for part in raw.split(",") if part.strip())
+
+
+def build_mcp_tools() -> list[dict]:
+    allowed = resolve_mcp_commands()
+    if not allowed:
+        return TOOLS
+    tools = copy.deepcopy(TOOLS)
+    schema = tools[0]["inputSchema"]
+    cmd_prop = schema["properties"]["command"]
+    cmd_prop["enum"] = [c for c in cmd_prop["enum"] if c in allowed]
+    desc_cmds = ", ".join(sorted(cmd_prop["enum"]))
+    tools[0]["description"] = f"Git-aware code intelligence. Commands: {desc_cmds}."
+    cmd_prop["description"] = f"One of: {desc_cmds}"
+    return tools
+
+
+def _attach_staleness(repo_root: Path, command: str, json_text: str) -> str:
+    if command not in _STALE_COMMANDS:
+        return json_text
+    store = Store(repo_root, readonly=True)
+    try:
+        report = gather_staleness_report(store, repo_root)
+        banner = format_staleness_banner(report)
+        if not banner:
+            return json_text
+        try:
+            payload = json.loads(json_text)
+        except json.JSONDecodeError:
+            return banner + json_text
+        if isinstance(payload, dict) and "error" not in payload:
+            payload["staleness"] = report
+            return banner + json.dumps(payload)
+        return banner + json_text
+    finally:
+        store.close()
+
+
+def _as_registry(repo_root: Path | RepoRegistry) -> RepoRegistry:
+    if isinstance(repo_root, RepoRegistry):
+        return repo_root
+    return build_repo_registry(repo_root)
+
+
+def _resolve_call_repo(registry: RepoRegistry, arguments: dict) -> Path:
+    return registry.resolve(arguments.get("repo_key"))
+
+
 TOOLS = [
     {
         "name": "pareto_context_graph",
-        "description": "Git-aware code intelligence. Commands: context (get related files for any prompt), retrieve (verbatim payload by content_hash), build (build graph), update (incremental update), blast (files affected by diff), neighbours (co-change lookup), search (find files), stats, doctor, hotspots, communities, session_clear, decay_sweep, mark_used, feedback_cite, feedback_accept, feedback_reject, feedback_view, feedback_dwell.",
+        "description": "Git-aware code intelligence. Commands: explore (alias for context), context (get related files for any prompt), retrieve (verbatim payload by content_hash), build (build graph), update (incremental update), blast (files affected by diff), detect_changes (git diff impact), affected (tests to run for a diff), neighbours (co-change lookup), search (find files), stats, doctor, hotspots, communities, architecture_report, list_subsystems, subsystem_files, session_clear, decay_sweep, mark_used, feedback_cite, feedback_accept, feedback_reject, feedback_view, feedback_dwell.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "command": {
                     "type": "string",
-                    "description": "One of: context, retrieve, build, update, blast, neighbours, search, stats, doctor, hotspots, communities, session_clear, savings, decay_sweep, mark_used, feedback_cite, feedback_accept, feedback_reject, feedback_view, feedback_dwell",
+                    "description": "One of: explore, context, retrieve, build, update, blast, detect_changes, affected, neighbours, search, stats, doctor, hotspots, communities, architecture_report, list_subsystems, subsystem_files, session_clear, savings, decay_sweep, mark_used, feedback_cite, feedback_accept, feedback_reject, feedback_view, feedback_dwell",
                     "enum": [
+                        "explore",
                         "context",
                         "retrieve",
                         "build",
                         "update",
                         "blast",
+                        "detect_changes",
+                        "affected",
                         "neighbours",
                         "search",
                         "stats",
                         "doctor",
                         "hotspots",
                         "communities",
+                        "architecture_report",
+                        "list_subsystems",
+                        "subsystem_files",
                         "session_clear",
                         "savings",
                         "decay_sweep",
@@ -141,6 +211,10 @@ TOOLS = [
                 "profile": {
                     "type": "string",
                     "description": "Preset tuning profile: tiny, medium, large, huge",
+                },
+                "repo_key": {
+                    "type": "string",
+                    "description": "Named repo from serve --repo-map (default: default)",
                 },
                 "min_weight": {
                     "type": "integer",
@@ -217,6 +291,25 @@ TOOLS = [
                     "type": "boolean",
                     "description": "[context] Include per-candidate retrieval scores (default on; PCG_FEATURE_DIAGNOSTICS=0 to disable)",
                 },
+                "include_specs": {
+                    "type": "boolean",
+                    "description": "[context] Attach BM25-matched docs/rules snippets (spec_context)",
+                    "default": False,
+                },
+                "spec_limit": {
+                    "type": "integer",
+                    "description": "[context] Max spec snippets when include_specs=true (default: 5)",
+                    "default": 5,
+                },
+                "subsystem": {
+                    "type": "string",
+                    "description": "[subsystem_files] Subsystem key from list_subsystems",
+                },
+                "file_limit": {
+                    "type": "integer",
+                    "description": "[subsystem_files] Max files returned (default: 50)",
+                    "default": 50,
+                },
                 "timeout_ms": {
                     "type": "integer",
                     "description": "[context] Per-request deadline in milliseconds (default: 5000)",
@@ -262,6 +355,12 @@ def _handle_tool_call(repo_root: Path, name: str, arguments: dict) -> str:
         if not command:
             return json.dumps({"error": f"Unknown tool: {name}"})
 
+    if command == "explore":
+        arguments = dict(arguments)
+        arguments.setdefault("tier", 1)
+        arguments.setdefault("token_budget", 50000)
+        command = "context"
+
     # --- build ---
     if command == "build":
         from .graph import build_graph_sharded
@@ -273,11 +372,14 @@ def _handle_tool_call(repo_root: Path, name: str, arguments: dict) -> str:
         if since is None:
             since = profile.get("since")
         shards = int(arguments.get("shards", profile.get("shards", 1)))
+        search_mode = "eager" if arguments.get("with_search_index") else None
         store = build_graph_sharded(
             repo_root,
             max_commits=max_commits,
             since=since,
             shards=shards,
+            profile_name=profile_name,
+            search_index_mode=search_mode,
         )
         result = {
             "status": "ok",
@@ -285,6 +387,7 @@ def _handle_tool_call(repo_root: Path, name: str, arguments: dict) -> str:
             "edges": store.edge_count(),
             "profile": profile_name,
             "shards": shards,
+            "search_index_status": store.get_meta("search_index_status"),
         }
         if since:
             result["since"] = since
@@ -355,6 +458,63 @@ def _handle_tool_call(repo_root: Path, name: str, arguments: dict) -> str:
                 "changed": changed,
                 "affected": [r["path"] for r in filtered if r["depth"] > 0],
                 "total": len(existing),
+            }
+        )
+
+    # --- detect_changes (git diff + blast + staleness) ---
+    if command == "detect_changes":
+        from .graph_diff import detect_changes as detect_changes_cmd
+
+        base = arguments.get("base", "main")
+        min_weight = int(arguments.get("min_weight", 2))
+        max_depth = int(arguments.get("max_depth", 2))
+        return json.dumps(
+            detect_changes_cmd(
+                repo_root,
+                base=base,
+                min_weight=min_weight,
+                max_depth=max_depth,
+            )
+        )
+
+    # --- affected (test selection for a diff) ---
+    if command == "affected":
+        from .affected import affected_from_git, compute_affected_tests
+
+        base = arguments.get("base", "main")
+        max_depth = int(arguments.get("max_depth", 3))
+        paths = list(arguments.get("paths", []) or [])
+        if paths:
+            store = Store(repo_root)
+            try:
+                payload = compute_affected_tests(
+                    store,
+                    repo_root,
+                    paths,
+                    max_depth=max_depth,
+                )
+                payload["base"] = base
+            finally:
+                store.close()
+        else:
+            payload = affected_from_git(repo_root, base=base, max_depth=max_depth)
+        return json.dumps(payload)
+
+    # --- architecture_report ---
+    if command == "architecture_report":
+        from .architecture_report import build_architecture_report, write_architecture_report
+
+        write = bool(arguments.get("write", True))
+        if write:
+            path = write_architecture_report(repo_root)
+            text = path.read_text()
+        else:
+            text = build_architecture_report(repo_root)
+            path = None
+        return json.dumps(
+            {
+                "report": text,
+                "path": str(path.relative_to(repo_root)) if path else None,
             }
         )
 
@@ -469,7 +629,11 @@ def _handle_tool_call(repo_root: Path, name: str, arguments: dict) -> str:
             return json.dumps({"error": "query is required"})
         limit = arguments.get("limit", 20)
         with PhaseTimer("search"):
-            with open_store(repo_root, write=False) as store:
+            with open_store(repo_root, write=True) as store:
+                from .indexing import ensure_search_indexes
+
+                profile_name = arguments.get("profile") or autodetect_profile(repo_root)
+                ensure_search_indexes(store, repo_root, profile_name=profile_name)
                 payload = store.unified_search(query, limit=limit)
         log_audit_event(
             repo_root,
@@ -493,6 +657,31 @@ def _handle_tool_call(repo_root: Path, name: str, arguments: dict) -> str:
         )
         payload.pop("_all_communities", None)
         store.close()
+        return json.dumps(payload)
+
+    # --- subsystems (Phase 15.6) ---
+    if command == "list_subsystems":
+        from .subsystems import list_subsystems as list_subsystems_cmd
+
+        store = Store(repo_root)
+        try:
+            payload = list_subsystems_cmd(store, repo_root)
+        finally:
+            store.close()
+        return json.dumps(payload)
+
+    if command == "subsystem_files":
+        from .subsystems import subsystem_files as subsystem_files_cmd
+
+        key = str(arguments.get("subsystem", "")).strip()
+        if not key:
+            return json.dumps({"error": "subsystem key is required"})
+        file_limit = int(arguments.get("file_limit", 50))
+        store = Store(repo_root)
+        try:
+            payload = subsystem_files_cmd(store, repo_root, key, file_limit=file_limit)
+        finally:
+            store.close()
         return json.dumps(payload)
 
     # --- session_clear ---
@@ -590,11 +779,14 @@ def _handle_tool_call(repo_root: Path, name: str, arguments: dict) -> str:
         except (ImportError, ValueError) as exc:
             return json.dumps({"error": str(exc)})
 
+        decay_store = Store(repo_root)
+        try:
+            maybe_decay_cochange_edges(decay_store)
+        finally:
+            decay_store.close()
         _pool_read = get_store_pool(repo_root).read()
         store = _pool_read.__enter__()
         try:
-            with get_store_pool(repo_root).write() as decay_store:
-                maybe_decay_cochange_edges(decay_store)
             response = execute_context_pipeline(
                 repo_root=repo_root,
                 store=store,
@@ -690,9 +882,12 @@ class ParetoContextGraphServer:
         return [{"type": "text", "text": text}]
 
 
-def run_server(repo_root: Path, transport: str = "stdio") -> None:
+def run_server(repo_root: Path | RepoRegistry, transport: str = "stdio") -> None:
     """Run the MCP server over stdio."""
-    get_store_pool(repo_root)
+    registry = _as_registry(repo_root)
+    default_repo = registry.resolve()
+    for key in registry.keys():
+        get_store_pool(registry.resolve(key))
     try:
         while True:
             msg = _read()
@@ -703,17 +898,27 @@ def run_server(repo_root: Path, transport: str = "stdio") -> None:
             msg_id = msg.get("id")
 
             if method == "initialize":
+                instructions = build_server_instructions(default_repo)
+                if len(registry.keys()) > 1:
+                    instructions += (
+                        f"\n\nMulti-repo mode: pass `repo_key` "
+                        f"({', '.join(registry.keys())}) on tool calls."
+                    )
                 _send(
                     {
                         "jsonrpc": "2.0",
                         "id": msg_id,
                         "result": {
                             "protocolVersion": "2024-11-05",
-                            "capabilities": {"tools": {"listChanged": False}},
+                            "capabilities": {
+                                "tools": {"listChanged": False},
+                                "prompts": {"listChanged": False},
+                            },
                             "serverInfo": {
                                 "name": "pareto-context-graph",
                                 "version": "0.1.0",
                             },
+                            "instructions": instructions,
                         },
                     }
                 )
@@ -726,9 +931,50 @@ def run_server(repo_root: Path, transport: str = "stdio") -> None:
                     {
                         "jsonrpc": "2.0",
                         "id": msg_id,
-                        "result": {"tools": TOOLS},
+                        "result": {"tools": build_mcp_tools()},
                     }
                 )
+
+            elif method == "prompts/list":
+                _send(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": msg_id,
+                        "result": {"prompts": PROMPT_DESCRIPTORS},
+                    }
+                )
+
+            elif method == "prompts/get":
+                params = msg.get("params", {})
+                prompt_name = params.get("name", "")
+                prompt_args = params.get("arguments") or {}
+                try:
+                    text = render_prompt(prompt_name, prompt_args)
+                    _send(
+                        {
+                            "jsonrpc": "2.0",
+                            "id": msg_id,
+                            "result": {
+                                "messages": [
+                                    {
+                                        "role": "user",
+                                        "content": {"type": "text", "text": text},
+                                    }
+                                ],
+                            },
+                        }
+                    )
+                except KeyError:
+                    _send(
+                        {
+                            "jsonrpc": "2.0",
+                            "id": msg_id,
+                            "error": {
+                                "code": -32602,
+                                "message": f"Unknown prompt: {prompt_name}",
+                            },
+                        }
+                    )
 
             elif method in ("notifications/cancelled", "cancelled", "$/cancelRequest"):
                 params = msg.get("params", {}) or {}
@@ -740,10 +986,23 @@ def run_server(repo_root: Path, transport: str = "stdio") -> None:
                 params = msg.get("params", {})
                 tool_name = params.get("name", "")
                 arguments = params.get("arguments", {})
+                stale_command = ""
+                if tool_name == "pareto_context_graph":
+                    stale_command = str(arguments.get("command", ""))
+                    if stale_command == "explore":
+                        stale_command = "context"
                 cancel_event = register_cancel(str(msg_id)) if msg_id is not None else None
                 set_current_cancel_event(cancel_event)
                 try:
-                    result_text = _handle_tool_call(repo_root, tool_name, arguments)
+                    try:
+                        call_repo = _resolve_call_repo(registry, arguments)
+                    except KeyError as exc:
+                        result_text = json.dumps({"error": str(exc)})
+                    else:
+                        catch_up_on_connect(call_repo)
+                        result_text = _handle_tool_call(call_repo, tool_name, arguments)
+                        if stale_command:
+                            result_text = _attach_staleness(call_repo, stale_command, result_text)
                     _send(
                         {
                             "jsonrpc": "2.0",
@@ -781,4 +1040,5 @@ def run_server(repo_root: Path, transport: str = "stdio") -> None:
                     }
                 )
     finally:
-        close_store_pool(repo_root)
+        for key in registry.keys():
+            close_store_pool(registry.resolve(key))

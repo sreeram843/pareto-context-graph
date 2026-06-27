@@ -182,3 +182,25 @@ def test_feedback_mcp_commands(tmp_path):
         )
     )
     assert dwell["written"] == 1
+
+
+def test_feedback_log_disabled_skips_context_request_events(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / ".pareto-context-graph").mkdir()
+
+    log_context_request(
+        repo,
+        request_id="req-1",
+        query="q",
+        seed_files=["a.py"],
+        candidates=[],
+        returned_paths=["a.py"],
+    )
+    assert len(FeedbackEventLog(repo).read_all()) == 1
+
+    from pareto_context_graph.feedback import feedback_log_enabled
+
+    assert feedback_log_enabled({}) is True
+    assert feedback_log_enabled({"feedback_log": False}) is False
+    assert feedback_log_enabled({"feedback_log": True}) is True

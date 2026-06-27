@@ -26,6 +26,7 @@ from .compress_stack import (
     legacy_compress_stack_fields,
     portable_compress_baseline_payload,
 )
+from .feedback import clear_learning_state
 from .headroom_stack import aggregate_headroom_stack
 from .server import _handle_tool_call
 from .store import Store
@@ -252,6 +253,7 @@ def _run_case(
     compress_stack: bool = False,
     summary_prune: bool = False,
     learned_tier1_prune: bool = False,
+    feedback_log: bool = True,
 ) -> dict:
     store = Store(repo_root)
     try:
@@ -273,6 +275,7 @@ def _run_case(
             "min_weight": case.min_weight,
             "query_first": not case.seed_files,
             "session_memory": False,
+            "feedback_log": feedback_log,
             **({"summary_prune": True} if summary_prune else {}),
             **({"learned_tier1_prune": True} if learned_tier1_prune else {}),
         },
@@ -319,6 +322,7 @@ def _run_case(
         if tokens_used and agent_tokens
         else 0.0,
         "notes": case.notes,
+        "retrieval_confidence": response.get("retrieval_confidence"),
     }
 
     if compress_stack:
@@ -340,6 +344,8 @@ def _run_case(
                 "min_weight": tier3_case.min_weight,
                 "query_first": not tier3_case.seed_files,
                 "compression": "prune",
+                "session_memory": False,
+                "feedback_log": False,
             },
         )
         response_t3 = json.loads(raw_t3)
@@ -746,12 +752,17 @@ def run_evaluation(
     golden_dir: Path | None = None,
     *,
     compress_stack: bool = False,
+    isolate_learning: bool = True,
+    isolate_cases: bool = False,
 ) -> dict:
     """Run all evaluation cases from per-repo golden directories."""
     golden_dir = golden_dir or DEFAULT_CASES_PATH
     results: list[dict] = []
+    feedback_log = not isolate_cases
 
     for repo_key, repo_root in sorted(repo_overrides.items()):
+        if isolate_learning:
+            clear_learning_state(repo_root)
         try:
             cases = load_cases_for_repo(repo_key, golden_dir)
         except RuntimeError as e:
@@ -759,13 +770,25 @@ def run_evaluation(
             continue
 
         for case in cases:
-            results.append(_run_case(case, repo_root, compress_stack=compress_stack))
+            if isolate_cases:
+                clear_learning_state(repo_root)
+            results.append(
+                _run_case(
+                    case,
+                    repo_root,
+                    compress_stack=compress_stack,
+                    feedback_log=feedback_log,
+                )
+            )
 
     if update_golden:
         write_golden_snapshots(golden_dir, results)
 
     summary = aggregate_results(results)
     summary["by_category"] = aggregate_by_category(results)
+    from .context_confidence import confidence_calibration_report
+
+    summary["confidence_calibration"] = confidence_calibration_report(results)
 
     return {
         "golden_dir": str(golden_dir),
@@ -862,6 +885,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Run per-signal ablation study (PCG_ABLATE_*); prints recall@5 deltas",
     )
+    parser.add_argument(
+        "--no-isolate-learning",
+        action="store_true",
+        help="Do not clear feedback/ranker artifacts before each repo's eval cases",
+    )
     args = parser.parse_args(argv)
 
     if args.check_compress_baseline and not args.compress_stack:
@@ -904,6 +932,7 @@ def main(argv: list[str] | None = None) -> int:
         update_golden=args.update_golden,
         golden_dir=args.golden_dir,
         compress_stack=args.compress_stack,
+        isolate_learning=not args.no_isolate_learning,
     )
 
     if args.json:

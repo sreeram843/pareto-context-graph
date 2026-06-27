@@ -45,10 +45,13 @@ def run_pre_context_hooks(repo_root: Path, payload: dict) -> dict:
 
 
 def run_post_context_hooks(repo_root: Path, response: dict) -> dict:
+    response = dict(response)
+    response["_repo_root"] = str(repo_root)
     for module in load_hooks(repo_root):
         func = getattr(module, "post_context", None)
         if callable(func):
             response = func(response) or response
+    response.pop("_repo_root", None)
     return response
 
 

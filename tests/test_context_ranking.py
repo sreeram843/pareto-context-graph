@@ -12,6 +12,13 @@ def test_apply_file_class_weight_doc_deprioritized():
     assert score < 10.0
 
 
+def test_apply_file_class_weight_openapi_boosts_openapi_dir():
+    boosted = apply_file_class_weight(10.0, "fastapi/openapi/utils.py", "openapi")
+    demoted = apply_file_class_weight(10.0, "fastapi/applications.py", "openapi")
+    assert boosted > 10.0
+    assert demoted < 10.0
+
+
 def test_build_mirror_groups_tracks_test_and_impl():
     groups = build_mirror_groups(["app/user.py", "spec/user_spec.rb"])
     assert len(groups) == 1

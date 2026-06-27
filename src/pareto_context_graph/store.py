@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-import math
+import os
 import re
 import sqlite3
 import time
 from pathlib import Path
+
+from .neighbour_cache import compute_top_neighbours_from_edges
 
 DB_DIR = ".pareto-context-graph"
 DB_NAME = "graph.db"
@@ -92,6 +94,12 @@ CREATE TABLE IF NOT EXISTS index_state (
     mtime_ns INTEGER NOT NULL,
     size INTEGER NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS spec_index_state (
+    path TEXT PRIMARY KEY,
+    mtime_ns INTEGER NOT NULL,
+    size INTEGER NOT NULL
+);
 """
 
 
@@ -124,7 +132,9 @@ class Store:
             self.conn = sqlite3.connect(str(db_path), check_same_thread=False)
             self.conn.execute("PRAGMA journal_mode=WAL")
             self.conn.execute("PRAGMA synchronous=NORMAL")
+            self.conn.execute("PRAGMA busy_timeout=5000")
         self._owns_connection = True
+        self._cold_bulk_load = False
         if readonly:
             self._init_reader_flags()
         else:
@@ -144,6 +154,7 @@ class Store:
         self._has_symbols_fts = self._table_exists("symbols_fts")
         self._has_content_fts = self._table_exists("content_fts")
         self._has_search_paths_fts = self._table_exists("search_paths_fts")
+        self._has_specs_fts = self._table_exists("specs_fts")
 
     def _init_writer_indexes(self) -> None:
         # FTS5 for fast file path search (best-effort; old SQLite may lack fts5)
@@ -156,6 +167,7 @@ class Store:
         self._has_symbols_fts = False
         self._has_content_fts = False
         self._has_search_paths_fts = False
+        self._has_specs_fts = False
         self.conn.executescript(SEARCH_INDEX_SCHEMA)
         try:
             self.conn.execute(
@@ -181,6 +193,14 @@ class Store:
             self._has_search_paths_fts = True
         except sqlite3.OperationalError:
             self._has_search_paths_fts = False
+        try:
+            self.conn.execute(
+                "CREATE VIRTUAL TABLE IF NOT EXISTS specs_fts USING fts5("
+                "path UNINDEXED, kind UNINDEXED, title, body, tokenize='porter unicode61')"
+            )
+            self._has_specs_fts = True
+        except sqlite3.OperationalError:
+            self._has_specs_fts = False
 
     def _run_migrations(self) -> None:
         columns = {row[1] for row in self.conn.execute("PRAGMA table_info(co_changes)").fetchall()}
@@ -324,49 +344,108 @@ class Store:
         ).fetchall()
         return [(r[0], float(r[1])) for r in rows]
 
-    def rebuild_top_neighbours(self, k: int = 50) -> None:
+    def enter_cold_bulk_load(self) -> None:
+        """Speed up cold builds: defer index maintenance until bulk insert completes."""
+        if self.readonly or self._cold_bulk_load:
+            return
+        self._cold_bulk_load = True
+        self.conn.execute("PRAGMA journal_mode=OFF")
+        self.conn.execute("PRAGMA synchronous=0")
+        self.conn.execute("PRAGMA temp_store=MEMORY")
+        self.conn.execute("PRAGMA cache_size=-200000")
+        self.conn.execute("PRAGMA locking_mode=EXCLUSIVE")
+        self.conn.execute("DROP INDEX IF EXISTS idx_co_a")
+        self.conn.execute("DROP INDEX IF EXISTS idx_co_b")
+
+    def exit_cold_bulk_load(self) -> None:
+        """Restore WAL mode and co-change indexes after a cold bulk load."""
+        if self.readonly or not self._cold_bulk_load:
+            return
+        self.conn.commit()
+        self.conn.execute("CREATE INDEX IF NOT EXISTS idx_co_a ON co_changes(file_a)")
+        self.conn.execute("CREATE INDEX IF NOT EXISTS idx_co_b ON co_changes(file_b)")
+        self.conn.commit()
+        self.conn.execute("PRAGMA journal_mode=WAL")
+        self.conn.execute("PRAGMA synchronous=NORMAL")
+        self.conn.execute("PRAGMA locking_mode=NORMAL")
+        self._cold_bulk_load = False
+        self.conn.commit()
+
+    @staticmethod
+    def cold_bulk_load_enabled() -> bool:
+        return os.environ.get("PCG_COLD_BUILD_FAST", "1").strip().lower() not in {
+            "0",
+            "false",
+            "no",
+            "off",
+        }
+
+    def write_top_neighbours(self, ranked: dict[str, list[tuple[str, float]]]) -> None:
+        """Persist pre-computed top-neighbour rows keyed by repo-relative paths."""
         self.conn.execute("DELETE FROM top_neighbours")
-        self.conn.execute(
-            """
-            INSERT INTO top_neighbours (file_id, rank, neighbour_id, weight)
-            WITH edges AS (
-                SELECT file_a AS file_id, file_b AS neighbour_id, weight FROM co_changes
-                UNION ALL
-                SELECT file_b AS file_id, file_a AS neighbour_id, weight FROM co_changes
-            ),
-            ranked AS (
-                SELECT file_id,
-                       neighbour_id,
-                       weight,
-                       ROW_NUMBER() OVER (
-                           PARTITION BY file_id ORDER BY weight DESC
-                       ) AS rank
-                FROM edges
+        if not ranked:
+            return
+        paths: set[str] = set(ranked)
+        for neighbours in ranked.values():
+            for neighbour, _weight in neighbours:
+                paths.add(neighbour)
+        placeholders = ",".join("?" * len(paths))
+        path_to_id = {
+            row[1]: row[0]
+            for row in self.conn.execute(
+                f"SELECT id, path FROM files WHERE path IN ({placeholders})",
+                sorted(paths),
+            ).fetchall()
+        }
+        rows: list[tuple[int, int, int, float]] = []
+        for path, neighbours in ranked.items():
+            file_id = path_to_id.get(path)
+            if file_id is None:
+                continue
+            for rank, (neighbour, weight) in enumerate(neighbours, start=1):
+                neighbour_id = path_to_id.get(neighbour)
+                if neighbour_id is None:
+                    continue
+                rows.append((file_id, rank, neighbour_id, weight))
+        if rows:
+            self.conn.executemany(
+                "INSERT INTO top_neighbours (file_id, rank, neighbour_id, weight) VALUES (?, ?, ?, ?)",
+                rows,
             )
-            SELECT file_id, rank, neighbour_id, weight
-            FROM ranked
-            WHERE rank <= ?
-            """,
-            (k,),
+
+    def rebuild_top_neighbours(self, k: int = 50) -> None:
+        """Rebuild top-neighbour cache in Python (linear scan, no SQL window sort)."""
+        edge_rows = self.conn.execute(
+            """
+            SELECT fa.path, fb.path, cc.weight
+            FROM co_changes cc
+            JOIN files fa ON fa.id = cc.file_a
+            JOIN files fb ON fb.id = cc.file_b
+            """
+        ).fetchall()
+        ranked = compute_top_neighbours_from_edges(
+            [(str(a), str(b), float(w)) for a, b, w in edge_rows],
+            k=k,
         )
+        self.write_top_neighbours(ranked)
         self.conn.commit()
 
     def apply_decay(self, half_life_days: float, prune_below: float | None = None) -> int:
         if half_life_days <= 0:
             raise ValueError("half_life_days must be > 0")
         now_ts = int(time.time())
-        rows = self.conn.execute(
-            "SELECT file_a, file_b, weight, COALESCE(last_seen_ts, ?) FROM co_changes",
-            (now_ts,),
-        ).fetchall()
-        for file_a, file_b, weight, last_seen_ts in rows:
-            age_days = max(0.0, (now_ts - int(last_seen_ts)) / 86400.0)
-            factor = math.exp(-(age_days / half_life_days))
-            new_weight = float(weight) * factor
-            self.conn.execute(
-                "UPDATE co_changes SET weight = ? WHERE file_a = ? AND file_b = ?",
-                (new_weight, file_a, file_b),
+        self.conn.execute(
+            """
+            UPDATE co_changes
+            SET weight = weight * exp(
+                -(
+                    MAX(0.0, (? - COALESCE(last_seen_ts, ?)) / 86400.0)
+                    / ?
+                )
             )
+            """,
+            (now_ts, now_ts, half_life_days),
+        )
 
         deleted = 0
         if prune_below is not None:
@@ -420,12 +499,39 @@ class Store:
             values = sorted(degrees.values())
             idx = int(0.95 * (len(values) - 1))
             p95 = values[idx]
-        return {
+        stats = {
             "files": self.file_count(),
             "edges": self.edge_count(),
             "p95_degree": p95,
             "top_hubs": [{"path": p, "degree": d} for p, d in sorted_hubs[:10]],
         }
+        stats.update(self.cross_file_coverage())
+        return stats
+
+    def cross_file_coverage(self) -> dict[str, int | float]:
+        """Share of files with at least one co-change or structural edge."""
+        total = self.file_count()
+        if total == 0:
+            return {"connected_files": 0, "cross_file_coverage_pct": 0.0}
+        connected = 0
+        if self._table_exists("structural_edges"):
+            row = self.conn.execute(
+                """SELECT COUNT(DISTINCT path) FROM (
+                       SELECT src_path AS path FROM structural_edges
+                       UNION SELECT dst_path AS path FROM structural_edges
+                   )"""
+            ).fetchone()
+            connected = int(row[0]) if row and row[0] is not None else 0
+        if self._table_exists("co_changes"):
+            row = self.conn.execute(
+                """SELECT COUNT(DISTINCT f.path)
+                   FROM files f
+                   JOIN co_changes c ON c.file_a = f.id OR c.file_b = f.id"""
+            ).fetchone()
+            co_count = int(row[0]) if row and row[0] is not None else 0
+            connected = max(connected, co_count)
+        pct = round(100.0 * connected / total, 1) if total else 0.0
+        return {"connected_files": connected, "cross_file_coverage_pct": pct}
 
     def log_feedback(
         self, query: str, file_path: str, returned: bool = True, used: bool = False
@@ -648,6 +754,35 @@ class Store:
             ).fetchall()
         return [(dst, kind, confidence) for dst, kind, confidence in rows]
 
+    def structural_incoming(
+        self,
+        path: str,
+        *,
+        kinds: set[str] | None = None,
+        limit: int = 50,
+    ) -> list[tuple[str, str, str]]:
+        """Return (src_path, kind, confidence) for edges pointing at *path*."""
+        if not self._table_exists("structural_edges"):
+            return []
+        if kinds:
+            placeholders = ",".join("?" for _ in kinds)
+            rows = self.conn.execute(
+                f"""SELECT src_path, kind, confidence
+                    FROM structural_edges
+                    WHERE dst_path = ? AND kind IN ({placeholders})
+                    LIMIT ?""",
+                (path, *sorted(kinds), limit),
+            ).fetchall()
+        else:
+            rows = self.conn.execute(
+                """SELECT src_path, kind, confidence
+                   FROM structural_edges
+                   WHERE dst_path = ?
+                   LIMIT ?""",
+                (path, limit),
+            ).fetchall()
+        return [(src, kind, confidence) for src, kind, confidence in rows]
+
     def structural_edge_count(self) -> int:
         row = self.conn.execute("SELECT COUNT(*) FROM structural_edges").fetchone()
         return int(row[0]) if row else 0
@@ -763,11 +898,77 @@ class Store:
             return []
         return [(path, float(-rank)) for path, rank in rows]
 
+    def clear_spec_index(self, path: str) -> None:
+        if self._has_specs_fts:
+            self.conn.execute("DELETE FROM specs_fts WHERE path = ?", (path,))
+        if self._table_exists("spec_index_state"):
+            self.conn.execute("DELETE FROM spec_index_state WHERE path = ?", (path,))
+
+    def clear_all_spec_indexes(self) -> None:
+        if self._has_specs_fts:
+            self.conn.execute("DELETE FROM specs_fts")
+        if self._table_exists("spec_index_state"):
+            self.conn.execute("DELETE FROM spec_index_state")
+
+    def get_spec_index_state(self, path: str) -> tuple[int, int] | None:
+        if not self._table_exists("spec_index_state"):
+            return None
+        row = self.conn.execute(
+            "SELECT mtime_ns, size FROM spec_index_state WHERE path = ?",
+            (path,),
+        ).fetchone()
+        return (int(row[0]), int(row[1])) if row else None
+
+    def set_spec_index_state(self, path: str, mtime_ns: int, size: int) -> None:
+        if not self._table_exists("spec_index_state"):
+            return
+        self.conn.execute(
+            """INSERT INTO spec_index_state(path, mtime_ns, size)
+               VALUES (?, ?, ?)
+               ON CONFLICT(path) DO UPDATE SET mtime_ns = excluded.mtime_ns,
+                                             size = excluded.size""",
+            (path, mtime_ns, size),
+        )
+
+    def index_spec_document(
+        self,
+        path: str,
+        *,
+        kind: str,
+        title: str,
+        body: str,
+    ) -> None:
+        if not self._has_specs_fts or not body.strip():
+            return
+        self.conn.execute(
+            "INSERT INTO specs_fts(path, kind, title, body) VALUES (?, ?, ?, ?)",
+            (path, kind, title, body),
+        )
+
+    def search_specs_bm25(self, query: str, limit: int = 10) -> list[tuple[str, float, str, str]]:
+        """Return (path, score, kind, title) for codified context documents."""
+        if not self._has_specs_fts:
+            return []
+        fts_query = _fts_query(query)
+        try:
+            rows = self.conn.execute(
+                """SELECT path, kind, title, bm25(specs_fts) AS rank
+                   FROM specs_fts
+                   WHERE specs_fts MATCH ?
+                   ORDER BY rank
+                   LIMIT ?""",
+                (fts_query, limit),
+            ).fetchall()
+        except sqlite3.OperationalError:
+            return []
+        return [(path, float(-rank), kind, title) for path, kind, title, rank in rows]
+
     def unified_search(self, query: str, limit: int = 20) -> dict:
         """Path + symbol + BM25 search for the `search` command."""
         paths = self.search_files(query, limit=limit)
         symbols = self.search_symbols(query, limit=limit)
         content = self.search_content_bm25(query, limit=limit)
+        specs = self.search_specs_bm25(query, limit=limit)
 
         ranked_paths: list[str] = []
         seen: set[str] = set()
@@ -792,6 +993,10 @@ class Store:
             "files": ranked_paths[:limit],
             "symbols": symbol_hits,
             "content_hits": [{"path": path, "score": score} for path, score in content[:limit]],
+            "spec_hits": [
+                {"path": path, "score": score, "kind": kind, "title": title}
+                for path, score, kind, title in specs[:limit]
+            ],
             "count": len(ranked_paths[:limit]),
         }
 

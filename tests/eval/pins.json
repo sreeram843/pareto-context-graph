@@ -6,28 +6,28 @@
       "sha": "219ac634ab82b6321492ef97fb223b618ce13948",
       "tier": 1,
       "notes": "CI smoke; ~1.1k files. Pin after first successful build.",
-      "pinned_at": "2026-06-24T05:21:37.766508+00:00",
-      "build_seconds": 2,
+      "pinned_at": "2026-06-26T04:57:51.762423+00:00",
+      "build_seconds": 17,
       "tracked_files": 2993,
-      "graph_db_bytes": 24821760
+      "graph_db_bytes": 31068160
     },
     "httpx": {
       "url": "https://github.com/encode/httpx",
       "sha": "b5addb64f0161ff6bfe94c124ef76f6a1fba5254",
       "tier": 1,
       "notes": "Small secondary smoke repo.",
-      "pinned_at": "2026-06-24T05:21:38.138966+00:00",
+      "pinned_at": "2026-06-26T04:57:52.396602+00:00",
       "build_seconds": 1,
       "tracked_files": 125,
-      "graph_db_bytes": 1146880
+      "graph_db_bytes": 2256896
     },
     "kubernetes": {
       "url": "https://github.com/kubernetes/kubernetes",
       "sha": "e62c2b04709d77f028b2d2dd3b57be567b4e7a60",
       "tier": 2,
       "notes": "T2 bench: 5150 non-merge commits (12mo), 289MB db, build 792s, hub go.mod, hub-only p95 0.006s, with-query p95 0.050s",
-      "pinned_at": "2026-06-24T08:28:34.680354+00:00",
-      "build_seconds": 792,
+      "pinned_at": "2026-06-25T02:02:34.955328+00:00",
+      "build_seconds": null,
       "tracked_files": 30523,
       "graph_db_bytes": 303210496
     },
@@ -36,10 +36,10 @@
       "sha": "840ef6c78e6a2f694b578ecb9063241c992aaa9e",
       "tier": 3,
       "notes": "T3 bench: 100k commits (24mo), 1.2GB db, build 37877s (~10.5h), hub MAINTAINERS, hub-only p95 0.006s, with-query p95 0.062s",
-      "pinned_at": "2026-06-24T19:25:44.986022+00:00",
-      "build_seconds": 37877,
+      "pinned_at": "2026-06-26T12:21:01.871214+00:00",
+      "build_seconds": 2294,
       "tracked_files": 94752,
-      "graph_db_bytes": 1254932480
+      "graph_db_bytes": 83628032
     }
   }
 }

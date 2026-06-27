@@ -263,4 +263,26 @@ def gather_doctor_report(
         "shards": plan.shards,
         "profiles_available": sorted(PROFILES.keys()),
     }
+    from .spec_drift import check_spec_drift
+    from .staleness import gather_staleness_report
+    from .symbols import symbol_index_mode, treesitter_installed, use_treesitter_for_symbols
+    from .watcher_health import snapshot as watcher_snapshot
+
+    report["spec_drift"] = check_spec_drift(repo_root)
+    report["symbol_index"] = {
+        "mode": symbol_index_mode(),
+        "treesitter_installed": treesitter_installed(),
+        "treesitter_enabled": use_treesitter_for_symbols(),
+    }
+    if not use_treesitter_for_symbols():
+        report["symbol_index"]["warning"] = (
+            "Running in regex (approximate) symbol mode. "
+            "Install `pip install -e '.[treesitter]'` for best search/symbol quality."
+        )
+    report["watcher"] = watcher_snapshot()
+    store = Store(repo_root, readonly=True)
+    try:
+        report["staleness"] = gather_staleness_report(store, repo_root, profile_name=profile)
+    finally:
+        store.close()
     return report

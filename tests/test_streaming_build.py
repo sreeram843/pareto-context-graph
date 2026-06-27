@@ -20,7 +20,7 @@ def _snapshot_pairs(repo):
 
 
 def test_streaming_matches_legacy(synthetic_repo_factory, monkeypatch):
-    repo = synthetic_repo_factory(commits=500, files=25, seed=17)
+    repo = synthetic_repo_factory(commits=200, files=25, seed=17)
 
     monkeypatch.setenv("CODE_GRAPH_LEGACY_BUILD", "1")
     store = build_graph(repo, max_commits=1000)

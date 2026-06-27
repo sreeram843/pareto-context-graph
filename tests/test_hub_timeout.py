@@ -15,7 +15,7 @@ import pytest
 
 from pareto_context_graph.bench import pick_hub_seed
 from pareto_context_graph.deadlines import DEFAULT_TIMEOUT_MS
-from pareto_context_graph.pool import get_store_pool
+from pareto_context_graph.pool import close_store_pool, get_store_pool
 from pareto_context_graph.profiles import autodetect_profile
 from pareto_context_graph.server import _handle_tool_call
 from pareto_context_graph.store import Store
@@ -37,6 +37,7 @@ pytestmark = pytest.mark.skipif(
 @pytest.fixture(scope="module", autouse=True)
 def _warm_store_pools() -> None:
     """Prime SQLite read pools so context timing excludes cold open."""
+    warmed: list[Path] = []
     for bench in (FASTAPI_BENCH, KUBERNETES_BENCH, LINUX_BENCH):
         graph = bench / ".pareto-context-graph" / "graph.db"
         if graph.exists():
@@ -45,6 +46,10 @@ def _warm_store_pools() -> None:
             pool = get_store_pool(repo)
             with pool.read() as store:
                 store.file_count()
+            warmed.append(repo)
+    yield
+    for repo in warmed:
+        close_store_pool(repo)
 
 
 @pytest.fixture(scope="module")
@@ -58,6 +63,8 @@ def hub_seed(repo: Path) -> str:
 
 
 def _context(repo: Path, *, hub: str, timeout_ms: int, query: str = "") -> dict:
+    for bench in (FASTAPI_BENCH, KUBERNETES_BENCH, LINUX_BENCH):
+        close_store_pool(bench.resolve())
     raw = _handle_tool_call(
         repo,
         "pareto_context_graph",

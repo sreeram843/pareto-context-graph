@@ -8,10 +8,19 @@ import time
 from pathlib import Path
 from typing import Any
 
+from .repo_caches import invalidate_caches
 from .store import DB_DIR, Store
 
 POSITIVE_KINDS = frozenset({"cite", "accept", "mark_used"})
 NEGATIVE_KINDS = frozenset({"reject"})
+
+LEARNING_ARTIFACTS = (
+    "events.jsonl",
+    "weights.json",
+    "prune_weights.json",
+    "ranker.json",
+    "ranker.lgb.txt",
+)
 
 
 def _events_path(repo_root: Path) -> Path:
@@ -166,6 +175,13 @@ class FeedbackFlusher:
             pass
 
 
+def feedback_log_enabled(arguments: dict) -> bool:
+    """When False, skip counterfactual event logging (eval tier-3 probes)."""
+    if "feedback_log" in arguments:
+        return bool(arguments["feedback_log"])
+    return True
+
+
 def log_context_request(
     repo_root: Path,
     *,
@@ -217,3 +233,23 @@ def record_feedback(
         else:
             deduped += 1
     return {"written": written, "deduped": deduped}
+
+
+def clear_learning_state(repo_root: Path) -> None:
+    """Remove learned artifacts and feedback tables for reproducible eval."""
+    from .session import clear_session
+
+    db_dir = repo_root / DB_DIR
+    for name in LEARNING_ARTIFACTS:
+        path = db_dir / name
+        if path.exists():
+            path.unlink()
+    clear_session(repo_root)
+    store = Store(repo_root)
+    try:
+        store.conn.execute("DELETE FROM feedback")
+        store.conn.execute("DELETE FROM feedback_dedup")
+        store.commit()
+    finally:
+        store.close()
+    invalidate_caches()

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import sqlite3
 import time
 
 from .store import Store
@@ -26,10 +27,15 @@ def maybe_decay_cochange_edges(store: Store) -> dict[str, int | bool | float | s
         if elapsed < DEFAULT_DECAY_INTERVAL_SECONDS:
             return {"skipped": True, "seconds_until_next": DEFAULT_DECAY_INTERVAL_SECONDS - elapsed}
 
-    deleted = store.apply_decay(
-        half_life_days=DEFAULT_HALF_LIFE_DAYS,
-        prune_below=DEFAULT_PRUNE_BELOW,
-    )
+    try:
+        deleted = store.apply_decay(
+            half_life_days=DEFAULT_HALF_LIFE_DAYS,
+            prune_below=DEFAULT_PRUNE_BELOW,
+        )
+    except sqlite3.OperationalError as exc:
+        if "locked" in str(exc).lower():
+            return {"skipped": True, "reason": "database_locked"}
+        raise
     store.set_meta("last_automatic_decay_ts", str(now))
     return {
         "applied": True,

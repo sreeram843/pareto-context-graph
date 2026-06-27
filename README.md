@@ -24,16 +24,17 @@ pip install -e /path/to/pareto-context-graph
 pip install -e "/path/to/pareto-context-graph[tiktoken]"
 ```
 
-**Cursor MCP** — in your repo:
+**One-shot onboarding** (build + MCP install + next steps):
 
 ```bash
 cd /path/to/your-repo
-pareto-context-graph build
-pareto-context-graph install --platform cursor
+pareto-context-graph init --platform cursor
 # restart Cursor
 ```
 
-Or add to `.cursor/mcp.json` manually:
+Or step by step: `build` → `install` → `serve --watch`. After commits: `pareto-context-graph sync`.
+
+**Cursor MCP** — manual config:
 
 ```json
 {
@@ -100,7 +101,7 @@ Containers, components, and pipeline phases: **[Architecture](docs/ARCHITECTURE.
 
 [code-review-graph (CRG)](https://github.com/tirth8205/code-review-graph) informed some design choices
 (structural edges, Leiden communities, install flow). **We do not import CRG** — all retrieval,
-ranking, compression, and MCP logic lives in this repo. Details: [CRG_INSPIRATIONS.md](docs/CRG_INSPIRATIONS.md).
+ranking, compression, and MCP logic lives in this repo.
 fastapi is a shared **eval benchmark** repo, not a library dependency.
 
 Tier-3 compression is **built in** (`compression: prune` + `retrieve`). See
@@ -121,11 +122,10 @@ Tier-3 compression is **built in** (`compression: prune` + `retrieve`). See
 
 ### More reference
 
-| Doc | Contents |
-|-----|----------|
-| [diagrams/](docs/diagrams/) | Mermaid/C4 sources + SVGs (`make render-diagrams`) |
-| [BENCHMARK_REPOS.md](docs/BENCHMARK_REPOS.md) | Clone/build recipes for T1–T3 |
-| [tests/eval/README.md](tests/eval/README.md) | Golden eval schema + metrics |
-| [FEEDBACK.md](docs/FEEDBACK.md) | Feedback learning loop |
-| [TOKEN_REDUCTION_AGENT_RESEARCH.md](docs/TOKEN_REDUCTION_AGENT_RESEARCH.md) | Paper mapping |
-| [PHASES.md](docs/PHASES.md) · [LEFTOVERS.md](docs/LEFTOVERS.md) | Roadmap |
+| Doc | Audience | Contents |
+|-----|----------|----------|
+| [diagrams/](docs/diagrams/) | All | Mermaid/C4 sources + SVGs (`make render-diagrams`) |
+| [BENCHMARK_REPOS.md](docs/BENCHMARK_REPOS.md) | Bench / CI | Clone/build recipes for T1–T3 |
+| [tests/eval/README.md](tests/eval/README.md) | Contributors | Golden eval schema + metrics |
+| [FEEDBACK.md](docs/FEEDBACK.md) | Integrators | Feedback learning loop |
+| [PHASES.md](docs/PHASES.md) | Maintainers | Execution plan, milestones, open items |

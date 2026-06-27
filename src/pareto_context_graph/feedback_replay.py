@@ -10,7 +10,13 @@ from pathlib import Path
 from typing import Any
 
 from .eval import EvalCase, _run_case, aggregate_results, load_cases_for_repo
-from .feedback import FeedbackEventLog, fold_events_to_sqlite, record_feedback
+from .feedback import (
+    LEARNING_ARTIFACTS,
+    FeedbackEventLog,
+    clear_learning_state,
+    fold_events_to_sqlite,
+    record_feedback,
+)
 from .prune_learn import invalidate_prune_weights_cache, learn_prune_weights, save_prune_weights
 from .ranker import learn_file_weights, save_ranker, train_best_ranker
 from .repo_caches import invalidate_caches
@@ -19,13 +25,7 @@ from .store import DB_DIR, Store
 
 DEFAULT_HOLDOUT_CATEGORY = "concept"
 MIN_MRR_IMPROVEMENT = 0.03
-LEARNING_FILES = (
-    "events.jsonl",
-    "weights.json",
-    "prune_weights.json",
-    "ranker.json",
-    "ranker.lgb.txt",
-)
+LEARNING_FILES = LEARNING_ARTIFACTS
 
 
 @dataclass
@@ -38,6 +38,7 @@ class ReplayReport:
     passed: bool
     holdout_results_before: list[dict[str, Any]]
     holdout_results_after: list[dict[str, Any]]
+    weights_count: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -48,6 +49,7 @@ class ReplayReport:
             "mrr_delta": round(self.mrr_delta, 4),
             "passed": self.passed,
             "min_required_delta": MIN_MRR_IMPROVEMENT,
+            "weights_count": self.weights_count,
             "holdout_before": self.holdout_results_before,
             "holdout_after": self.holdout_results_after,
         }
@@ -65,23 +67,6 @@ def split_cases(
         midpoint = max(1, len(cases) // 5)
         return cases[midpoint:], cases[:midpoint]
     return train, holdout
-
-
-def clear_learning_state(repo_root: Path) -> None:
-    """Remove learned artifacts and feedback tables."""
-    db_dir = repo_root / DB_DIR
-    for name in LEARNING_FILES:
-        path = db_dir / name
-        if path.exists():
-            path.unlink()
-    store = Store(repo_root)
-    try:
-        store.conn.execute("DELETE FROM feedback")
-        store.conn.execute("DELETE FROM feedback_dedup")
-        store.commit()
-    finally:
-        store.close()
-    invalidate_caches()
 
 
 @contextmanager
@@ -314,7 +299,7 @@ def run_feedback_replay(
         for case in train_cases:
             synthesize_feedback_for_case(case, repo_root)
 
-    apply_learn(repo_root, holdout_cases=holdout_cases)
+    learn_stats = apply_learn(repo_root, holdout_cases=holdout_cases)
 
     holdout_after = run_cases(holdout_cases, repo_root)
     after_mrr = aggregate_results(holdout_after)["mean_mrr"]
@@ -329,6 +314,7 @@ def run_feedback_replay(
         passed=delta >= min_mrr_improvement,
         holdout_results_before=holdout_before,
         holdout_results_after=holdout_after,
+        weights_count=int(learn_stats.get("weights", 0)),
     )
 
 

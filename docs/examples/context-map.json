@@ -1,0 +1,8 @@
+{
+  "subsystems": {
+    "example": {
+      "path_globs": ["src/example/**"],
+      "specs": ["docs/example.md", ".cursor/rules/example.mdc"]
+    }
+  }
+}

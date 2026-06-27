@@ -13,7 +13,15 @@ from itertools import combinations
 from pathlib import Path
 
 from .build_profile import META_KEY, BuildTimings
-from .indexing import rebuild_search_indexes, update_search_indexes
+from .indexing import (
+    SEARCH_INDEX_STATUS_META,
+    rebuild_search_indexes,
+    update_search_indexes,
+)
+from .neighbour_cache import compute_top_neighbours_from_merged
+from .repo_config import SearchIndexMode, filter_paths, load_repo_config, resolve_search_index_mode
+from .profiles import resolve_profile
+from .spec_index import rebuild_spec_indexes, update_spec_indexes
 from .store import Store
 
 _NOISY_COMMIT_RE = re.compile(
@@ -25,6 +33,23 @@ _COMMIT_CACHE_NAME = "commit_window_cache.json"
 _COMMIT_CACHE_VERSION = 2
 _COMMIT_CACHE_TTL_SECONDS = int(os.environ.get("PCG_COMMIT_CACHE_TTL_SECONDS", str(7 * 24 * 3600)))
 BUILD_WINDOW_META = "build_window_key"
+
+
+def _filter_commit_files(
+    repo_root: Path,
+    files: list[str],
+    *,
+    profile_name: str | None = None,
+) -> list[str]:
+    config = load_repo_config(repo_root, profile_name=profile_name)
+    return filter_paths(files, repo_root, config)
+
+
+def _new_build_store(repo_root: Path) -> Store:
+    store = Store(repo_root)
+    if Store.cold_bulk_load_enabled():
+        store.enter_cold_bulk_load()
+    return store
 
 
 def _run_git(args: list[str], cwd: Path) -> str:
@@ -236,6 +261,14 @@ def _maybe_skip_build(
     return incremental_update(repo_root, since_commit=last_hash)
 
 
+def _resolve_max_files_per_commit(profile_name: str | None, override: int | None) -> int:
+    if override is not None:
+        return override
+    if profile_name:
+        return int(resolve_profile(profile_name).get("max_files_per_commit", 250))
+    return 250
+
+
 def _finalize_store(
     store: Store,
     repo_root: Path,
@@ -247,6 +280,9 @@ def _finalize_store(
     build_strategy: str,
     last_commit_hash: str | None = None,
     window_key: str | None = None,
+    merged_pairs: dict[tuple[str, str], tuple[float, int]] | None = None,
+    profile_name: str | None = None,
+    search_index_mode: SearchIndexMode | None = None,
 ) -> Store:
     """Shared post-processing: indexes, metadata, commit."""
     if processed is not None:
@@ -262,13 +298,34 @@ def _finalize_store(
     store.set_meta("build_status", "built", commit=False)
 
     started = timings.start("top_neighbours")
-    store.rebuild_top_neighbours(k=50)
+    if merged_pairs is not None:
+        store.write_top_neighbours(compute_top_neighbours_from_merged(merged_pairs, k=50))
+        store.commit()
+    else:
+        store.rebuild_top_neighbours(k=50)
     timings.stop("top_neighbours", started)
 
-    started = timings.start("search_indexes")
-    index_stats = rebuild_search_indexes(store, repo_root)
-    timings.stop("search_indexes", started)
-    timings.meta["search_index_stats"] = index_stats
+    mode = search_index_mode or resolve_search_index_mode(
+        repo_root, profile_name=profile_name
+    )
+    if mode == "eager":
+        started = timings.start("search_indexes")
+        index_stats = rebuild_search_indexes(
+            store, repo_root, profile_name=profile_name, force=True
+        )
+        timings.stop("search_indexes", started)
+        timings.meta["search_index_stats"] = index_stats
+
+        started = timings.start("spec_indexes")
+        spec_stats = rebuild_spec_indexes(store, repo_root)
+        timings.stop("spec_indexes", started)
+        timings.meta["spec_index_stats"] = spec_stats
+        store.set_meta(SEARCH_INDEX_STATUS_META, "complete", commit=False)
+        timings.meta["build_phase"] = "full"
+    else:
+        store.set_meta(SEARCH_INDEX_STATUS_META, "pending", commit=False)
+        timings.meta["build_phase"] = "cochange"
+        timings.meta["search_index_deferred"] = True
 
     started = timings.start("files_fts")
     store.rebuild_files_fts()
@@ -278,6 +335,9 @@ def _finalize_store(
     store.set_meta(META_KEY, timings.to_json(), commit=False)
     store.commit()
     timings.stop("commit", started)
+
+    if Store.cold_bulk_load_enabled():
+        store.exit_cold_bulk_load()
     return store
 
 
@@ -287,8 +347,9 @@ def _build_graph_legacy(
     max_commits: int,
     since: str | None,
     max_files_per_commit: int,
+    profile_name: str | None = None,
 ) -> Store:
-    store = Store(repo_root)
+    store = _new_build_store(repo_root)
     store.clear()
     timings = BuildTimings(meta={"profile": "legacy-v1"})
     started = timings.start("git_log")
@@ -325,6 +386,7 @@ def _build_graph_legacy(
             cwd=repo_root,
         )
         files = list(dict.fromkeys(f for f in diff_output.strip().splitlines() if f))
+        files = _filter_commit_files(repo_root, files, profile_name=profile_name)
         if len(files) > max_files_per_commit or len(files) < 2:
             continue
         pair_weight = _commit_pair_weight(len(files), subject)
@@ -348,6 +410,7 @@ def _build_graph_legacy(
         build_strategy="legacy-v1",
         last_commit_hash=commits[0][0] if commits else None,
         window_key=_window_key(max_commits, since, 1),
+        profile_name=profile_name,
     )
 
 
@@ -357,6 +420,8 @@ def build_graph(
     max_commits: int = 5000,
     since: str | None = None,
     max_files_per_commit: int = 250,
+    profile_name: str | None = None,
+    search_index_mode: SearchIndexMode | None = None,
 ) -> Store:
     """Parse git log and populate the co-change graph.
 
@@ -375,11 +440,12 @@ def build_graph(
             max_commits=max_commits,
             since=since,
             max_files_per_commit=max_files_per_commit,
+            profile_name=profile_name,
         )
 
-    store = Store(repo_root)
+    store = _new_build_store(repo_root)
     store.clear()
-    timings = BuildTimings(meta={"profile": "streaming-v1"})
+    timings = BuildTimings(meta={"profile": "aggregated-v1"})
     window_key = _window_key(max_commits, since, 1)
     commits = _get_commits_for_window(
         repo_root,
@@ -388,28 +454,25 @@ def build_graph(
         window_key=window_key,
         timings=timings,
     )
+    commits = [
+        (commit_hash, commit_ts, subject, _filter_commit_files(repo_root, files, profile_name=profile_name))
+        for commit_hash, commit_ts, subject, files in commits
+    ]
 
-    processed = 0
+    started = timings.start("pair_aggregate")
+    merged = _aggregate_stream_chunk(commits, max_files_per_commit)
+    timings.stop("pair_aggregate", started)
+    timings.meta["unique_pairs"] = len(merged)
+
+    processed = sum(
+        1
+        for _commit_hash, _commit_ts, subject, files in commits
+        if 2 <= len(files) <= max_files_per_commit and _commit_pair_weight(len(files), subject) > 0
+    )
+
     started = timings.start("sqlite_writes")
-    edge_batch: list[tuple[str, str, float, int]] = []
-
-    def _flush_edges() -> None:
-        if edge_batch:
-            store.record_co_changes_bulk(edge_batch)
-            edge_batch.clear()
-
-    for commit_hash, commit_ts, subject, files in commits:
-        if len(files) > max_files_per_commit or len(files) < 2:
-            continue
-        pair_weight = _commit_pair_weight(len(files), subject)
-        if pair_weight <= 0:
-            continue
-        for a, b in combinations(sorted(files), 2):
-            edge_batch.append((a, b, pair_weight, commit_ts))
-            if len(edge_batch) >= _EDGE_FLUSH_SIZE:
-                _flush_edges()
-        processed += 1
-    _flush_edges()
+    bulk_rows = [(a, b, weight, ts) for (a, b), (weight, ts) in merged.items()]
+    store.record_co_changes_bulk(bulk_rows)
     timings.stop("sqlite_writes", started)
 
     return _finalize_store(
@@ -419,9 +482,12 @@ def build_graph(
         processed=processed,
         commits_scanned=len(commits),
         since=since,
-        build_strategy="streaming-v1",
+        build_strategy="aggregated-v1",
         last_commit_hash=commits[0][0] if commits else None,
         window_key=window_key,
+        merged_pairs=merged,
+        profile_name=profile_name,
+        search_index_mode=search_index_mode,
     )
 
 
@@ -444,6 +510,7 @@ def _compute_shard_pairs(
             cwd=root,
         )
         files = list(dict.fromkeys(f for f in diff_output.strip().splitlines() if f))
+        files = _filter_commit_files(root, files)
         if len(files) > max_files_per_commit or len(files) < 2:
             continue
         pair_weight = _commit_pair_weight(len(files), subject)
@@ -485,10 +552,13 @@ def build_graph_sharded(
     *,
     max_commits: int = 5000,
     since: str | None = None,
-    max_files_per_commit: int = 250,
+    max_files_per_commit: int | None = None,
     shards: int = 1,
+    profile_name: str | None = None,
+    search_index_mode: SearchIndexMode | None = None,
 ) -> Store:
     shards = max(1, int(shards))
+    max_files_per_commit = _resolve_max_files_per_commit(profile_name, max_files_per_commit)
     skipped = _maybe_skip_build(
         repo_root,
         max_commits=max_commits,
@@ -504,6 +574,8 @@ def build_graph_sharded(
             max_commits=max_commits,
             since=since,
             max_files_per_commit=max_files_per_commit,
+            profile_name=profile_name,
+            search_index_mode=search_index_mode,
         )
         store.set_meta("build_strategy", "sharded-v1:1")
         store.commit()
@@ -519,7 +591,7 @@ def build_graph_sharded(
         timings=timings,
     )
     if not commits:
-        store = Store(repo_root)
+        store = _new_build_store(repo_root)
         store.clear()
         timings.meta["commits_scanned"] = 0
         return _finalize_store(
@@ -531,9 +603,15 @@ def build_graph_sharded(
             since=since,
             build_strategy=f"sharded-v1:{shards}",
             window_key=window_key,
+            profile_name=profile_name,
+            search_index_mode=search_index_mode,
         )
 
     chunk_size = max(1, math.ceil(len(commits) / shards))
+    commits = [
+        (commit_hash, commit_ts, subject, _filter_commit_files(repo_root, files, profile_name=profile_name))
+        for commit_hash, commit_ts, subject, files in commits
+    ]
     chunks = [commits[i : i + chunk_size] for i in range(0, len(commits), chunk_size)]
 
     started = timings.start("pair_aggregate")
@@ -558,7 +636,7 @@ def build_graph_sharded(
     timings.meta["unique_pairs"] = len(merged)
     timings.meta["commits_scanned"] = len(commits)
 
-    store = Store(repo_root)
+    store = _new_build_store(repo_root)
     store.clear()
     started = timings.start("sqlite_writes")
     bulk_rows = [(a, b, weight, ts) for (a, b), (weight, ts) in merged.items()]
@@ -580,6 +658,9 @@ def build_graph_sharded(
         build_strategy=f"sharded-v1:{shards}",
         last_commit_hash=commits[0][0],
         window_key=window_key,
+        merged_pairs=merged,
+        profile_name=profile_name,
+        search_index_mode=search_index_mode,
     )
 
 
@@ -611,6 +692,7 @@ def incremental_update(repo_root: Path, since_commit: str | None = None) -> Stor
             cwd=repo_root,
         )
         files = list(dict.fromkeys(f for f in diff_output.strip().splitlines() if f))
+        files = _filter_commit_files(repo_root, files)
         touched_paths.update(files)
         if len(files) > 250 or len(files) < 2:
             continue
@@ -632,6 +714,11 @@ def incremental_update(repo_root: Path, since_commit: str | None = None) -> Stor
     store.rebuild_top_neighbours(k=50)
     if touched_paths:
         update_search_indexes(store, repo_root, paths=touched_paths)
+        spec_touched = {
+            p for p in touched_paths if Path(p).suffix.lower() in {".md", ".mdc", ".txt", ".rst"}
+        }
+        if spec_touched:
+            update_spec_indexes(store, repo_root, paths=spec_touched)
     store.commit()
     return store
 

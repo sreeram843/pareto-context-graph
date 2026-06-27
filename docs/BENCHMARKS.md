@@ -233,3 +233,30 @@ PYTHONPATH=. python scripts/profile_build.py --repo bench/fastapi --show
 Weekly CI runs synthetic stress via `.github/workflows/bench-weekly.yml`.
 OSS Tier 2/3 numbers are recorded manually after `bench-huge` on a machine with
 the clone.
+
+## Agent A/B scorecard (Week 5)
+
+Headless comparison of **one PCG `context`/`explore` call** vs a **grep + read**
+baseline on golden cases. Measures median tool calls, file reads, tokens, wall
+time, and recall@5.
+
+```bash
+# After building graphs for eval repos:
+make eval-agent-ab-baseline REPOS='fastapi=$(pwd)/bench/fastapi httpx=$(pwd)/bench/httpx'
+make eval-agent-ab-check   REPOS='fastapi=$(pwd)/bench/fastapi httpx=$(pwd)/bench/httpx'
+
+# Or directly:
+pareto-context-graph eval --repo-map fastapi=/path/to/fastapi --agent-ab --json
+```
+
+Baseline: `tests/eval/baseline-agent-ab.json`. Gate (`--check-agent-ab`) fails when
+PCG recall@5 drops >2pp vs the baseline arm or vs the stored PCG median, or when
+PCG uses more tool calls than grep+read.
+
+| Metric (median) | PCG | Baseline (grep+read) | Target |
+|-----------------|-----|----------------------|--------|
+| Tool calls | 1 | ~4 | PCG ≤ baseline |
+| File reads | tier-ranked set | top-3 grep hits | fewer tokens |
+| recall@5 | (run eval) | (run eval) | PCG ≥ baseline − 2pp |
+
+Record refreshed numbers here after `make eval-agent-ab-baseline` on T1 repos.

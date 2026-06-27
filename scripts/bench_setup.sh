@@ -138,7 +138,7 @@ build_repo() {
       extra_args=(--since "$since" --shards "$shards")
       ;;
     linux)
-      profile="huge"
+      profile="huge-full"
       since="24 months ago"
       commits=100000
       shards=8

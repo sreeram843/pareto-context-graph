@@ -6,7 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from pareto_context_graph.symbols import _extract_treesitter_records, _treesitter_available
+from pareto_context_graph.symbols import (
+    _extract_treesitter_records,
+    _treesitter_available,
+    _typescript_treesitter_available,
+)
 
 
 @pytest.mark.skipif(not _treesitter_available(), reason="tree-sitter extra not installed")
@@ -18,3 +22,21 @@ def test_treesitter_extracts_python_function(tmp_path: Path):
     assert "Foo" in names
     assert "bar" in names
     assert "baz" in names
+
+
+@pytest.mark.skipif(
+    not _typescript_treesitter_available(),
+    reason="tree-sitter-typescript not installed",
+)
+def test_treesitter_extracts_typescript_symbols(tmp_path: Path):
+    fp = tmp_path / "mod.ts"
+    fp.write_text(
+        "export class Widget {\n  greet(): string {\n    return 'hi';\n  }\n}\n"
+        "export function standalone() {}\n"
+        "export interface Config { id: string }\n"
+    )
+    records = _extract_treesitter_records(fp)
+    names = {r["symbol"] for r in records}
+    assert "Widget" in names
+    assert "standalone" in names
+    assert "Config" in names

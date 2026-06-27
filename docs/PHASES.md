@@ -10,8 +10,7 @@ accuracy-preserving MCP — informed by [code-review-graph](https://github.com/t
 2. **Honest budgets** (measurement) — `tiktoken`, `context_savings`
 3. **In-house compression** (payload shrink) — `compression: prune` + `retrieve` ([CONTEXT_COMPRESSION.md](CONTEXT_COMPRESSION.md))
 
-See also: [PRODUCTION_ROADMAP.md](PRODUCTION_ROADMAP.md) (detailed task specs),
-[CRG_INSPIRATIONS.md](CRG_INSPIRATIONS.md) (features to borrow).
+See also: [BENCHMARKS.md](BENCHMARKS.md) · [CI_SNAPSHOTS.md](CI_SNAPSHOTS.md) · [CONTEXT_COMPRESSION.md](CONTEXT_COMPRESSION.md)
 
 ---
 
@@ -62,7 +61,7 @@ flowchart LR
 
 **Order (Phases 9–14):** **9** first (labels + gates) → **10** ∥ **11** → **12** → **13** → **14**. Phase 10 and 11 can run in parallel on separate branches.
 
-**Leftovers:** incomplete or deferred work per phase is tracked in [LEFTOVERS.md](LEFTOVERS.md).
+Open items and phase status tables: [§ Open items & next actions](#open-items--next-actions) below.
 
 ---
 
@@ -126,8 +125,6 @@ cd bench/linux && pareto-context-graph build --profile huge --since "24 months a
 
 **Goal:** Regression gate so ranking changes are measurable and safe.
 
-Maps to [PRODUCTION_ROADMAP.md](PRODUCTION_ROADMAP.md) Phase 1.
-
 ### Tasks
 
 | ID | Task | Deliverable | Status |
@@ -189,8 +186,6 @@ Maps to [PRODUCTION_ROADMAP.md](PRODUCTION_ROADMAP.md) Phase 1.
 
 **Goal:** `token_budget` and `tokens_used` match the client's tokenizer.
 
-Maps to [PRODUCTION_ROADMAP.md](PRODUCTION_ROADMAP.md) Phase 2.
-
 ### Tasks
 
 | ID | Task | Deliverable |
@@ -212,8 +207,6 @@ Maps to [PRODUCTION_ROADMAP.md](PRODUCTION_ROADMAP.md) Phase 2.
 ## Phase 3 — Query-first retrieval *(~2–3 weeks)*
 
 **Goal:** Answer concept questions without seed files; search finds symbols, not just paths.
-
-Maps to [PRODUCTION_ROADMAP.md](PRODUCTION_ROADMAP.md) Phase 3.
 
 ### Tasks
 
@@ -237,9 +230,7 @@ Maps to [PRODUCTION_ROADMAP.md](PRODUCTION_ROADMAP.md) Phase 3.
 
 ## Phase 4 — Structure + savings reporting *(~2 weeks)*
 
-**Goal:** CRG-style structural edges and visible token savings per call.
-
-See [CRG_INSPIRATIONS.md](CRG_INSPIRATIONS.md) §1–2, §8.
+**Goal:** Structural edges, communities, and visible token savings per call.
 
 ### Tasks
 
@@ -277,8 +268,6 @@ See [CRG_INSPIRATIONS.md](CRG_INSPIRATIONS.md) §1–2, §8.
 ## Phase 5 — Feedback + learned ranking *(~2–3 weeks)*
 
 **Goal:** Ranking improves from real usage; feedback is not all negative.
-
-Maps to [PRODUCTION_ROADMAP.md](PRODUCTION_ROADMAP.md) Phase 4.
 
 ### Tasks
 
@@ -339,8 +328,6 @@ Maps to [PRODUCTION_ROADMAP.md](PRODUCTION_ROADMAP.md) Phase 4.
 
 **Goal:** Safe to ship to many developers unattended.
 
-Maps to [PRODUCTION_ROADMAP.md](PRODUCTION_ROADMAP.md) Phase 5.
-
 ### Tasks (priority order)
 
 | ID | Task | Why first |
@@ -357,8 +344,6 @@ Maps to [PRODUCTION_ROADMAP.md](PRODUCTION_ROADMAP.md) Phase 5.
 - [x] 32 concurrent readers + 1 writer: no errors, p99 read < 5 ms (`tests/test_phase7.py`)
 - [x] Hub-seeded `context` returns in ≤ 5 s (`timeout_ms` + `truncated`); kubernetes `go.mod` and linux `MAINTAINERS` hub-only p95 **~6 ms** post-7.2
 - [x] One-click Cursor MCP config from `install --platform cursor`
-
-See [LEFTOVERS.md](LEFTOVERS.md) for deferred items (cancelRequest, Ed25519, OTel, etc.).
 
 ---
 
@@ -467,7 +452,7 @@ See [CONTEXT_COMPRESSION.md](CONTEXT_COMPRESSION.md).
 
 **Goal:** Better top-5 on concept queries and noisy monorepos without reintroducing hub latency blow-ups.
 
-See [TOKEN_REDUCTION_AGENT_RESEARCH.md](TOKEN_REDUCTION_AGENT_RESEARCH.md) P1 and [CRG_INSPIRATIONS.md](CRG_INSPIRATIONS.md).
+See [CONTEXT_COMPRESSION.md](CONTEXT_COMPRESSION.md) for prune stack details.
 
 ### Tasks
 
@@ -586,15 +571,156 @@ Phase 3  [x] query-first context + orchestrator/retrievers (flags default on)
 Phase 4  [x] context_savings + structural edges + Leiden communities (flags default on)
 Phase 5  [x] positive feedback loop live
 Phase 6  [x] kubernetes + linux stress numbers recorded (hub p95 ~6 ms post-7.2)
-Phase 7  [x] timeouts + high-fanout fast path + WAL + cursor install (see LEFTOVERS.md)
+Phase 7  [x] timeouts + high-fanout fast path + WAL + cursor install
 Phase 8  [x] In-house compression (prune + retrieve + eval gate + learned prune)
 Phase 9  [x] Eval quality lift (k8s + httpx CI, community eval, zero-recall gate)
 Phase 10 [~] snapshot onboarding done; linux cold build re-bench pending (10.7)
 Phase 11 [x] acceptance gates shipped (11.1/11.4/11.6 done)
 Phase 12 [x] tiktoken default + session clear + packing CI gate
-Phase 13 [~] suggested_next + org policy shipped; IDE extension open
-Phase 14 [~] OTel OTLP + phase metrics + audit rotation shipped; CI concurrency open
+Phase 13 [~] suggested_next + org policy + install v2 shipped; IDE extension open
+Phase 14 [x] OTel OTLP + phase metrics + audit rotation + CI concurrency
+Phase 15 [x] Codified context bridge — see [PHASES_CODIFIED_CONTEXT.md](PHASES_CODIFIED_CONTEXT.md) (15.1–15.8 shipped)
+
+Product plan Weeks 1–6 (CodeGraph UX on co-change moat): [x] complete
 ```
+
+---
+
+## Open items & next actions
+
+1. **Phase 10.7** — Full cold linux re-bench (`make bench-linux`, ~10+ h locally) if build numbers need refresh.
+2. **Agent A/B baseline** — Run `make eval-agent-ab-baseline` on T1 repos; fill scorecard in [BENCHMARKS.md](BENCHMARKS.md).
+3. **Phase 13.1–13.2** — VS Code / Cursor extension (today: `install` writes `.cursor/mcp.json`).
+4. **Optional** — Wire `--check-agent-ab` into `.github/workflows/eval.yml`; refresh `baseline-agent-ab.json` with real numbers.
+
+### Product plan (Weeks 1–6) — complete
+
+CodeGraph-inspired UX on top of co-change moat. All items shipped:
+
+| Week | Items | Status |
+|------|-------|--------|
+| 1 | #2 neighbours, #3 cold bulk, #6 exclusions, #7 profile caps | **Done** |
+| 2 | #1 lazy index, #5 batched commits, #4 shards=1 pre-agg | **Done** |
+| 3 | #9 MCP instructions, #10 watcher, #11 staleness, #12 explore trim | **Done** |
+| 4 | #8 snapshot CI, #13 install v2, #15 `affected` | **Done** |
+| 5 | #14 `init`/`sync`, #16 agent A/B, #17 cross-file in `doctor` | **Done** |
+| 6 | #18 treesitter default, #19 route edges, #20 ops at scale | **Done** |
+
+---
+
+## Phase status (quick reference)
+
+Condensed done/open tracker. Update when closing an item in the phase sections above.
+
+### Phase 0 — Bench setup
+
+| Item | Status | Notes |
+|------|--------|-------|
+| T2 kubernetes clone + build on CI machine | **Done** | `.github/workflows/bench-t2.yml` (Sunday + manual) |
+| T3 linux 100k-commit stress | **Done** | Build + latency recorded; `make bench-linux` |
+| Pin kubernetes/linux SHAs in `pins.json` | **Done** | k8s `e62c2b04709`; linux `840ef6c78e6a` |
+
+### Phase 1 — Eval + CI
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Grow fastapi golden set toward 50 cases | **Done** | 50 cases in `golden/fastapi/cases.json` |
+| kubernetes golden `cases.json` | **Done** | 24 cases in `golden/kubernetes/cases.json` |
+| P0 token reduction (adaptive cap, session memory, bench savings) | **Done** | `adaptive_cap.py`, `session.py`, bench `token_savings` |
+| httpx in CI eval workflow | **Done** | fastapi + httpx in `.github/workflows/eval.yml` |
+| Regression limit documentation in PR template | **Done** | eval-audit checklist |
+
+### Phase 2 — Token honesty
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Default tokenizer to tiktoken in production | **Done** | Docker `[tiktoken]`; `auto` prefers tiktoken when installed |
+| Eval gate on all PRs touching packing | **Done** | packing paths in `.github/workflows/eval.yml` |
+
+### Phase 3 — Query-first retrieval
+
+| Item | Status | Notes |
+|------|--------|-------|
+| `PCG_FEATURE_QUERY_FIRST` default on | **Done** | `PCG_FEATURE_QUERY_FIRST=0` to disable |
+| `PCG_FEATURE_DIAGNOSTICS` default on | **Done** | env opt-out |
+| tree-sitter symbol index | **Done** | Default on when `[treesitter]` installed |
+
+### Phase 4 — Structure + savings
+
+| Item | Status | Notes |
+|------|--------|-------|
+| `PCG_FEATURE_STRUCTURAL_EDGES` default on | **Done** | blast traversal + route edges |
+| `PCG_FEATURE_LEIDEN` default on | **Done** | falls back without igraph |
+| kubernetes community eval | **Done** | 4 `category: community` cases |
+
+### Phase 5 — Feedback + learned ranking
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Held-out MRR +3 pts after feedback replay | **Done** | `eval --feedback-replay` |
+| LambdaMART ranker (optional) | **Done** | `[ranker]` extra |
+| Counterfactual replay vs grep baseline in CI | **Done** | `make eval-check` |
+
+### Phase 6 — Huge-repo stress bench
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Real kubernetes + linux bench numbers | **Done** | [BENCHMARKS.md](BENCHMARKS.md) |
+| Hub timeout tests on OSS graphs | **Done** | fastapi, kubernetes, linux |
+
+### Phase 7 — Operational hardening
+
+| Item | Status | Notes |
+|------|--------|-------|
+| MCP cancel, Ed25519, Prometheus, OTel, org policy | **Done** | see phase 7 tasks |
+| VS Code extension (one-click + feedback) | **Open** | Phase 13.1–13.2; `install` today |
+| Linux build indexing throughput | **Open** | Phase 10.7 cold re-bench pending |
+
+### Phase 8 — In-house compression
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Prune + retrieve + compress eval gate | **Done** | [CONTEXT_COMPRESSION.md](CONTEXT_COMPRESSION.md) |
+
+### Phase 9 — Eval quality lift
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Zero-recall audit, k8s/httpx CI, PR-sourced cases | **Done** | `make eval-audit`, `bench-t2.yml` |
+
+### Phase 10 — Build + snapshots
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Build profile, batch writes, incremental index, doctor estimate | **Done** | Weeks 1–2 product plan |
+| CI snapshot publish + onboarding docs | **Done** | [CI_SNAPSHOTS.md](CI_SNAPSHOTS.md) |
+| Linux cold build re-bench (10.7) | **Open** | post–optimization numbers pending |
+
+### Phase 11 — Signals + pruning
+
+| Item | Status | Notes |
+|------|--------|-------|
+| tree-sitter, selective hybrid, summary/learned prune | **Done** | acceptance gates in CI |
+| Grep-baseline counterfactual CI | **Done** | `make eval-check` |
+
+### Phase 12 — Default token stack
+
+| Item | Status | Notes |
+|------|--------|-------|
+| tiktoken default, session clear, packing CI | **Done** | |
+
+### Phase 13 — Agent DX
+
+| Item | Status | Notes |
+|------|--------|-------|
+| VS Code / Cursor extension | **Open** | Phase 13.1–13.2 |
+| `suggested_next`, feedback hooks, org policy | **Done** | |
+
+### Phase 14 — Fleet observability
+
+| Item | Status | Notes |
+|------|--------|-------|
+| OTel, phase metrics, audit rotation, snapshot verify | **Done** | |
 
 ---
 
@@ -618,17 +744,3 @@ Eval impact:   recall@5 / MRR / budget_honesty — expected direction
 Risks:         <bullet>
 Out of scope:  <bullet>
 ```
-
----
-
-## What to start this week
-
-**Phase 9** (eval quality) — highest leverage before more ranking work:
-
-1. **9.1** — Fix or remove the 4 fastapi cases with `recall@5 = 0`; refresh baseline.
-2. **10.7** — Re-bench linux after 10.2–10.3 optimizations.
-3. **9.8** — Kubernetes community eval category.
-
-Then parallelize **Phase 10** (linux build profile) and **Phase 11** (tree-sitter spike) on separate branches.
-
-See [LEFTOVERS.md](LEFTOVERS.md) for open items mapped to phases 9–14.
