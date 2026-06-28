@@ -30,7 +30,7 @@ Each entry in `golden/<repo_key>/cases.json`:
 |-------|----------|-------------|
 | `case_id` | yes | Stable identifier, e.g. `fastapi_oauth2_password` |
 | `repo_key` | yes | Must match directory name under `golden/` |
-| `seed_files` | usually | Files the user is editing; empty for query-only cases (Phase 3+) |
+| `seed_files` | usually | Files the user is editing; empty for query-only cases |
 | `query` | yes | Natural-language question or task |
 | `expected_top_files` | yes | Ground-truth paths that should rank highly |
 | `tier` | no | Default `1` (summaries only) |
@@ -127,7 +127,7 @@ drop by **> 2 absolute points** vs the repo baseline (`baseline.json` for T1;
 
 `scripts/audit_golden_cases.py` fails on any case with `recall@5 = 0` (run via `make eval-audit`).
 
-See [docs/PHASES.md](../docs/PHASES.md) for the execution plan and open items.
+See [docs/ROADMAP.md](../../docs/ROADMAP.md) for open work.
 
 ## Benchmark results (`bench_results.json`)
 

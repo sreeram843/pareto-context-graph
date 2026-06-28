@@ -75,7 +75,6 @@ def cmd_sync(args: argparse.Namespace) -> None:
     """Incremental graph update (+ optional search index catch-up)."""
     from .graph import incremental_update
     from .indexing import SEARCH_INDEX_STATUS_META, count_pending_index_files, ensure_search_indexes
-    from .store import Store
 
     repo = _resolve_repo_root(Path(args.repo) if args.repo else None)
     profile_name = args.profile or autodetect_profile(repo)
@@ -586,7 +585,7 @@ def cmd_affected(args: argparse.Namespace) -> None:
 
 def cmd_install(args: argparse.Namespace) -> None:
     """Auto-configure MCP and steering markers for AI coding tools."""
-    from .agent_install import INSTALL_TARGETS, print_agent_config, install_agent
+    from .agent_install import INSTALL_TARGETS, install_agent, print_agent_config
 
     repo = _resolve_repo_root(Path(args.repo) if args.repo else None)
     target = getattr(args, "target", None) or getattr(args, "platform", None) or "auto"
@@ -689,11 +688,19 @@ def cmd_eval(args: argparse.Namespace) -> None:
             print("  Agent A/B harness (PCG vs grep+read baseline)")
             print(f"{'=' * 60}\n")
             print(f"  Cases:              {ab_result['cases']}")
-            print(f"  PCG tool calls:     {pcg['tool_calls']:.1f}  (baseline {baseline['tool_calls']:.1f})")
-            print(f"  PCG file reads:     {pcg['file_reads']:.1f}  (baseline {baseline['file_reads']:.1f})")
+            print(
+                f"  PCG tool calls:     {pcg['tool_calls']:.1f}  (baseline {baseline['tool_calls']:.1f})"
+            )
+            print(
+                f"  PCG file reads:     {pcg['file_reads']:.1f}  (baseline {baseline['file_reads']:.1f})"
+            )
             print(f"  PCG tokens:         {pcg['tokens']:.0f}  (baseline {baseline['tokens']:.0f})")
-            print(f"  PCG wall time ms:   {pcg['wall_time_ms']:.1f}  (baseline {baseline['wall_time_ms']:.1f})")
-            print(f"  PCG recall@5:       {pcg['recall_at_5']:.4f}  (baseline {baseline['recall_at_5']:.4f})")
+            print(
+                f"  PCG wall time ms:   {pcg['wall_time_ms']:.1f}  (baseline {baseline['wall_time_ms']:.1f})"
+            )
+            print(
+                f"  PCG recall@5:       {pcg['recall_at_5']:.4f}  (baseline {baseline['recall_at_5']:.4f})"
+            )
             if delta.get("tool_calls_reduction_pct") is not None:
                 print(f"  Tool call reduction:{delta['tool_calls_reduction_pct']:.1f}%")
             if delta.get("tokens_reduction_pct") is not None:
@@ -707,7 +714,10 @@ def cmd_eval(args: argparse.Namespace) -> None:
 
         if getattr(args, "check_agent_ab", False):
             if not agent_ab_baseline_path.exists():
-                print(f"Error: agent A/B baseline missing at {agent_ab_baseline_path}", file=sys.stderr)
+                print(
+                    f"Error: agent A/B baseline missing at {agent_ab_baseline_path}",
+                    file=sys.stderr,
+                )
                 sys.exit(1)
             stored = json.loads(agent_ab_baseline_path.read_text())
             gate = check_agent_ab_gate(ab_result, stored)
@@ -764,6 +774,20 @@ def cmd_eval(args: argparse.Namespace) -> None:
                 )
         sys.exit(0 if report.passed else 1)
 
+    if getattr(args, "ablation", False):
+        from .eval import format_ablation_table, run_ablation_study
+
+        ablation_result = run_ablation_study(
+            repo_overrides=repo_overrides,
+            golden_dir=golden_dir,
+            compress_stack=getattr(args, "compress_stack", False),
+        )
+        if args.json:
+            print(json.dumps(ablation_result, indent=2))
+        else:
+            print("\n" + format_ablation_table(ablation_result))
+        sys.exit(0)
+
     results = run_evaluation(
         repo_overrides=repo_overrides,
         update_golden=args.update_golden,
@@ -799,6 +823,9 @@ def cmd_eval(args: argparse.Namespace) -> None:
         print(f"{'=' * 60}\n")
         print(f"  Cases:          {summary['cases']}")
         print(f"  Mean recall@5:  {summary['mean_recall_at_5']:.4f}")
+        if summary.get("mean_candidate_pool_recall") is not None:
+            print(f"  Pool recall:    {summary['mean_candidate_pool_recall']:.4f}")
+            print(f"  Pre-MMR @5:     {summary['mean_pre_mmr_recall_at_5']:.4f}")
         print(f"  Mean MRR:       {summary['mean_mrr']:.4f}")
         print(f"  Mean NDCG@10:   {summary['mean_ndcg_at_10']:.4f}")
         print(f"  Mean tokens:    {summary['mean_tokens_used']:.2f}")
@@ -975,7 +1002,9 @@ def main() -> None:
 
     # sync (= incremental update + optional index catch-up)
     p_sync = sub.add_parser("sync", help="Incremental graph update (+ optional index catch-up)")
-    p_sync.add_argument("--profile", choices=sorted(PROFILES.keys()), help="Profile for index catch-up")
+    p_sync.add_argument(
+        "--profile", choices=sorted(PROFILES.keys()), help="Profile for index catch-up"
+    )
     p_sync.add_argument(
         "--with-index",
         action="store_true",
@@ -1200,6 +1229,11 @@ def main() -> None:
         "--check-agent-ab",
         action="store_true",
         help="With --agent-ab: fail if PCG recall or tool-call savings regress vs baseline",
+    )
+    p_eval.add_argument(
+        "--ablation",
+        action="store_true",
+        help="Print per-signal ablation table (recall@5 / pool / pre-MMR deltas)",
     )
 
     # decay-sweep

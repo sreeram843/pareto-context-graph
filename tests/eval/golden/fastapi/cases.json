@@ -412,14 +412,13 @@
       "query": "",
       "expected_top_files": [
         "fastapi/routing.py",
-        "pyproject.toml",
         "fastapi/openapi/utils.py"
       ],
       "tier": 1,
       "token_budget": 6000,
       "max_depth": 1,
       "category": "co_change",
-      "notes": "Auto-generated from graph neighbours of fastapi/applications.py."
+      "notes": "Auto-generated from graph neighbours of fastapi/applications.py. [gold cleaned: removed release/packaging/CI files]"
     },
     {
       "case_id": "fastapi_fastapi_datastructures_py",
@@ -448,14 +447,13 @@
       "query": "",
       "expected_top_files": [
         "fastapi/routing.py",
-        "fastapi/openapi/utils.py",
-        "pyproject.toml"
+        "fastapi/openapi/utils.py"
       ],
       "tier": 1,
       "token_budget": 6000,
       "max_depth": 1,
       "category": "co_change",
-      "notes": "Auto-generated from graph neighbours of fastapi/dependencies/utils.py."
+      "notes": "Auto-generated from graph neighbours of fastapi/dependencies/utils.py. [gold cleaned: removed release/packaging/CI files]"
     },
     {
       "case_id": "fastapi_fastapi_encoders_py",
@@ -573,14 +571,13 @@
       "query": "",
       "expected_top_files": [
         "fastapi/dependencies/utils.py",
-        "fastapi/applications.py",
-        "pyproject.toml"
+        "fastapi/applications.py"
       ],
       "tier": 1,
       "token_budget": 6000,
       "max_depth": 1,
       "category": "co_change",
-      "notes": "Auto-generated from graph neighbours of fastapi/routing.py."
+      "notes": "Auto-generated from graph neighbours of fastapi/routing.py. [gold cleaned: removed release/packaging/CI files]"
     },
     {
       "case_id": "fastapi_fastapi_security_api_key_py",
@@ -591,14 +588,13 @@
       "query": "",
       "expected_top_files": [
         "fastapi/security/oauth2.py",
-        "pyproject.toml",
         "fastapi/security/open_id_connect_url.py"
       ],
       "tier": 1,
       "token_budget": 6000,
       "max_depth": 1,
       "category": "co_change",
-      "notes": "Auto-generated from graph neighbours of fastapi/security/api_key.py."
+      "notes": "Auto-generated from graph neighbours of fastapi/security/api_key.py. [gold cleaned: removed release/packaging/CI files]"
     },
     {
       "case_id": "fastapi_fastapi_security_http_py",
@@ -617,24 +613,6 @@
       "max_depth": 1,
       "category": "co_change",
       "notes": "Auto-generated from graph neighbours of fastapi/security/http.py."
-    },
-    {
-      "case_id": "fastapi_fastapi___init___py",
-      "repo_key": "fastapi",
-      "seed_files": [
-        "fastapi/__init__.py"
-      ],
-      "query": "",
-      "expected_top_files": [
-        "docs/en/docs/release-notes.md",
-        ".github/workflows/publish.yml",
-        "pyproject.toml"
-      ],
-      "tier": 1,
-      "token_budget": 6000,
-      "max_depth": 1,
-      "category": "co_change",
-      "notes": "Auto-generated from graph neighbours of fastapi/__init__.py."
     },
     {
       "case_id": "fastapi_fastapi__compat_main_py",
@@ -890,32 +868,13 @@
       "query": "",
       "expected_top_files": [
         "fastapi/dependencies/utils.py",
-        "fastapi/applications.py",
-        "pyproject.toml"
+        "fastapi/applications.py"
       ],
       "tier": 1,
       "token_budget": 6000,
       "max_depth": 1,
       "category": "pr_co_change",
-      "notes": "PR-sourced case from merge commit ad471307e2be (:sparkles: Additional Responses (#97))."
-    },
-    {
-      "case_id": "fastapi_pr_15808",
-      "repo_key": "fastapi",
-      "seed_files": [
-        "fastapi/__init__.py"
-      ],
-      "query": "",
-      "expected_top_files": [
-        "docs/en/docs/release-notes.md",
-        ".github/workflows/publish.yml",
-        "pyproject.toml"
-      ],
-      "tier": 1,
-      "token_budget": 6000,
-      "max_depth": 1,
-      "category": "pr_co_change",
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15808 (\ud83d\udd16 Release version 0.138.0 (#15808))."
+      "notes": "PR-sourced case from merge commit ad471307e2be (:sparkles: Additional Responses (#97)). [gold cleaned: removed release/packaging/CI files]"
     },
     {
       "case_id": "fastapi_pr_15800",
@@ -935,24 +894,6 @@
       "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15800 (\u2728 Add support for `app.frontend(\"/\", directory=\"dist\")` and `router.frontend(\"/\")."
     },
     {
-      "case_id": "fastapi_pr_15790",
-      "repo_key": "fastapi",
-      "seed_files": [
-        "fastapi/__init__.py"
-      ],
-      "query": "",
-      "expected_top_files": [
-        "docs/en/docs/release-notes.md",
-        ".github/workflows/publish.yml",
-        "pyproject.toml"
-      ],
-      "tier": 1,
-      "token_budget": 6000,
-      "max_depth": 1,
-      "category": "pr_co_change",
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15790 (\ud83d\udd16 Release version 0.137.2 (#15790))."
-    },
-    {
       "case_id": "fastapi_pr_15785",
       "repo_key": "fastapi",
       "seed_files": [
@@ -968,24 +909,6 @@
       "max_depth": 1,
       "category": "pr_co_change",
       "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15785 (\u2728 Add `iter_route_contexts()` for advanced use cases that used to use `router.ro)."
-    },
-    {
-      "case_id": "fastapi_pr_15766",
-      "repo_key": "fastapi",
-      "seed_files": [
-        "fastapi/__init__.py"
-      ],
-      "query": "",
-      "expected_top_files": [
-        "docs/en/docs/release-notes.md",
-        ".github/workflows/publish.yml",
-        "pyproject.toml"
-      ],
-      "tier": 1,
-      "token_budget": 6000,
-      "max_depth": 1,
-      "category": "pr_co_change",
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15766 (\ud83d\udd16 Release version 0.137.1 (#15766))."
     },
     {
       "case_id": "fastapi_pr_15763",
@@ -1004,24 +927,6 @@
       "max_depth": 1,
       "category": "pr_co_change",
       "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15763 (\ud83d\udc1b Fix bug, allow empty path in path operation in prefixless router (#15763))."
-    },
-    {
-      "case_id": "fastapi_pr_15748",
-      "repo_key": "fastapi",
-      "seed_files": [
-        "fastapi/__init__.py"
-      ],
-      "query": "",
-      "expected_top_files": [
-        "docs/en/docs/release-notes.md",
-        ".github/workflows/publish.yml",
-        "pyproject.toml"
-      ],
-      "tier": 1,
-      "token_budget": 6000,
-      "max_depth": 1,
-      "category": "pr_co_change",
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15748 (\ud83d\udd16 Release version 0.137.0 (#15748))."
     },
     {
       "case_id": "fastapi_pr_15745",
@@ -1122,14 +1027,13 @@
       "query": "",
       "expected_top_files": [
         "tests/test_vibe.py",
-        "fastapi/routing.py",
-        "pyproject.toml"
+        "fastapi/routing.py"
       ],
       "tier": 1,
       "token_budget": 6000,
       "max_depth": 1,
       "category": "pr_co_change",
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15363 (\ud83d\udd25 Remove April Fool's `@app.vibe()` \ud83e\udd2a (#15363))."
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15363 (\ud83d\udd25 Remove April Fool's `@app.vibe()` \ud83e\udd2a (#15363)). [gold cleaned: removed release/packaging/CI files]"
     },
     {
       "case_id": "fastapi_pr_15280",
@@ -1140,14 +1044,13 @@
       "query": "",
       "expected_top_files": [
         "tests/test_vibe.py",
-        "fastapi/routing.py",
-        "pyproject.toml"
+        "fastapi/routing.py"
       ],
       "tier": 1,
       "token_budget": 6000,
       "max_depth": 1,
       "category": "pr_co_change",
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15280 (\u2728 Add support for `@app.vibe()` (#15280))."
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15280 (\u2728 Add support for `@app.vibe()` (#15280)). [gold cleaned: removed release/packaging/CI files]"
     }
   ]
 }

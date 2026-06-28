@@ -11,8 +11,8 @@ from typing import Any
 from .blast import filter_existing
 from .graph import get_changed_files
 from .indexing import iter_indexable_files
-from .structural import infer_test_target, is_test_path
 from .store import Store
+from .structural import infer_test_target, is_test_path
 
 DEFAULT_TEST_GLOBS = (
     "*_test.go",
@@ -81,7 +81,9 @@ def compute_affected_tests(
             tests.add(path)
             related.append({"path": path, "depth": depth, "reason": "test_path"})
         else:
-            related.append({"path": path, "depth": depth, "reason": "changed" if depth == 0 else "structural"})
+            related.append(
+                {"path": path, "depth": depth, "reason": "changed" if depth == 0 else "structural"}
+            )
 
         tests.update(_tests_for_impl(path, all_files))
 

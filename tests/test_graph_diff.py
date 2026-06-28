@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import json
 
-from pareto_context_graph.architecture_report import build_architecture_report, write_architecture_report
+from pareto_context_graph.architecture_report import (
+    build_architecture_report,
+    write_architecture_report,
+)
 from pareto_context_graph.graph import build_graph
 from pareto_context_graph.graph_diff import detect_changes
 from pareto_context_graph.server import _handle_tool_call
@@ -41,7 +44,9 @@ def test_mcp_detect_changes_and_architecture_report_commands(synthetic_repo_fact
     store.close()
 
     dc = json.loads(
-        _handle_tool_call(repo, "pareto_context_graph", {"command": "detect_changes", "base": "main"})
+        _handle_tool_call(
+            repo, "pareto_context_graph", {"command": "detect_changes", "base": "main"}
+        )
     )
     assert "blast_count" in dc
 

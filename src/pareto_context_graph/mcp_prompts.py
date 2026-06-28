@@ -18,7 +18,11 @@ PROMPT_DESCRIPTORS: list[dict[str, Any]] = [
         "description": "Search → neighbours → tier-1 context for a bug or failure.",
         "arguments": [
             {"name": "query", "description": "Error message or symptom", "required": True},
-            {"name": "seed_file", "description": "Optional failing test or log path", "required": False},
+            {
+                "name": "seed_file",
+                "description": "Optional failing test or log path",
+                "required": False,
+            },
         ],
     },
     {

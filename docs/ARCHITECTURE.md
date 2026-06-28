@@ -131,7 +131,7 @@ src/pareto_context_graph/
 | `policy.json` | Repo-local policy overrides (merged on top of org policy) |
 | `hooks/` | Python extension hooks |
 
-**Audit retention (Phase 14.4):** `.pareto-context-graph/audit.jsonl` rotates when it reaches
+**Audit retention:** `.pareto-context-graph/audit.jsonl` rotates when it reaches
 **10 MiB** (default). The active file becomes `audit.jsonl.1`, older segments shift
 up, and only **5** files total are kept (`audit.jsonl` + `.1` … `.4`). Override via
 repo `.pareto-context-graph/policy.json`:
@@ -143,14 +143,14 @@ repo `.pareto-context-graph/policy.json`:
 Environment: `PCG_AUDIT_MAX_BYTES`, `PCG_AUDIT_MAX_FILES`, `PCG_AUDIT_ROTATION=0`
 to disable, `PCG_DISABLE_AUDIT=1` to stop logging entirely.
 
-**Org policy (Phase 13.5–13.6):** Files merge weakest → strongest:
+**Org policy:** Files merge weakest → strongest:
 `/etc/pareto-context-graph/policy.yaml`, `/etc/pareto-context-graph/policy.json`, `$PCG_POLICY`, then
 `.pareto-context-graph/policy.json`. YAML requires optional `pyyaml` (`pip install pareto-context-graph[policy]`).
 Context knobs applied before hooks: `default_tier`, `token_budget_default`, `max_token_budget`,
 `session_memory`, `profile_default`, `allow_no_safety`. Hook SHA-256 allowlists union across layers.
 Override org path in tests via `PCG_ORG_POLICY_DIR`.
 
-**Tracing (Phase 14.1):** Context requests emit `context` + `context.<phase>` spans.
+**Tracing:** Context requests emit `context` + `context.<phase>` spans.
 Enable OTLP with `OTEL_EXPORTER_OTLP_ENDPOINT` (or `PCG_OTEL_ENDPOINT`) and optional
 `OTEL_EXPORTER_OTLP_PROTOCOL` (`http/protobuf` default, or `grpc`). Install
 `pip install pareto-context-graph[otel]`. In-process buffer remains on `/traces` when metrics
@@ -167,7 +167,7 @@ service on port 4318.
 | [COMMANDS.md](COMMANDS.md) | `context` params, all commands, CLI, feature flags |
 | [OPTIONAL_FEATURES.md](OPTIONAL_FEATURES.md) | Embeddings, ranker, hooks, compression, Docker |
 | [CONTEXT_COMPRESSION.md](CONTEXT_COMPRESSION.md) | Built-in tier-3 prune + retrieve |
-| [PHASES.md](PHASES.md) | Execution plan, milestones, open items |
+| [ROADMAP.md](ROADMAP.md) | Open work and known issues |
 | [FEEDBACK.md](FEEDBACK.md) | Learn loop from agent usage |
 | [HOOKS.md](HOOKS.md) | Repo-local extension hooks |
 | [BENCHMARKS.md](BENCHMARKS.md) | Latency and build numbers |

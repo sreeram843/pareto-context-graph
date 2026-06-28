@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "src/pareto_context_graph/context_pipeline.py"
+      - "src/pareto_context_graph/context_pipeline_phases.py"
       - "src/pareto_context_graph/context_confidence.py"
       - "src/pareto_context_graph/context_ranking.py"
       - "src/pareto_context_graph/ablation.py"
@@ -80,11 +81,17 @@ jobs:
         working-directory: bench/httpx
 
       - name: Unit tests (eval metrics)
-        run: pytest -q tests/test_eval_metrics.py tests/test_tokenizer.py tests/test_feedback_events.py tests/test_ranker.py tests/test_features.py tests/test_hub_timeout.py tests/test_phase7.py tests/test_suggested_next.py tests/test_community_rank.py tests/test_feedback_hooks.py tests/test_audit_rotation.py tests/test_summary_prune.py tests/test_prune_learn.py tests/test_selective_hybrid.py tests/test_context_phase_metrics.py tests/test_policy.py tests/test_otel_tracing.py tests/test_phase11_gates.py tests/test_ranker_feedback_features.py tests/test_fastapi_symbol_search.py
+        run: pytest -q tests/test_eval_metrics.py tests/test_tokenizer.py tests/test_feedback_events.py tests/test_ranker.py tests/test_features.py tests/test_hub_timeout.py tests/test_phase7.py tests/test_suggested_next.py tests/test_community_rank.py tests/test_feedback_hooks.py tests/test_audit_rotation.py tests/test_summary_prune.py tests/test_prune_learn.py tests/test_selective_hybrid.py tests/test_context_phase_metrics.py tests/test_policy.py tests/test_otel_tracing.py tests/test_phase11_gates.py tests/test_ranker_feedback_features.py tests/test_fastapi_symbol_search.py tests/test_agent_transcript.py tests/test_flows.py
 
       - name: Run eval regression check
         run: |
+          export PCG_EDGE_DECAY=0
           make eval-check REPOS="fastapi=${{ github.workspace }}/bench/fastapi httpx=${{ github.workspace }}/bench/httpx"
+
+      - name: Per-signal ablation table
+        run: |
+          export PCG_EDGE_DECAY=0
+          make eval-ablation REPOS="fastapi=${{ github.workspace }}/bench/fastapi httpx=${{ github.workspace }}/bench/httpx"
 
       - name: Phase C compress stack gate
         run: |
@@ -97,3 +104,9 @@ jobs:
       - name: Feedback replay gate (Phase 5)
         run: |
           pareto-context-graph eval --repo-map fastapi=${{ github.workspace }}/bench/fastapi --feedback-replay
+
+      - name: Agent A/B gate (Phase 1.5)
+        # No-op unless a committed tests/eval/agent-ab.json exists (the live arms need
+        # an authenticated `claude` CLI; run `make agent-bench` where it is available).
+        run: |
+          PYTHONPATH=. python scripts/agent_ab_check.py tests/eval/agent-ab.json

@@ -5,23 +5,100 @@
     "httpx": "bench/httpx"
   },
   "summary": {
-    "cases": 74,
-    "mean_recall_at_5": 0.7387,
-    "mean_mrr": 0.875,
-    "mean_ndcg_at_10": 0.7455,
-    "mean_tokens_used": 1858.16,
-    "mean_token_efficiency": 0.0024,
-    "mean_budget_honesty": 0.9857,
-    "mean_payload_honesty": 1.0,
-    "mean_reduction_vs_corpus": 8557.6476,
-    "mean_reduction_vs_agent": 295.9805,
-    "median_reduction_vs_agent": 218.8,
+    "cases": 68,
+    "mean_recall_at_5": 0.8015,
+    "mean_candidate_pool_recall": 0.9191,
+    "mean_pre_mmr_recall_at_5": 0.8015,
+    "mean_mrr": 0.913,
+    "mean_ndcg_at_10": 0.7802,
+    "mean_tokens_used": 1308.57,
+    "mean_token_efficiency": 0.0023,
+    "mean_budget_honesty": 1.0,
+    "mean_payload_honesty": 0.0,
+    "mean_reduction_vs_corpus": 7746.6897,
+    "mean_reduction_vs_agent": 264.4718,
+    "median_reduction_vs_agent": 195.03,
     "three_way_benchmark": {
-      "corpus_tokens_mean": 7608917.28,
-      "agent_tokens_mean": 256373.0,
-      "graph_tokens_mean": 1858.16,
-      "median_reduction_vs_agent": 218.8,
-      "mean_reduction_vs_corpus": 8557.6476
+      "corpus_tokens_mean": 7639417.18,
+      "agent_tokens_mean": 257305.88,
+      "graph_tokens_mean": 1308.57,
+      "median_reduction_vs_agent": 195.03,
+      "mean_reduction_vs_corpus": 7746.6897
+    },
+    "by_category": {
+      "co_change": {
+        "cases": 44,
+        "mean_recall_at_5": 0.8523,
+        "mean_candidate_pool_recall": 0.9318,
+        "mean_pre_mmr_recall_at_5": 0.8523,
+        "mean_mrr": 0.9583,
+        "mean_ndcg_at_10": 0.8376,
+        "mean_tokens_used": 1158.7,
+        "mean_token_efficiency": 0.0027,
+        "mean_budget_honesty": 1.0,
+        "mean_payload_honesty": 0.0,
+        "mean_reduction_vs_corpus": 9319.1334,
+        "mean_reduction_vs_agent": 325.8261,
+        "median_reduction_vs_agent": 205.13,
+        "three_way_benchmark": {
+          "corpus_tokens_mean": 7670194.34,
+          "agent_tokens_mean": 268797.73,
+          "graph_tokens_mean": 1158.7,
+          "median_reduction_vs_agent": 205.13,
+          "mean_reduction_vs_corpus": 9319.1334
+        }
+      },
+      "concept": {
+        "cases": 13,
+        "mean_recall_at_5": 0.718,
+        "mean_candidate_pool_recall": 1.0,
+        "mean_pre_mmr_recall_at_5": 0.718,
+        "mean_mrr": 0.7372,
+        "mean_ndcg_at_10": 0.7193,
+        "mean_tokens_used": 1672.54,
+        "mean_token_efficiency": 0.0017,
+        "mean_budget_honesty": 1.0,
+        "mean_payload_honesty": 0.0,
+        "mean_reduction_vs_corpus": 4077.5577,
+        "mean_reduction_vs_agent": 114.2354,
+        "median_reduction_vs_agent": 99.71,
+        "three_way_benchmark": {
+          "corpus_tokens_mean": 6771343.31,
+          "agent_tokens_mean": 190827.38,
+          "graph_tokens_mean": 1672.54,
+          "median_reduction_vs_agent": 99.71,
+          "mean_reduction_vs_corpus": 4077.5577
+        }
+      },
+      "pr_co_change": {
+        "cases": 11,
+        "mean_recall_at_5": 0.697,
+        "mean_candidate_pool_recall": 0.7727,
+        "mean_pre_mmr_recall_at_5": 0.697,
+        "mean_mrr": 0.9394,
+        "mean_ndcg_at_10": 0.6226,
+        "mean_tokens_used": 1477.91,
+        "mean_token_efficiency": 0.0012,
+        "mean_budget_honesty": 1.0,
+        "mean_payload_honesty": 0.0,
+        "mean_reduction_vs_corpus": 5793.1618,
+        "mean_reduction_vs_agent": 196.6064,
+        "median_reduction_vs_agent": 194.96,
+        "three_way_benchmark": {
+          "corpus_tokens_mean": 8542214.0,
+          "agent_tokens_mean": 289904.0,
+          "graph_tokens_mean": 1477.91,
+          "median_reduction_vs_agent": 194.96,
+          "mean_reduction_vs_corpus": 5793.1618
+        }
+      }
+    },
+    "confidence_calibration": {
+      "cases": 68,
+      "pearson_r": 0.2965,
+      "mean_abs_error": 0.1826,
+      "mean_confidence": 0.9788,
+      "mean_recall_at_5": 0.8015
     }
   },
   "results": [
@@ -45,48 +122,49 @@
         "fastapi/openapi/utils.py",
         "fastapi/_compat/v2.py",
         "fastapi/encoders.py",
-        "fastapi/exceptions.py",
-        "fastapi/utils.py",
-        "fastapi/param_functions.py",
-        "fastapi/_compat/__init__.py",
         "fastapi/params.py",
-        "fastapi/datastructures.py",
-        "fastapi/exception_handlers.py",
-        "fastapi/security/api_key.py",
+        "fastapi/utils.py",
+        "fastapi/exceptions.py",
+        "fastapi/param_functions.py",
         "pyproject.toml",
-        "fastapi/_compat/shared.py",
-        "fastapi/openapi/models.py",
-        "fastapi/__main__.py",
-        "fastapi/__init__.py",
-        "fastapi/sse.py",
-        "fastapi/cli.py",
-        "fastapi/types.py",
-        ".pre-commit-config.yaml",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "fastapi/dependencies/models.py"
+        "fastapi/_compat/__init__.py",
+        "fastapi/datastructures.py"
       ],
-      "returned_count": 25,
+      "returned_count": 12,
       "files_available": 25,
-      "files_included": 25,
-      "tokens_used": 2555,
+      "files_included": 12,
+      "tokens_used": 1486,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
       "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0012,
+      "token_efficiency": 0.002,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.5,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 3343.33,
-      "reduction_vs_agent": 113.47,
-      "notes": "Core routing module should surface dependency and app wiring."
+      "reduction_vs_corpus": 5748.46,
+      "reduction_vs_agent": 195.09,
+      "notes": "Core routing module should surface dependency and app wiring.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_routing_with_query",
@@ -109,63 +187,52 @@
         "fastapi/openapi/utils.py",
         "fastapi/_compat/v2.py",
         "fastapi/encoders.py",
-        "fastapi/exceptions.py",
-        "fastapi/utils.py",
-        "fastapi/openapi/models.py",
-        "fastapi/param_functions.py",
-        "fastapi/_compat/__init__.py",
         "fastapi/params.py",
-        "fastapi/datastructures.py",
-        "fastapi/security/api_key.py",
+        "fastapi/utils.py",
         "pyproject.toml",
-        "fastapi/_compat/shared.py",
-        "fastapi/__main__.py",
-        "fastapi/__init__.py",
-        "fastapi/sse.py",
-        "fastapi/cli.py",
-        "fastapi/dependencies/models.py",
-        "fastapi/types.py",
-        ".pre-commit-config.yaml",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "tests/test_frontend.py",
-        "tests/test_router_include_context.py",
-        "docs/ko/docs/tutorial/bigger-applications.md",
-        "tests/test_router_events.py",
-        "tests/test_response_model_as_return_annotation.py",
-        "docs/zh-hant/docs/tutorial/bigger-applications.md",
-        "docs/tr/docs/tutorial/bigger-applications.md",
-        "docs/ja/docs/tutorial/bigger-applications.md",
-        "docs/en/docs/tutorial/bigger-applications.md",
-        "docs/uk/docs/tutorial/bigger-applications.md",
-        "docs/es/docs/tutorial/bigger-applications.md",
-        "docs/pt/docs/tutorial/bigger-applications.md",
-        "docs/zh/docs/tutorial/bigger-applications.md",
-        "docs/ru/docs/tutorial/bigger-applications.md",
-        "docs/fr/docs/tutorial/bigger-applications.md",
-        "docs/de/docs/tutorial/bigger-applications.md"
+        "fastapi/exceptions.py",
+        "fastapi/openapi/models.py",
+        "fastapi/param_functions.py"
       ],
-      "returned_count": 41,
-      "files_available": 41,
-      "files_included": 41,
-      "tokens_used": 4488,
+      "returned_count": 12,
+      "files_available": 39,
+      "files_included": 12,
+      "tokens_used": 1502,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 0.5,
       "ndcg_at_10": 0.6979,
-      "token_efficiency": 0.0007,
+      "token_efficiency": 0.002,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "fastapi/routing.py",
         "docs/en/docs/release-notes.md",
         "tests/test_router_include_context.py"
       ],
       "agent_baseline_tokens": 246974,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 1903.35,
-      "reduction_vs_agent": 55.03,
-      "notes": "Query-aware ranking for routing domain."
+      "reduction_vs_corpus": 5687.23,
+      "reduction_vs_agent": 164.43,
+      "notes": "Query-aware ranking for routing domain.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "backend": "bm25",
+          "prefer_bm25": true,
+          "index_present": true,
+          "bm25_empty_fallback": false,
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_applications_entry",
@@ -183,37 +250,53 @@
       ],
       "returned_paths": [
         "fastapi/routing.py",
-        "pyproject.toml",
         "fastapi/openapi/utils.py",
+        "fastapi/encoders.py",
         "fastapi/openapi/docs.py",
-        "docs/en/mkdocs.yml",
         "fastapi/security/api_key.py",
         "fastapi/param_functions.py",
-        "fastapi/encoders.py",
         "fastapi/security/oauth2.py",
-        "fastapi/security/http.py"
+        "fastapi/security/http.py",
+        "pyproject.toml",
+        "fastapi/params.py",
+        "fastapi/middleware/asyncexitstack.py",
+        "fastapi/exception_handlers.py"
       ],
-      "returned_count": 10,
-      "files_available": 10,
-      "files_included": 10,
-      "tokens_used": 846,
+      "returned_count": 12,
+      "files_available": 22,
+      "files_included": 12,
+      "tokens_used": 1516,
       "token_budget": 6000,
       "recall_at_5": 0.6667,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.6667,
       "mrr": 1.0,
-      "ndcg_at_10": 0.735,
-      "token_efficiency": 0.0024,
+      "ndcg_at_10": 0.7625,
+      "token_efficiency": 0.002,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 10097.18,
-      "reduction_vs_agent": 342.68,
-      "notes": "Application class couples to router and OpenAPI stack."
+      "reduction_vs_corpus": 5634.71,
+      "reduction_vs_agent": 191.23,
+      "notes": "Application class couples to router and OpenAPI stack.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_openapi_utils",
@@ -233,34 +316,51 @@
         "fastapi/routing.py",
         "fastapi/dependencies/utils.py",
         "fastapi/_compat/v2.py",
+        "fastapi/openapi/models.py",
         "fastapi/params.py",
-        "pyproject.toml",
         "fastapi/applications.py",
         "fastapi/_compat/__init__.py",
-        "fastapi/openapi/models.py",
-        "fastapi/utils.py"
+        "fastapi/utils.py",
+        "fastapi/encoders.py",
+        "pyproject.toml",
+        "fastapi/openapi/docs.py",
+        "fastapi/types.py"
       ],
-      "returned_count": 9,
-      "files_available": 9,
-      "files_included": 9,
-      "tokens_used": 760,
+      "returned_count": 12,
+      "files_available": 17,
+      "files_included": 12,
+      "tokens_used": 1496,
       "token_budget": 6000,
-      "recall_at_5": 0.3333,
+      "recall_at_5": 0.6667,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.6667,
       "mrr": 1.0,
-      "ndcg_at_10": 0.6187,
-      "token_efficiency": 0.0026,
+      "ndcg_at_10": 0.6913,
+      "token_efficiency": 0.002,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 11239.76,
-      "reduction_vs_agent": 381.45,
-      "notes": "OpenAPI util layer links models, routing, and docs."
+      "reduction_vs_corpus": 5710.04,
+      "reduction_vs_agent": 193.79,
+      "notes": "OpenAPI util layer links models, routing, and docs.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_dependencies_utils",
@@ -279,42 +379,52 @@
       "returned_paths": [
         "fastapi/routing.py",
         "fastapi/openapi/utils.py",
-        "pyproject.toml",
         "fastapi/_compat/v2.py",
-        "fastapi/utils.py",
+        "fastapi/dependencies/models.py",
         "fastapi/params.py",
         "fastapi/encoders.py",
+        "fastapi/utils.py",
         "fastapi/_compat/__init__.py",
-        "tests/test_compat.py",
+        "pyproject.toml",
         ".pre-commit-config.yaml",
-        "fastapi/dependencies/models.py",
-        "tests/test_forms_single_model.py",
-        "docs/en/mkdocs.yml",
         "fastapi/_compat/shared.py",
-        "fastapi/param_functions.py",
-        "uv.lock"
+        "fastapi/param_functions.py"
       ],
-      "returned_count": 16,
-      "files_available": 16,
-      "files_included": 16,
-      "tokens_used": 1368,
+      "returned_count": 12,
+      "files_available": 21,
+      "files_included": 12,
+      "tokens_used": 1532,
       "token_budget": 6000,
-      "recall_at_5": 0.6667,
+      "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 0.7204,
-      "token_efficiency": 0.0022,
+      "ndcg_at_10": 0.9159,
+      "token_efficiency": 0.002,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 6244.31,
-      "reduction_vs_agent": 211.92,
-      "notes": "Dependency injection utils tie to routing and models."
+      "reduction_vs_corpus": 5575.86,
+      "reduction_vs_agent": 189.23,
+      "notes": "Dependency injection utils tie to routing and models.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_dependencies_models",
@@ -336,24 +446,38 @@
       "returned_count": 2,
       "files_available": 2,
       "files_included": 2,
-      "tokens_used": 189,
+      "tokens_used": 222,
       "token_budget": 4000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
       "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0106,
+      "token_efficiency": 0.009,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 45196.9,
-      "reduction_vs_agent": 1533.88,
-      "notes": "Narrow dependency model pair."
+      "reduction_vs_corpus": 38478.44,
+      "reduction_vs_agent": 1305.87,
+      "notes": "Narrow dependency model pair.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_security_oauth2",
@@ -376,30 +500,44 @@
         "fastapi/param_functions.py",
         "fastapi/applications.py",
         "fastapi/security/utils.py",
-        "fastapi/openapi/models.py",
-        "fastapi/exceptions.py"
+        "fastapi/exceptions.py",
+        "fastapi/openapi/models.py"
       ],
       "returned_count": 8,
       "files_available": 8,
       "files_included": 8,
-      "tokens_used": 829,
+      "tokens_used": 1041,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
       "ndcg_at_10": 0.79,
-      "token_efficiency": 0.0036,
+      "token_efficiency": 0.0029,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 10304.24,
-      "reduction_vs_agent": 349.7,
-      "notes": "Security package modules co-change."
+      "reduction_vs_corpus": 8205.78,
+      "reduction_vs_agent": 278.49,
+      "notes": "Security package modules co-change.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_security_http",
@@ -421,30 +559,44 @@
         "fastapi/security/api_key.py",
         "fastapi/applications.py",
         "fastapi/security/utils.py",
-        "fastapi/openapi/models.py",
-        "fastapi/exceptions.py"
+        "fastapi/exceptions.py",
+        "fastapi/openapi/models.py"
       ],
       "returned_count": 7,
       "files_available": 7,
       "files_included": 7,
-      "tokens_used": 729,
+      "tokens_used": 913,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
       "ndcg_at_10": 0.9212,
-      "token_efficiency": 0.0041,
+      "token_efficiency": 0.0033,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "uv.lock",
         "fastapi/applications.py"
       ],
       "agent_baseline_tokens": 494090,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 11717.71,
-      "reduction_vs_agent": 677.76,
-      "notes": "HTTP auth links to oauth2 and api_key."
+      "reduction_vs_corpus": 9356.2,
+      "reduction_vs_agent": 541.17,
+      "notes": "HTTP auth links to oauth2 and api_key.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_middleware_cors",
@@ -460,30 +612,44 @@
         "fastapi/middleware/asyncexitstack.py"
       ],
       "returned_paths": [
-        "fastapi/middleware/wsgi.py",
-        "fastapi/middleware/asyncexitstack.py"
+        "fastapi/middleware/asyncexitstack.py",
+        "fastapi/middleware/wsgi.py"
       ],
       "returned_count": 2,
       "files_available": 2,
       "files_included": 2,
-      "tokens_used": 213,
+      "tokens_used": 268,
       "token_budget": 4000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0094,
+      "ndcg_at_10": 0.8597,
+      "token_efficiency": 0.0075,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 40104.29,
-      "reduction_vs_agent": 1361.05,
-      "notes": "Middleware siblings in same package."
+      "reduction_vs_corpus": 31873.93,
+      "reduction_vs_agent": 1081.73,
+      "notes": "Middleware siblings in same package.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_exception_handlers",
@@ -500,39 +666,53 @@
         "fastapi/__init__.py"
       ],
       "returned_paths": [
-        "fastapi/__init__.py",
         "fastapi/__main__.py",
-        "fastapi/cli.py",
+        "fastapi/__init__.py",
         "fastapi/concurrency.py",
+        "fastapi/cli.py",
         "fastapi/background.py",
         "fastapi/exceptions.py",
+        "fastapi/utils.py",
         "fastapi/datastructures.py",
         "fastapi/encoders.py",
-        "fastapi/utils.py",
         "fastapi/applications.py",
         "tests/test_exception_handlers.py"
       ],
       "returned_count": 11,
       "files_available": 11,
       "files_included": 11,
-      "tokens_used": 1157,
+      "tokens_used": 1463,
       "token_budget": 6000,
       "recall_at_5": 0.3333,
-      "mrr": 1.0,
-      "ndcg_at_10": 0.5558,
-      "token_efficiency": 0.0026,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.3333,
+      "mrr": 0.5,
+      "ndcg_at_10": 0.4783,
+      "token_efficiency": 0.0021,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.5,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 7383.07,
-      "reduction_vs_agent": 250.57,
-      "notes": "Exception handling ties to exceptions module and app."
+      "reduction_vs_corpus": 5838.83,
+      "reduction_vs_agent": 198.16,
+      "notes": "Exception handling ties to exceptions module and app.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_encoders",
@@ -552,42 +732,51 @@
         "fastapi/dependencies/utils.py",
         "fastapi/routing.py",
         "fastapi/_compat/v2.py",
-        "fastapi/datastructures.py",
-        "fastapi/exception_handlers.py",
-        "fastapi/__init__.py",
-        "fastapi/param_functions.py",
-        "fastapi/__main__.py",
         "fastapi/applications.py",
+        "fastapi/datastructures.py",
         "fastapi/utils.py",
-        "fastapi/cli.py",
-        "fastapi/types.py",
-        "fastapi/concurrency.py",
+        "fastapi/param_functions.py",
         "pyproject.toml",
-        "fastapi/background.py",
-        "fastapi/exceptions.py",
-        "tests/test_jsonable_encoder.py"
+        "fastapi/types.py",
+        "fastapi/__main__.py",
+        "fastapi/exception_handlers.py",
+        "fastapi/__init__.py"
       ],
-      "returned_count": 17,
+      "returned_count": 12,
       "files_available": 17,
-      "files_included": 17,
-      "tokens_used": 1709,
+      "files_included": 12,
+      "tokens_used": 1487,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
       "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0018,
+      "token_efficiency": 0.002,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 4998.37,
-      "reduction_vs_agent": 169.63,
-      "notes": "JSON encoders used across routing and compat."
+      "reduction_vs_corpus": 5744.6,
+      "reduction_vs_agent": 194.96,
+      "notes": "JSON encoders used across routing and compat.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_compat_v2",
@@ -611,32 +800,46 @@
         "fastapi/openapi/utils.py",
         "fastapi/encoders.py",
         "fastapi/utils.py",
-        "fastapi/openapi/models.py",
         "fastapi/params.py",
+        "fastapi/openapi/models.py",
         "fastapi/types.py",
         "tests/test_compat.py"
       ],
       "returned_count": 11,
       "files_available": 11,
       "files_included": 11,
-      "tokens_used": 1097,
+      "tokens_used": 1392,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
       "ndcg_at_10": 0.8675,
-      "token_efficiency": 0.0027,
+      "token_efficiency": 0.0022,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 7786.89,
-      "reduction_vs_agent": 264.27,
-      "notes": "Pydantic v2 compat cluster."
+      "reduction_vs_corpus": 6136.65,
+      "reduction_vs_agent": 208.26,
+      "notes": "Pydantic v2 compat cluster.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_params",
@@ -654,43 +857,53 @@
       ],
       "returned_paths": [
         "fastapi/dependencies/utils.py",
-        "fastapi/param_functions.py",
         "fastapi/routing.py",
-        "fastapi/exception_handlers.py",
         "fastapi/openapi/utils.py",
-        "fastapi/__init__.py",
         "fastapi/_compat/v2.py",
-        "fastapi/__main__.py",
+        "fastapi/param_functions.py",
         "fastapi/openapi/models.py",
-        "fastapi/cli.py",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "fastapi/exceptions.py",
-        "fastapi/datastructures.py",
         "fastapi/encoders.py",
-        "fastapi/applications.py"
+        "fastapi/applications.py",
+        "fastapi/__main__.py",
+        "fastapi/exception_handlers.py",
+        "fastapi/__init__.py",
+        "fastapi/concurrency.py"
       ],
-      "returned_count": 16,
+      "returned_count": 12,
       "files_available": 16,
-      "files_included": 16,
-      "tokens_used": 1624,
+      "files_included": 12,
+      "tokens_used": 1519,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 0.8675,
-      "token_efficiency": 0.0018,
+      "ndcg_at_10": 0.8987,
+      "token_efficiency": 0.002,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/routing.py",
         "fastapi/applications.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.5,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 5259.98,
-      "reduction_vs_agent": 178.51,
-      "notes": "Parameter definitions link to routing and DI."
+      "reduction_vs_corpus": 5623.58,
+      "reduction_vs_agent": 190.85,
+      "notes": "Parameter definitions link to routing and DI.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_sse",
@@ -707,11 +920,11 @@
         "fastapi/__main__.py"
       ],
       "returned_paths": [
+        "fastapi/__main__.py",
         "fastapi/exception_handlers.py",
         "fastapi/__init__.py",
-        "fastapi/__main__.py",
-        "fastapi/cli.py",
         "fastapi/concurrency.py",
+        "fastapi/cli.py",
         "fastapi/background.py",
         "fastapi/datastructures.py",
         "fastapi/encoders.py",
@@ -721,24 +934,38 @@
       "returned_count": 10,
       "files_available": 10,
       "files_included": 10,
-      "tokens_used": 1029,
+      "tokens_used": 1282,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0029,
+      "ndcg_at_10": 0.8175,
+      "token_efficiency": 0.0023,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/routing.py",
         "fastapi/applications.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 8301.47,
-      "reduction_vs_agent": 281.73,
-      "notes": "SSE support couples to app and routing stack."
+      "reduction_vs_corpus": 6663.19,
+      "reduction_vs_agent": 226.13,
+      "notes": "SSE support couples to app and routing stack.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_cli",
@@ -755,9 +982,9 @@
         "fastapi/exception_handlers.py"
       ],
       "returned_paths": [
+        "fastapi/__main__.py",
         "fastapi/exception_handlers.py",
         "fastapi/__init__.py",
-        "fastapi/__main__.py",
         "fastapi/concurrency.py",
         "fastapi/background.py",
         "fastapi/exceptions.py",
@@ -768,24 +995,38 @@
       "returned_count": 9,
       "files_available": 9,
       "files_included": 9,
-      "tokens_used": 930,
+      "tokens_used": 1164,
       "token_budget": 6000,
       "recall_at_5": 0.6667,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.6667,
       "mrr": 1.0,
-      "ndcg_at_10": 0.6514,
-      "token_efficiency": 0.0032,
+      "ndcg_at_10": 0.8889,
+      "token_efficiency": 0.0026,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "docs/en/docs/img/sponsors/jina.svg",
         "fastapi/applications.py"
       ],
       "agent_baseline_tokens": 275966,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 9185.18,
-      "reduction_vs_agent": 296.74,
-      "notes": "CLI entry couples to __main__ and application."
+      "reduction_vs_corpus": 7338.67,
+      "reduction_vs_agent": 237.08,
+      "notes": "CLI entry couples to __main__ and application.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_concept_oauth2",
@@ -800,63 +1041,58 @@
         "fastapi/security/api_key.py"
       ],
       "returned_paths": [
-        "fastapi/security/__init__.py",
         "fastapi/security/oauth2.py",
+        "fastapi/security/__init__.py",
         "fastapi/security/http.py",
-        "fastapi/security/open_id_connect_url.py",
         "fastapi/security/api_key.py",
-        "docs_src/authentication_error_status_code/tutorial001_an_py310.py",
+        "fastapi/security/open_id_connect_url.py",
         "fastapi/security/utils.py",
-        "tests/test_tutorial/test_security/test_tutorial005.py",
-        "fastapi/openapi/models.py",
         "fastapi/exceptions.py",
+        "fastapi/openapi/models.py",
         "fastapi/param_functions.py",
-        "tests/test_tutorial/test_bigger_applications/test_main.py",
-        "docs/tr/docs/tutorial/security/oauth2-jwt.md",
         "tests/test_security_oauth2_password_bearer_optional.py",
-        "tests/test_tutorial/test_authentication_error_status_code/__init__.py",
-        "docs/zh-hant/docs/tutorial/security/first-steps.md",
-        "tests/test_security_oauth2_authorization_code_bearer_scopes_openapi_simple.py",
-        "tests/test_security_oauth2_authorization_code_bearer_scopes_openapi.py",
-        "tests/test_security_http_bearer.py",
-        "docs/en/docs/tutorial/security/simple-oauth2.md",
-        "tests/test_tutorial/test_authentication_error_status_code/test_tutorial001.py",
-        "docs_src/authentication_error_status_code/__init__.py",
-        "tests/test_tutorial/test_security/test_tutorial004.py",
-        "docs/tr/docs/tutorial/security/first-steps.md",
         "tests/test_security_oauth2_password_bearer_optional_description.py",
-        "docs/fr/docs/tutorial/security/first-steps.md",
-        "docs/es/docs/tutorial/security/first-steps.md",
-        "docs/de/docs/tutorial/security/first-steps.md",
-        "docs/tr/docs/tutorial/security/simple-oauth2.md",
-        "docs/en/docs/tutorial/security/first-steps.md",
-        "tests/test_security_oauth2_authorization_code_bearer.py",
-        "tests/test_security_http_bearer_description.py",
-        "tests/test_security_http_bearer_optional.py",
-        "tests/test_security_oauth2_authorization_code_bearer_description.py",
-        "docs/pt/docs/tutorial/security/first-steps.md"
+        "docs_src/authentication_error_status_code/__init__.py"
       ],
-      "returned_count": 35,
-      "files_available": 35,
-      "files_included": 35,
-      "tokens_used": 4162,
+      "returned_count": 12,
+      "files_available": 45,
+      "files_included": 12,
+      "tokens_used": 1739,
       "token_budget": 6000,
       "recall_at_5": 1.0,
-      "mrr": 0.5,
-      "ndcg_at_10": 0.6887,
-      "token_efficiency": 0.0007,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_10": 0.9305,
+      "token_efficiency": 0.0017,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "tests/test_tutorial/test_security/test_tutorial005.py",
         "fastapi/security/oauth2.py",
         "uv.lock"
       ],
       "agent_baseline_tokens": 284701,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.5,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 2052.43,
-      "reduction_vs_agent": 68.4,
-      "notes": "Query-first: OAuth2 security stack without seed files."
+      "reduction_vs_corpus": 4912.14,
+      "reduction_vs_agent": 163.72,
+      "notes": "Query-first: OAuth2 security stack without seed files.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "backend": "bm25",
+          "prefer_bm25": true,
+          "index_present": true,
+          "bm25_empty_fallback": false,
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_concept_cors",
@@ -872,102 +1108,57 @@
       ],
       "returned_paths": [
         "fastapi/middleware/cors.py",
+        "fastapi/applications.py",
+        "fastapi/routing.py",
         "fastapi/middleware/__init__.py",
+        "fastapi/middleware/asyncexitstack.py",
         "fastapi/middleware/gzip.py",
         "fastapi/middleware/httpsredirect.py",
         "fastapi/middleware/trustedhost.py",
         "fastapi/middleware/wsgi.py",
-        "fastapi/middleware/asyncexitstack.py",
-        "fastapi/routing.py",
-        "fastapi/applications.py",
-        "fastapi/exception_handlers.py",
-        "fastapi/_compat/shared.py",
-        "fastapi/openapi/docs.py",
-        "fastapi/exceptions.py",
-        "fastapi/security/api_key.py",
         "fastapi/dependencies/utils.py",
-        "fastapi/_compat/v2.py",
-        "fastapi/__main__.py",
-        "fastapi/__init__.py",
-        "fastapi/sse.py",
-        "fastapi/cli.py",
-        "docs/tr/docs/tutorial/cors.md",
-        "fastapi/types.py",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "fastapi/datastructures.py",
-        "fastapi/params.py",
-        "fastapi/encoders.py",
-        "fastapi/dependencies/models.py",
-        "tests/test_custom_middleware_exception.py",
-        "fastapi/openapi/utils.py",
-        "docs/tr/docs/advanced/middleware.md",
-        "docs/de/docs/tutorial/cors.md",
-        "docs/en/docs/tutorial/cors.md",
-        "docs/ru/docs/tutorial/middleware.md",
-        "docs/es/docs/tutorial/cors.md",
-        "docs/uk/docs/how-to/separate-openapi-schemas.md",
-        "fastapi/utils.py",
-        "docs/fr/docs/tutorial/cors.md",
-        "docs/ru/docs/tutorial/cors.md",
-        "docs/tr/docs/tutorial/middleware.md",
-        "docs/ja/docs/python-types.md",
-        "docs/uk/docs/tutorial/cors.md",
-        "docs/zh-hant/docs/tutorial/cors.md",
-        "docs/ko/docs/tutorial/cors.md",
-        "docs/zh-hant/docs/how-to/authentication-error-status-code.md",
-        "docs/ko/docs/how-to/extending-openapi.md",
-        "docs/en/docs/how-to/migrate-from-pydantic-v1-to-pydantic-v2.md",
-        "docs/en/docs/tutorial/middleware.md",
-        "docs/pt/docs/advanced/security/oauth2-scopes.md",
-        "docs/en/data/translation_reviewers.yml",
-        "docs/ru/docs/advanced/additional-responses.md",
-        "docs/zh/docs/tutorial/request-form-models.md",
-        "docs/tr/docs/async.md",
-        "docs/ru/docs/how-to/separate-openapi-schemas.md",
-        "docs/tr/docs/how-to/separate-openapi-schemas.md",
-        "docs/zh/docs/how-to/separate-openapi-schemas.md",
-        "docs/ko/docs/how-to/separate-openapi-schemas.md",
-        "docs/ja/docs/how-to/separate-openapi-schemas.md",
-        "docs/zh-hant/docs/how-to/separate-openapi-schemas.md",
-        "docs/zh-hant/docs/advanced/middleware.md",
-        "docs/fr/docs/how-to/separate-openapi-schemas.md",
-        "docs/uk/docs/how-to/extending-openapi.md",
-        "docs/zh/docs/how-to/extending-openapi.md",
-        "docs/zh-hant/docs/how-to/extending-openapi.md",
-        "docs/ja/docs/how-to/extending-openapi.md",
-        "docs/ru/docs/how-to/extending-openapi.md",
-        "docs/pt/docs/how-to/separate-openapi-schemas.md",
-        "docs/tr/docs/how-to/extending-openapi.md",
-        "docs/fr/docs/how-to/extending-openapi.md",
-        "docs/de/docs/how-to/extending-openapi.md",
-        "docs/fr/docs/tutorial/security/first-steps.md",
-        "docs/pt/docs/advanced/response-directly.md",
-        "docs/en/docs/tutorial/security/get-current-user.md",
-        "docs/ja/docs/index.md",
-        "docs/en/docs/how-to/graphql.md"
+        "fastapi/openapi/docs.py",
+        "fastapi/_compat/shared.py"
       ],
-      "returned_count": 75,
+      "returned_count": 12,
       "files_available": 75,
-      "files_included": 75,
-      "tokens_used": 9177,
+      "files_included": 12,
+      "tokens_used": 1692,
       "token_budget": 6000,
-      "recall_at_5": 0.3333,
+      "recall_at_5": 0.6667,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.6667,
       "mrr": 1.0,
-      "ndcg_at_10": 0.8496,
-      "token_efficiency": 0.0003,
-      "budget_honesty": 0.4705,
-      "payload_honesty": 1.0,
+      "ndcg_at_10": 0.8377,
+      "token_efficiency": 0.0018,
+      "budget_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/routing.py",
         "fastapi/applications.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 930.83,
-      "reduction_vs_agent": 31.59,
-      "notes": "Query-first: CORS middleware family."
+      "reduction_vs_corpus": 5048.59,
+      "reduction_vs_agent": 171.34,
+      "notes": "Query-first: CORS middleware family.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "backend": "bm25",
+          "prefer_bm25": true,
+          "index_present": true,
+          "bm25_empty_fallback": false,
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_concept_openapi",
@@ -984,101 +1175,56 @@
       "returned_paths": [
         "fastapi/openapi/utils.py",
         "fastapi/openapi/docs.py",
-        "fastapi/exception_handlers.py",
         "fastapi/openapi/models.py",
-        "fastapi/sse.py",
-        "fastapi/security/api_key.py",
-        "fastapi/routing.py",
         "fastapi/applications.py",
-        "fastapi/security/open_id_connect_url.py",
+        "fastapi/routing.py",
+        "fastapi/security/api_key.py",
         "fastapi/utils.py",
+        "fastapi/_compat/v2.py",
+        "fastapi/sse.py",
         "fastapi/param_functions.py",
         "fastapi/security/oauth2.py",
-        "fastapi/security/http.py",
-        "fastapi/_compat/v2.py",
-        "tests/test_router_include_context.py",
-        "fastapi/__init__.py",
-        "fastapi/__main__.py",
-        "fastapi/middleware/asyncexitstack.py",
-        "fastapi/cli.py",
-        "fastapi/dependencies/models.py",
-        "fastapi/responses.py",
-        "fastapi/types.py",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "fastapi/exceptions.py",
-        "fastapi/datastructures.py",
-        "fastapi/encoders.py",
-        "fastapi/params.py",
-        "docs/zh-hant/docs/tutorial/schema-extra-example.md",
-        "fastapi/dependencies/utils.py",
-        "docs/uk/docs/how-to/separate-openapi-schemas.md",
-        "tests/test_application.py",
-        "docs/en/docs/alternatives.md",
-        "docs/ko/docs/advanced/openapi-callbacks.md",
-        "docs/fr/docs/deployment/docker.md",
-        "docs/uk/docs/advanced/openapi-webhooks.md",
-        "docs/ko/docs/how-to/extending-openapi.md",
-        "docs/uk/docs/tutorial/request-forms-and-files.md",
-        "docs/zh-hant/docs/advanced/security/oauth2-scopes.md",
-        "docs/fr/docs/tutorial/security/first-steps.md",
-        "docs/ko/docs/tutorial/dependencies/dependencies-in-path-operation-decorators.md",
-        "docs/en/docs/how-to/custom-request-and-route.md",
-        "docs/de/docs/deployment/server-workers.md",
-        "docs/de/docs/tutorial/request-files.md",
-        "docs/en/docs/tutorial/frontend.md",
-        "docs/en/docs/advanced/settings.md",
-        "docs/en/docs/project-generation.md",
-        "docs/tr/docs/tutorial/schema-extra-example.md",
-        "docs/es/docs/tutorial/schema-extra-example.md",
-        "docs/zh/docs/tutorial/schema-extra-example.md",
-        "docs/ru/docs/tutorial/schema-extra-example.md",
-        "docs/uk/docs/tutorial/dependencies/dependencies-with-yield.md",
-        "docs/zh-hant/docs/advanced/wsgi.md",
-        "docs/fr/docs/tutorial/metadata.md",
-        "docs/ko/docs/tutorial/request-forms.md",
-        "docs/pt/docs/tutorial/schema-extra-example.md",
-        "docs/en/docs/environment-variables.md",
-        "docs/en/docs/tutorial/security/get-current-user.md",
-        "docs/ko/docs/how-to/separate-openapi-schemas.md",
-        "docs/zh-hant/docs/how-to/separate-openapi-schemas.md",
-        "docs/fr/docs/how-to/separate-openapi-schemas.md",
-        "docs/uk/docs/advanced/openapi-callbacks.md",
-        "docs/uk/docs/how-to/extending-openapi.md",
-        "docs/ko/docs/advanced/openapi-webhooks.md",
-        "docs/uk/docs/tutorial/schema-extra-example.md",
-        "docs/zh-hant/docs/advanced/openapi-callbacks.md",
-        "docs/zh-hant/docs/advanced/openapi-webhooks.md",
-        "docs/zh-hant/docs/how-to/extending-openapi.md",
-        "docs/fr/docs/advanced/openapi-callbacks.md",
-        "docs/fr/docs/advanced/openapi-webhooks.md",
-        "docs/fr/docs/how-to/extending-openapi.md",
-        "docs/fr/docs/tutorial/request-forms-and-files.md",
-        "docs/fr/docs/tutorial/schema-extra-example.md",
-        "docs/de/docs/advanced/openapi-webhooks.md",
-        "docs/de/docs/how-to/extending-openapi.md"
+        "fastapi/security/http.py"
       ],
-      "returned_count": 75,
-      "files_available": 75,
-      "files_included": 75,
-      "tokens_used": 9159,
+      "returned_count": 12,
+      "files_available": 37,
+      "files_included": 12,
+      "tokens_used": 1789,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 0.9434,
-      "token_efficiency": 0.0003,
-      "budget_honesty": 0.4735,
-      "payload_honesty": 1.0,
+      "ndcg_at_10": 0.9725,
+      "token_efficiency": 0.0017,
+      "budget_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "fastapi/routing.py",
         "docs/en/docs/release-notes.md",
         "tests/test_include_router_defaults_overrides.py"
       ],
       "agent_baseline_tokens": 349099,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 932.66,
-      "reduction_vs_agent": 38.12,
-      "notes": "Query-first: OpenAPI documentation pipeline."
+      "reduction_vs_corpus": 4774.85,
+      "reduction_vs_agent": 195.14,
+      "notes": "Query-first: OpenAPI documentation pipeline.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "backend": "bm25",
+          "prefer_bm25": true,
+          "index_present": true,
+          "bm25_empty_fallback": false,
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_concept_dependencies",
@@ -1094,66 +1240,57 @@
       ],
       "returned_paths": [
         "fastapi/params.py",
-        "fastapi/__init__.py",
         "fastapi/param_functions.py",
-        "fastapi/dependencies/models.py",
-        "fastapi/exceptions.py",
-        "fastapi/openapi/docs.py",
+        "fastapi/__init__.py",
         "fastapi/routing.py",
-        "fastapi/security/http.py",
-        "fastapi/security/oauth2.py",
-        "fastapi/datastructures.py",
+        "fastapi/openapi/utils.py",
         "fastapi/applications.py",
         "fastapi/dependencies/utils.py",
-        "fastapi/openapi/utils.py",
-        "fastapi/security/api_key.py",
-        "fastapi/exception_handlers.py",
-        "fastapi/__main__.py",
-        "fastapi/sse.py",
-        "fastapi/cli.py",
-        "tests/test_dependency_overrides.py",
-        "fastapi/responses.py",
-        "fastapi/types.py",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "tests/test_dependency_wrapped.py",
-        "fastapi/encoders.py",
-        "tests/test_dependency_partial.py",
-        "fastapi/openapi/models.py",
-        "tests/test_dependency_class.py",
-        "fastapi/utils.py",
-        "tests/test_dependency_contextmanager.py",
-        "docs/tr/docs/tutorial/dependencies/dependencies-with-yield.md",
-        "docs/tr/docs/advanced/security/oauth2-scopes.md",
-        "docs/en/docs/tutorial/dependencies/index.md",
-        "docs/tr/docs/advanced/advanced-dependencies.md",
-        "docs/tr/docs/tutorial/dependencies/classes-as-dependencies.md",
-        "docs/tr/docs/tutorial/dependencies/index.md",
-        "docs/ru/docs/tutorial/dependencies/index.md",
-        "docs/ja/docs/tutorial/dependencies/index.md",
-        "docs/en/docs/tutorial/dependencies/dependencies-with-yield.md"
+        "fastapi/exceptions.py",
+        "fastapi/dependencies/models.py",
+        "fastapi/openapi/docs.py",
+        "fastapi/security/http.py",
+        "fastapi/datastructures.py"
       ],
-      "returned_count": 39,
-      "files_available": 39,
-      "files_included": 39,
-      "tokens_used": 4336,
+      "returned_count": 12,
+      "files_available": 36,
+      "files_included": 12,
+      "tokens_used": 1808,
       "token_budget": 6000,
       "recall_at_5": 0.3333,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.3333,
       "mrr": 0.25,
-      "ndcg_at_10": 0.2509,
-      "token_efficiency": 0.0007,
+      "ndcg_at_10": 0.4269,
+      "token_efficiency": 0.0017,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "tests/test_dependency_overrides.py",
         "tests/test_dependency_wrapped.py",
         "docs/en/docs/release-notes.md"
       ],
       "agent_baseline_tokens": 175915,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 1970.07,
-      "reduction_vs_agent": 40.57,
-      "notes": "Query-first: DI layer without routing seed."
+      "reduction_vs_corpus": 4724.68,
+      "reduction_vs_agent": 97.3,
+      "notes": "Query-first: DI layer without routing seed.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "backend": "bm25",
+          "prefer_bm25": true,
+          "index_present": true,
+          "bm25_empty_fallback": false,
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi__compat_py",
@@ -1169,13 +1306,13 @@
         "fastapi/params.py"
       ],
       "returned_paths": [
-        "fastapi/exception_handlers.py",
         "fastapi/dependencies/utils.py",
         "fastapi/params.py",
-        "fastapi/__init__.py",
         "fastapi/__main__.py",
-        "fastapi/cli.py",
+        "fastapi/exception_handlers.py",
+        "fastapi/__init__.py",
         "fastapi/concurrency.py",
+        "fastapi/cli.py",
         "fastapi/background.py",
         "fastapi/exceptions.py",
         "fastapi/datastructures.py",
@@ -1185,24 +1322,38 @@
       "returned_count": 12,
       "files_available": 12,
       "files_included": 12,
-      "tokens_used": 1226,
+      "tokens_used": 1523,
       "token_budget": 6000,
       "recall_at_5": 1.0,
-      "mrr": 0.5,
-      "ndcg_at_10": 0.6697,
-      "token_efficiency": 0.0016,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_10": 1.0,
+      "token_efficiency": 0.0013,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 6967.55,
-      "reduction_vs_agent": 236.46,
-      "notes": "Auto-generated from graph neighbours of fastapi/_compat.py."
+      "reduction_vs_corpus": 5608.81,
+      "reduction_vs_agent": 190.35,
+      "notes": "Auto-generated from graph neighbours of fastapi/_compat.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi__compat___init___py",
@@ -1221,32 +1372,46 @@
       "returned_paths": [
         "fastapi/_compat/v2.py",
         "fastapi/dependencies/utils.py",
+        "fastapi/_compat/shared.py",
         "fastapi/routing.py",
         "fastapi/openapi/utils.py",
-        "fastapi/_compat/shared.py",
         "fastapi/utils.py"
       ],
       "returned_count": 6,
       "files_available": 6,
       "files_included": 6,
-      "tokens_used": 604,
+      "tokens_used": 758,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 1.0,
-      "token_efficiency": 0.005,
+      "ndcg_at_10": 0.9854,
+      "token_efficiency": 0.004,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 14142.74,
-      "reduction_vs_agent": 479.97,
-      "notes": "Auto-generated from graph neighbours of fastapi/_compat/__init__.py."
+      "reduction_vs_corpus": 11269.41,
+      "reduction_vs_agent": 382.46,
+      "notes": "Auto-generated from graph neighbours of fastapi/_compat/__init__.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi__compat_shared_py",
@@ -1264,33 +1429,47 @@
       ],
       "returned_paths": [
         "fastapi/_compat/v2.py",
-        "fastapi/dependencies/utils.py",
-        "fastapi/routing.py",
         "fastapi/_compat/__init__.py",
+        "fastapi/dependencies/utils.py",
         "fastapi/utils.py",
+        "fastapi/routing.py",
         "fastapi/types.py"
       ],
       "returned_count": 6,
       "files_available": 6,
       "files_included": 6,
-      "tokens_used": 588,
+      "tokens_used": 727,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 0.9762,
-      "token_efficiency": 0.0051,
+      "ndcg_at_10": 0.9305,
+      "token_efficiency": 0.0041,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 14527.57,
-      "reduction_vs_agent": 493.03,
-      "notes": "Auto-generated from graph neighbours of fastapi/_compat/shared.py."
+      "reduction_vs_corpus": 11749.95,
+      "reduction_vs_agent": 398.77,
+      "notes": "Auto-generated from graph neighbours of fastapi/_compat/shared.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi__compat_v2_py",
@@ -1314,32 +1493,46 @@
         "fastapi/openapi/utils.py",
         "fastapi/encoders.py",
         "fastapi/utils.py",
-        "fastapi/openapi/models.py",
         "fastapi/params.py",
+        "fastapi/openapi/models.py",
         "fastapi/types.py",
         "tests/test_compat.py"
       ],
       "returned_count": 11,
       "files_available": 11,
       "files_included": 11,
-      "tokens_used": 1097,
+      "tokens_used": 1392,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
       "ndcg_at_10": 0.9079,
-      "token_efficiency": 0.0027,
+      "token_efficiency": 0.0022,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 7786.89,
-      "reduction_vs_agent": 264.27,
-      "notes": "Auto-generated from graph neighbours of fastapi/_compat/v2.py."
+      "reduction_vs_corpus": 6136.65,
+      "reduction_vs_agent": 208.26,
+      "notes": "Auto-generated from graph neighbours of fastapi/_compat/v2.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_applications_py",
@@ -1352,42 +1545,57 @@
       "query": "",
       "expected_top_files": [
         "fastapi/routing.py",
-        "pyproject.toml",
         "fastapi/openapi/utils.py"
       ],
       "returned_paths": [
         "fastapi/routing.py",
-        "pyproject.toml",
         "fastapi/openapi/utils.py",
+        "fastapi/encoders.py",
         "fastapi/openapi/docs.py",
-        "docs/en/mkdocs.yml",
         "fastapi/security/api_key.py",
         "fastapi/param_functions.py",
-        "fastapi/encoders.py",
         "fastapi/security/oauth2.py",
-        "fastapi/security/http.py"
+        "fastapi/security/http.py",
+        "pyproject.toml",
+        "fastapi/params.py",
+        "fastapi/middleware/asyncexitstack.py",
+        "fastapi/exception_handlers.py"
       ],
-      "returned_count": 10,
-      "files_available": 10,
-      "files_included": 10,
-      "tokens_used": 846,
+      "returned_count": 12,
+      "files_available": 22,
+      "files_included": 12,
+      "tokens_used": 1516,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
       "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0035,
+      "token_efficiency": 0.0013,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.5,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 10097.18,
-      "reduction_vs_agent": 342.68,
-      "notes": "Auto-generated from graph neighbours of fastapi/applications.py."
+      "reduction_vs_corpus": 5634.71,
+      "reduction_vs_agent": 191.23,
+      "notes": "Auto-generated from graph neighbours of fastapi/applications.py. [gold cleaned: removed release/packaging/CI files]",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_datastructures_py",
@@ -1405,40 +1613,53 @@
       ],
       "returned_paths": [
         "fastapi/encoders.py",
-        "fastapi/exception_handlers.py",
         "fastapi/routing.py",
-        "fastapi/__init__.py",
         "fastapi/param_functions.py",
         "fastapi/__main__.py",
-        "fastapi/cli.py",
+        "fastapi/exception_handlers.py",
+        "fastapi/__init__.py",
         "fastapi/concurrency.py",
+        "fastapi/cli.py",
         "fastapi/background.py",
-        "fastapi/_compat/v2.py",
         "fastapi/exceptions.py",
-        "fastapi/applications.py",
-        "tests/test_datastructures.py"
+        "fastapi/_compat/v2.py",
+        "fastapi/applications.py"
       ],
-      "returned_count": 13,
+      "returned_count": 12,
       "files_available": 13,
-      "files_included": 13,
-      "tokens_used": 1328,
+      "files_included": 12,
+      "tokens_used": 1508,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 0.9212,
-      "token_efficiency": 0.0023,
+      "ndcg_at_10": 1.0,
+      "token_efficiency": 0.002,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 6432.39,
-      "reduction_vs_agent": 218.3,
-      "notes": "Auto-generated from graph neighbours of fastapi/datastructures.py."
+      "reduction_vs_corpus": 5664.6,
+      "reduction_vs_agent": 192.24,
+      "notes": "Auto-generated from graph neighbours of fastapi/datastructures.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_dependencies_utils_py",
@@ -1451,48 +1672,57 @@
       "query": "",
       "expected_top_files": [
         "fastapi/routing.py",
-        "fastapi/openapi/utils.py",
-        "pyproject.toml"
+        "fastapi/openapi/utils.py"
       ],
       "returned_paths": [
         "fastapi/routing.py",
         "fastapi/openapi/utils.py",
-        "pyproject.toml",
         "fastapi/_compat/v2.py",
-        "fastapi/utils.py",
+        "fastapi/dependencies/models.py",
         "fastapi/params.py",
         "fastapi/encoders.py",
+        "fastapi/utils.py",
         "fastapi/_compat/__init__.py",
-        "tests/test_compat.py",
+        "pyproject.toml",
         ".pre-commit-config.yaml",
-        "fastapi/dependencies/models.py",
-        "tests/test_forms_single_model.py",
-        "docs/en/mkdocs.yml",
         "fastapi/_compat/shared.py",
-        "fastapi/param_functions.py",
-        "uv.lock"
+        "fastapi/param_functions.py"
       ],
-      "returned_count": 16,
-      "files_available": 16,
-      "files_included": 16,
-      "tokens_used": 1368,
+      "returned_count": 12,
+      "files_available": 21,
+      "files_included": 12,
+      "tokens_used": 1532,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
       "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0022,
+      "token_efficiency": 0.0013,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.5,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 6244.31,
-      "reduction_vs_agent": 211.92,
-      "notes": "Auto-generated from graph neighbours of fastapi/dependencies/utils.py."
+      "reduction_vs_corpus": 5575.86,
+      "reduction_vs_agent": 189.23,
+      "notes": "Auto-generated from graph neighbours of fastapi/dependencies/utils.py. [gold cleaned: removed release/packaging/CI files]",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_encoders_py",
@@ -1512,42 +1742,51 @@
         "fastapi/dependencies/utils.py",
         "fastapi/routing.py",
         "fastapi/_compat/v2.py",
-        "fastapi/datastructures.py",
-        "fastapi/exception_handlers.py",
-        "fastapi/__init__.py",
-        "fastapi/param_functions.py",
-        "fastapi/__main__.py",
         "fastapi/applications.py",
+        "fastapi/datastructures.py",
         "fastapi/utils.py",
-        "fastapi/cli.py",
-        "fastapi/types.py",
-        "fastapi/concurrency.py",
+        "fastapi/param_functions.py",
         "pyproject.toml",
-        "fastapi/background.py",
-        "fastapi/exceptions.py",
-        "tests/test_jsonable_encoder.py"
+        "fastapi/types.py",
+        "fastapi/__main__.py",
+        "fastapi/exception_handlers.py",
+        "fastapi/__init__.py"
       ],
-      "returned_count": 17,
+      "returned_count": 12,
       "files_available": 17,
-      "files_included": 17,
-      "tokens_used": 1709,
+      "files_included": 12,
+      "tokens_used": 1487,
       "token_budget": 6000,
       "recall_at_5": 0.6667,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.6667,
       "mrr": 1.0,
       "ndcg_at_10": 0.5525,
-      "token_efficiency": 0.0018,
+      "token_efficiency": 0.0013,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 4998.37,
-      "reduction_vs_agent": 169.63,
-      "notes": "Auto-generated from graph neighbours of fastapi/encoders.py."
+      "reduction_vs_corpus": 5744.6,
+      "reduction_vs_agent": 194.96,
+      "notes": "Auto-generated from graph neighbours of fastapi/encoders.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_exceptions_py",
@@ -1565,11 +1804,11 @@
       "returned_paths": [
         "fastapi/routing.py",
         "fastapi/param_functions.py",
+        "fastapi/__main__.py",
         "fastapi/exception_handlers.py",
         "fastapi/__init__.py",
-        "fastapi/__main__.py",
-        "fastapi/cli.py",
         "fastapi/concurrency.py",
+        "fastapi/cli.py",
         "fastapi/background.py",
         "fastapi/datastructures.py",
         "fastapi/encoders.py",
@@ -1578,24 +1817,38 @@
       "returned_count": 11,
       "files_available": 11,
       "files_included": 11,
-      "tokens_used": 1123,
+      "tokens_used": 1393,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
       "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0018,
+      "token_efficiency": 0.0014,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.5,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 7606.6,
-      "reduction_vs_agent": 258.15,
-      "notes": "Auto-generated from graph neighbours of fastapi/exceptions.py."
+      "reduction_vs_corpus": 6132.24,
+      "reduction_vs_agent": 208.11,
+      "notes": "Auto-generated from graph neighbours of fastapi/exceptions.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_openapi_models_py",
@@ -1614,31 +1867,45 @@
       "returned_paths": [
         "fastapi/openapi/utils.py",
         "fastapi/_compat/v2.py",
-        "fastapi/params.py",
         "fastapi/routing.py",
+        "fastapi/params.py",
         "fastapi/openapi/docs.py"
       ],
       "returned_count": 5,
       "files_available": 5,
       "files_included": 5,
-      "tokens_used": 496,
+      "tokens_used": 601,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 0.9854,
-      "token_efficiency": 0.006,
+      "ndcg_at_10": 1.0,
+      "token_efficiency": 0.005,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 17222.21,
-      "reduction_vs_agent": 584.48,
-      "notes": "Auto-generated from graph neighbours of fastapi/openapi/models.py."
+      "reduction_vs_corpus": 14213.33,
+      "reduction_vs_agent": 482.37,
+      "notes": "Auto-generated from graph neighbours of fastapi/openapi/models.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_openapi_utils_py",
@@ -1658,34 +1925,51 @@
         "fastapi/routing.py",
         "fastapi/dependencies/utils.py",
         "fastapi/_compat/v2.py",
+        "fastapi/openapi/models.py",
         "fastapi/params.py",
-        "pyproject.toml",
         "fastapi/applications.py",
         "fastapi/_compat/__init__.py",
-        "fastapi/openapi/models.py",
-        "fastapi/utils.py"
+        "fastapi/utils.py",
+        "fastapi/encoders.py",
+        "pyproject.toml",
+        "fastapi/openapi/docs.py",
+        "fastapi/types.py"
       ],
-      "returned_count": 9,
-      "files_available": 9,
-      "files_included": 9,
-      "tokens_used": 760,
+      "returned_count": 12,
+      "files_available": 17,
+      "files_included": 12,
+      "tokens_used": 1496,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
       "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0039,
+      "token_efficiency": 0.002,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 11239.76,
-      "reduction_vs_agent": 381.45,
-      "notes": "Auto-generated from graph neighbours of fastapi/openapi/utils.py."
+      "reduction_vs_corpus": 5710.04,
+      "reduction_vs_agent": 193.79,
+      "notes": "Auto-generated from graph neighbours of fastapi/openapi/utils.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_param_functions_py",
@@ -1702,43 +1986,54 @@
         "fastapi/security/oauth2.py"
       ],
       "returned_paths": [
-        "fastapi/security/oauth2.py",
-        "fastapi/params.py",
         "fastapi/routing.py",
+        "fastapi/params.py",
+        "fastapi/security/oauth2.py",
         "fastapi/exceptions.py",
-        "fastapi/exception_handlers.py",
-        "fastapi/__init__.py",
-        "fastapi/datastructures.py",
         "fastapi/applications.py",
         "fastapi/dependencies/utils.py",
-        "fastapi/__main__.py",
+        "fastapi/datastructures.py",
         "fastapi/encoders.py",
-        "fastapi/cli.py",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "fastapi/openapi/models.py"
+        "fastapi/__main__.py",
+        "fastapi/exception_handlers.py",
+        "fastapi/__init__.py",
+        "fastapi/concurrency.py"
       ],
-      "returned_count": 15,
+      "returned_count": 12,
       "files_available": 15,
-      "files_included": 15,
-      "tokens_used": 1520,
+      "files_included": 12,
+      "tokens_used": 1473,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 0.79,
+      "ndcg_at_10": 1.0,
       "token_efficiency": 0.002,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 5619.88,
-      "reduction_vs_agent": 190.73,
-      "notes": "Auto-generated from graph neighbours of fastapi/param_functions.py."
+      "reduction_vs_corpus": 5799.19,
+      "reduction_vs_agent": 196.81,
+      "notes": "Auto-generated from graph neighbours of fastapi/param_functions.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_params_py",
@@ -1756,43 +2051,53 @@
       ],
       "returned_paths": [
         "fastapi/dependencies/utils.py",
-        "fastapi/param_functions.py",
         "fastapi/routing.py",
-        "fastapi/exception_handlers.py",
         "fastapi/openapi/utils.py",
-        "fastapi/__init__.py",
         "fastapi/_compat/v2.py",
-        "fastapi/__main__.py",
+        "fastapi/param_functions.py",
         "fastapi/openapi/models.py",
-        "fastapi/cli.py",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "fastapi/exceptions.py",
-        "fastapi/datastructures.py",
         "fastapi/encoders.py",
-        "fastapi/applications.py"
+        "fastapi/applications.py",
+        "fastapi/__main__.py",
+        "fastapi/exception_handlers.py",
+        "fastapi/__init__.py",
+        "fastapi/concurrency.py"
       ],
-      "returned_count": 16,
+      "returned_count": 12,
       "files_available": 16,
-      "files_included": 16,
-      "tokens_used": 1624,
+      "files_included": 12,
+      "tokens_used": 1519,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 0.9725,
-      "token_efficiency": 0.0018,
+      "ndcg_at_10": 0.9762,
+      "token_efficiency": 0.002,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/routing.py",
         "fastapi/applications.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.5,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 5259.98,
-      "reduction_vs_agent": 178.51,
-      "notes": "Auto-generated from graph neighbours of fastapi/params.py."
+      "reduction_vs_corpus": 5623.58,
+      "reduction_vs_agent": 190.85,
+      "notes": "Auto-generated from graph neighbours of fastapi/params.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_routing_py",
@@ -1805,8 +2110,7 @@
       "query": "",
       "expected_top_files": [
         "fastapi/dependencies/utils.py",
-        "fastapi/applications.py",
-        "pyproject.toml"
+        "fastapi/applications.py"
       ],
       "returned_paths": [
         "fastapi/dependencies/utils.py",
@@ -1814,48 +2118,49 @@
         "fastapi/openapi/utils.py",
         "fastapi/_compat/v2.py",
         "fastapi/encoders.py",
-        "fastapi/exceptions.py",
-        "fastapi/utils.py",
-        "fastapi/param_functions.py",
-        "fastapi/_compat/__init__.py",
         "fastapi/params.py",
-        "fastapi/datastructures.py",
-        "fastapi/exception_handlers.py",
-        "fastapi/security/api_key.py",
+        "fastapi/utils.py",
+        "fastapi/exceptions.py",
+        "fastapi/param_functions.py",
         "pyproject.toml",
-        "fastapi/_compat/shared.py",
-        "fastapi/openapi/models.py",
-        "fastapi/__main__.py",
-        "fastapi/__init__.py",
-        "fastapi/sse.py",
-        "fastapi/cli.py",
-        "fastapi/types.py",
-        ".pre-commit-config.yaml",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "fastapi/dependencies/models.py"
+        "fastapi/_compat/__init__.py",
+        "fastapi/datastructures.py"
       ],
-      "returned_count": 25,
+      "returned_count": 12,
       "files_available": 25,
-      "files_included": 25,
-      "tokens_used": 2555,
+      "files_included": 12,
+      "tokens_used": 1486,
       "token_budget": 6000,
-      "recall_at_5": 0.6667,
+      "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 0.895,
-      "token_efficiency": 0.0012,
+      "ndcg_at_10": 1.0,
+      "token_efficiency": 0.0013,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.5,
+      "agent_mrr": 0.5,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 3343.33,
-      "reduction_vs_agent": 113.47,
-      "notes": "Auto-generated from graph neighbours of fastapi/routing.py."
+      "reduction_vs_corpus": 5748.46,
+      "reduction_vs_agent": 195.09,
+      "notes": "Auto-generated from graph neighbours of fastapi/routing.py. [gold cleaned: removed release/packaging/CI files]",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_security_api_key_py",
@@ -1868,40 +2173,53 @@
       "query": "",
       "expected_top_files": [
         "fastapi/security/oauth2.py",
-        "pyproject.toml",
         "fastapi/security/open_id_connect_url.py"
       ],
       "returned_paths": [
         "fastapi/security/oauth2.py",
         "fastapi/security/open_id_connect_url.py",
         "fastapi/security/http.py",
-        "fastapi/routing.py",
         "fastapi/applications.py",
-        "pyproject.toml",
+        "fastapi/routing.py",
         "fastapi/security/utils.py",
+        "pyproject.toml",
         "fastapi/openapi/models.py"
       ],
       "returned_count": 8,
       "files_available": 8,
       "files_included": 8,
-      "tokens_used": 804,
+      "tokens_used": 988,
       "token_budget": 6000,
-      "recall_at_5": 0.6667,
+      "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 0.9121,
-      "token_efficiency": 0.0037,
+      "ndcg_at_10": 1.0,
+      "token_efficiency": 0.002,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 10624.64,
-      "reduction_vs_agent": 360.58,
-      "notes": "Auto-generated from graph neighbours of fastapi/security/api_key.py."
+      "reduction_vs_corpus": 8645.97,
+      "reduction_vs_agent": 293.43,
+      "notes": "Auto-generated from graph neighbours of fastapi/security/api_key.py. [gold cleaned: removed release/packaging/CI files]",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_security_http_py",
@@ -1923,81 +2241,44 @@
         "fastapi/security/api_key.py",
         "fastapi/applications.py",
         "fastapi/security/utils.py",
-        "fastapi/openapi/models.py",
-        "fastapi/exceptions.py"
+        "fastapi/exceptions.py",
+        "fastapi/openapi/models.py"
       ],
       "returned_count": 7,
       "files_available": 7,
       "files_included": 7,
-      "tokens_used": 729,
+      "tokens_used": 913,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
       "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0041,
+      "token_efficiency": 0.0033,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "uv.lock",
         "fastapi/applications.py"
       ],
       "agent_baseline_tokens": 494090,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 11717.71,
-      "reduction_vs_agent": 677.76,
-      "notes": "Auto-generated from graph neighbours of fastapi/security/http.py."
-    },
-    {
-      "case_id": "fastapi_fastapi___init___py",
-      "repo_key": "fastapi",
-      "category": "co_change",
-      "repo_root": "bench/fastapi",
-      "seed_files": [
-        "fastapi/__init__.py"
-      ],
-      "query": "",
-      "expected_top_files": [
-        "docs/en/docs/release-notes.md",
-        ".github/workflows/publish.yml",
-        "pyproject.toml"
-      ],
-      "returned_paths": [
-        "fastapi/exception_handlers.py",
-        "fastapi/__main__.py",
-        "fastapi/cli.py",
-        "docs/en/docs/release-notes.md",
-        "fastapi/responses.py",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "fastapi/exceptions.py",
-        "fastapi/param_functions.py",
-        "fastapi/datastructures.py",
-        "fastapi/encoders.py",
-        "fastapi/routing.py",
-        "fastapi/applications.py"
-      ],
-      "returned_count": 13,
-      "files_available": 13,
-      "files_included": 13,
-      "tokens_used": 1325,
-      "token_budget": 6000,
-      "recall_at_5": 0.3333,
-      "mrr": 0.25,
-      "ndcg_at_10": 0.2713,
-      "token_efficiency": 0.0008,
-      "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
-      "agent_baseline_paths": [
-        "docs/en/docs/release-notes.md",
-        "fastapi/applications.py",
-        "fastapi/routing.py"
-      ],
-      "agent_baseline_tokens": 289904,
-      "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 6446.95,
-      "reduction_vs_agent": 218.8,
-      "notes": "Auto-generated from graph neighbours of fastapi/__init__.py."
+      "reduction_vs_corpus": 9356.2,
+      "reduction_vs_agent": 541.17,
+      "notes": "Auto-generated from graph neighbours of fastapi/security/http.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi__compat_main_py",
@@ -2018,30 +2299,45 @@
         "fastapi/_compat/shared.py",
         "fastapi/_compat/v2.py",
         "docs_src/app_testing/app_b_an_py310/test_main.py",
-        "tests/test_tutorial/test_bigger_applications/test_main.py",
-        "tests/test_modules_same_name_body/test_main.py"
+        "docs_src/app_testing/app_b_py310/test_main.py",
+        "tests/test_modules_same_name_body/test_main.py",
+        "tests/test_tutorial/test_bigger_applications/test_main.py"
       ],
-      "returned_count": 6,
-      "files_available": 6,
-      "files_included": 6,
-      "tokens_used": 647,
+      "returned_count": 7,
+      "files_available": 7,
+      "files_included": 7,
+      "tokens_used": 985,
       "token_budget": 6000,
       "recall_at_5": 0.3333,
+      "candidate_pool_recall": 0.3333,
+      "pre_mmr_recall_at_5": 0.3333,
       "mrr": 0.3333,
       "ndcg_at_10": 0.105,
-      "token_efficiency": 0.0015,
+      "token_efficiency": 0.001,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 13202.8,
-      "reduction_vs_agent": 448.07,
-      "notes": "Auto-generated from graph neighbours of fastapi/_compat/main.py."
+      "reduction_vs_corpus": 8672.3,
+      "reduction_vs_agent": 294.32,
+      "notes": "Auto-generated from graph neighbours of fastapi/_compat/main.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi__compat_may_v1_py",
@@ -2065,24 +2361,38 @@
       "returned_count": 3,
       "files_available": 3,
       "files_included": 3,
-      "tokens_used": 311,
+      "tokens_used": 411,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
       "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0096,
+      "token_efficiency": 0.0073,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 27466.93,
-      "reduction_vs_agent": 932.17,
-      "notes": "Phase 9.1: expected aligned to stable BFS neighbours (was stale auto-gen)."
+      "reduction_vs_corpus": 20783.98,
+      "reduction_vs_agent": 705.36,
+      "notes": "Phase 9.1: expected aligned to stable BFS neighbours (was stale auto-gen).",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi__compat_v1_py",
@@ -2106,24 +2416,38 @@
       "returned_count": 3,
       "files_available": 3,
       "files_included": 3,
-      "tokens_used": 311,
+      "tokens_used": 411,
       "token_budget": 6000,
       "recall_at_5": 0.3333,
+      "candidate_pool_recall": 0.3333,
+      "pre_mmr_recall_at_5": 0.3333,
       "mrr": 0.3333,
       "ndcg_at_10": 0.105,
-      "token_efficiency": 0.0032,
+      "token_efficiency": 0.0024,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 27466.93,
-      "reduction_vs_agent": 932.17,
-      "notes": "Auto-generated from graph neighbours of fastapi/_compat/v1.py."
+      "reduction_vs_corpus": 20783.98,
+      "reduction_vs_agent": 705.36,
+      "notes": "Auto-generated from graph neighbours of fastapi/_compat/v1.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_background_py",
@@ -2140,11 +2464,11 @@
         "fastapi/__main__.py"
       ],
       "returned_paths": [
+        "fastapi/__main__.py",
         "fastapi/exception_handlers.py",
         "fastapi/__init__.py",
-        "fastapi/__main__.py",
-        "fastapi/cli.py",
         "fastapi/concurrency.py",
+        "fastapi/cli.py",
         "fastapi/exceptions.py",
         "fastapi/datastructures.py",
         "fastapi/encoders.py",
@@ -2153,24 +2477,38 @@
       "returned_count": 9,
       "files_available": 9,
       "files_included": 9,
-      "tokens_used": 927,
+      "tokens_used": 1158,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0032,
+      "ndcg_at_10": 0.8175,
+      "token_efficiency": 0.0026,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 9214.9,
-      "reduction_vs_agent": 312.73,
-      "notes": "Phase 9.1: expected aligned to top-5 co-change rank (was stale auto-gen)."
+      "reduction_vs_corpus": 7376.7,
+      "reduction_vs_agent": 250.35,
+      "notes": "Phase 9.1: expected aligned to top-5 co-change rank (was stale auto-gen).",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_dependencies_models_py",
@@ -2193,24 +2531,38 @@
       "returned_count": 2,
       "files_available": 2,
       "files_included": 2,
-      "tokens_used": 189,
+      "tokens_used": 222,
       "token_budget": 6000,
       "recall_at_5": 0.3333,
+      "candidate_pool_recall": 0.3333,
+      "pre_mmr_recall_at_5": 0.3333,
       "mrr": 1.0,
       "ndcg_at_10": 0.63,
-      "token_efficiency": 0.0053,
+      "token_efficiency": 0.0045,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 45196.9,
-      "reduction_vs_agent": 1533.88,
-      "notes": "Auto-generated from graph neighbours of fastapi/dependencies/models.py."
+      "reduction_vs_corpus": 38478.44,
+      "reduction_vs_agent": 1305.87,
+      "notes": "Auto-generated from graph neighbours of fastapi/dependencies/models.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_openapi_docs_py",
@@ -2235,24 +2587,38 @@
       "returned_count": 4,
       "files_available": 4,
       "files_included": 4,
-      "tokens_used": 402,
+      "tokens_used": 496,
       "token_budget": 6000,
       "recall_at_5": 0.3333,
+      "candidate_pool_recall": 0.3333,
+      "pre_mmr_recall_at_5": 0.3333,
       "mrr": 1.0,
       "ndcg_at_10": 0.63,
-      "token_efficiency": 0.0025,
+      "token_efficiency": 0.002,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.5,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 21249.29,
-      "reduction_vs_agent": 721.15,
-      "notes": "Auto-generated from graph neighbours of fastapi/openapi/docs.py."
+      "reduction_vs_corpus": 17222.21,
+      "reduction_vs_agent": 584.48,
+      "notes": "Auto-generated from graph neighbours of fastapi/openapi/docs.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_responses_py",
@@ -2269,12 +2635,12 @@
         "fastapi/__main__.py"
       ],
       "returned_paths": [
-        "fastapi/exception_handlers.py",
-        "fastapi/__init__.py",
         "fastapi/__main__.py",
+        "fastapi/exception_handlers.py",
         "fastapi/sse.py",
-        "fastapi/cli.py",
+        "fastapi/__init__.py",
         "fastapi/concurrency.py",
+        "fastapi/cli.py",
         "fastapi/background.py",
         "fastapi/exceptions.py",
         "fastapi/datastructures.py",
@@ -2284,24 +2650,38 @@
       "returned_count": 11,
       "files_available": 11,
       "files_included": 11,
-      "tokens_used": 1142,
+      "tokens_used": 1434,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0026,
+      "ndcg_at_10": 0.7884,
+      "token_efficiency": 0.0021,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 7480.05,
-      "reduction_vs_agent": 253.86,
-      "notes": "Phase 9.1: expected aligned to top-5 co-change rank (was pyproject/lock noise)."
+      "reduction_vs_corpus": 5956.91,
+      "reduction_vs_agent": 202.16,
+      "notes": "Phase 9.1: expected aligned to top-5 co-change rank (was pyproject/lock noise).",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_concept_00",
@@ -2316,77 +2696,58 @@
         "fastapi/applications.py"
       ],
       "returned_paths": [
-        "fastapi/websockets.py",
         "fastapi/exception_handlers.py",
-        "fastapi/security/__init__.py",
         "fastapi/exceptions.py",
         "fastapi/routing.py",
+        "fastapi/websockets.py",
         "fastapi/__init__.py",
-        "fastapi/dependencies/models.py",
-        "fastapi/security/open_id_connect_url.py",
-        "fastapi/concurrency.py",
+        "fastapi/security/__init__.py",
         "fastapi/dependencies/utils.py",
+        "fastapi/security/open_id_connect_url.py",
         "fastapi/applications.py",
-        "tests/test_ws_router.py",
-        "fastapi/__main__.py",
-        "fastapi/sse.py",
-        "docs_src/handling_errors/tutorial003_py310.py",
-        "fastapi/cli.py",
-        "tests/test_tutorial/test_handling_errors/__init__.py",
-        "tests/test_http_connection_injection.py",
-        "docs_src/handling_errors/tutorial001_py310.py",
-        "docs_src/handling_errors/tutorial005_py310.py",
-        "docs_src/handling_errors/tutorial002_py310.py",
-        "docs_src/handling_errors/tutorial006_py310.py",
-        "docs_src/handling_errors/tutorial004_py310.py",
-        "fastapi/types.py",
-        "fastapi/background.py",
-        "fastapi/datastructures.py",
-        "fastapi/encoders.py",
-        "tests/test_validation_error_context.py",
-        "tests/test_dependency_yield_scope_websockets.py",
-        "tests/test_tutorial/test_websockets/test_tutorial002.py",
-        "fastapi/utils.py",
-        "docs_src/websockets_/tutorial003_py310.py",
-        "docs/zh-hant/docs/advanced/websockets.md",
-        "tests/test_dependency_after_yield_websockets.py",
-        "tests/test_ws_dependencies.py",
-        "tests/test_frontend.py",
-        "docs/en/docs/deployment/https.md",
-        "tests/test_exception_handlers.py",
-        "docs_src/handling_errors/__init__.py",
-        "tests/test_tutorial/test_handling_errors/test_tutorial001.py",
-        "docs/uk/docs/advanced/websockets.md",
-        "docs/fr/docs/advanced/websockets.md",
-        "docs/en/docs/advanced/websockets.md",
-        "docs/zh/docs/advanced/websockets.md",
-        "tests/test_tutorial/test_handling_errors/test_tutorial004.py",
-        "tests/test_tutorial/test_handling_errors/test_tutorial002.py",
-        "tests/test_tutorial/test_handling_errors/test_tutorial005.py",
-        "tests/test_tutorial/test_handling_errors/test_tutorial003.py",
-        "tests/test_tutorial/test_handling_errors/test_tutorial006.py"
+        "fastapi/concurrency.py",
+        "fastapi/dependencies/models.py",
+        "fastapi/encoders.py"
       ],
-      "returned_count": 49,
-      "files_available": 49,
-      "files_included": 49,
-      "tokens_used": 5457,
+      "returned_count": 12,
+      "files_available": 50,
+      "files_included": 12,
+      "tokens_used": 1735,
       "token_budget": 8000,
       "recall_at_5": 0.6667,
-      "mrr": 1.0,
-      "ndcg_at_10": 0.7925,
-      "token_efficiency": 0.0005,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.6667,
+      "mrr": 0.3333,
+      "ndcg_at_10": 0.5445,
+      "token_efficiency": 0.0017,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "tests/test_ws_router.py",
         "docs/en/docs/advanced/websockets.md"
       ],
       "agent_baseline_tokens": 173002,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 1565.37,
-      "reduction_vs_agent": 31.7,
-      "notes": "Query-first concept case: WebSocket connection handling"
+      "reduction_vs_corpus": 4923.47,
+      "reduction_vs_agent": 99.71,
+      "notes": "Query-first concept case: WebSocket connection handling",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "backend": "bm25",
+          "prefer_bm25": true,
+          "index_present": true,
+          "bm25_empty_fallback": false,
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_concept_01",
@@ -2404,86 +2765,57 @@
       ],
       "returned_paths": [
         "fastapi/dependencies/utils.py",
-        "fastapi/routing.py",
         "fastapi/applications.py",
+        "fastapi/routing.py",
+        "fastapi/datastructures.py",
         "fastapi/openapi/utils.py",
         "fastapi/security/open_id_connect_url.py",
-        "fastapi/_compat/v2.py",
         "fastapi/security/oauth2.py",
+        "fastapi/_compat/v2.py",
+        "fastapi/utils.py",
         "fastapi/encoders.py",
         "fastapi/exceptions.py",
-        "fastapi/utils.py",
-        "fastapi/openapi/models.py",
-        "fastapi/security/api_key.py",
-        "fastapi/param_functions.py",
-        "tests/test_response_dependency.py",
-        "fastapi/_compat/__init__.py",
-        "fastapi/security/http.py",
-        "fastapi/params.py",
-        "fastapi/openapi/docs.py",
-        "fastapi/datastructures.py",
-        "fastapi/exception_handlers.py",
-        "pyproject.toml",
-        "fastapi/_compat/shared.py",
-        "fastapi/__main__.py",
-        "fastapi/__init__.py",
-        "fastapi/cli.py",
-        "fastapi/concurrency.py",
-        ".pre-commit-config.yaml",
-        "tests/test_path.py",
-        "tests/test_frontend.py",
-        "docs/en/docs/tutorial/background-tasks.md",
-        "uv.lock",
-        "docs/tr/docs/advanced/custom-response.md",
-        "tests/test_response_model_as_return_annotation.py",
-        "docs/de/docs/how-to/custom-docs-ui-assets.md",
-        "tests/test_tutorial/test_custom_docs_ui/test_tutorial001.py",
-        "docs/tr/docs/tutorial/dependencies/dependencies-with-yield.md",
-        "tests/test_jsonable_encoder.py",
-        "docs/en/docs/advanced/advanced-dependencies.md",
-        "tests/test_router_include_context.py",
-        "tests/test_router_events.py",
-        "tests/test_dependency_contextmanager.py",
-        "tests/test_datastructures.py",
-        "tests/test_tutorial/test_security/test_tutorial003.py",
-        "tests/test_compat.py",
-        "tests/test_get_model_definitions_formfeed_escape.py",
-        "tests/test_openapi_separate_input_output_schemas.py",
-        "docs/en/mkdocs.yml",
-        "tests/test_computed_fields.py",
-        "docs/tr/docs/tutorial/background-tasks.md",
-        "docs/es/docs/tutorial/background-tasks.md",
-        "docs/uk/docs/tutorial/background-tasks.md",
-        "docs/en/docs/release-notes.md",
-        "docs/en/docs/advanced/custom-response.md",
-        "docs/en/docs/how-to/custom-docs-ui-assets.md",
-        "docs/en/docs/advanced/events.md",
-        "tests/test_tutorial/test_security/test_tutorial005.py",
-        "docs/es/docs/tutorial/dependencies/dependencies-with-yield.md",
-        "docs/fr/docs/tutorial/dependencies/dependencies-with-yield.md",
-        "docs/en/docs/tutorial/dependencies/dependencies-with-yield.md"
+        "fastapi/security/api_key.py"
       ],
-      "returned_count": 59,
-      "files_available": 59,
-      "files_included": 59,
-      "tokens_used": 6212,
+      "returned_count": 12,
+      "files_available": 58,
+      "files_included": 12,
+      "tokens_used": 1459,
       "token_budget": 8000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 0.9225,
-      "token_efficiency": 0.0005,
+      "ndcg_at_10": 0.8675,
+      "token_efficiency": 0.0021,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "fastapi/routing.py",
         "fastapi/applications.py",
         "tests/test_response_model_as_return_annotation.py"
       ],
       "agent_baseline_tokens": 134963,
+      "agent_recall_at_5": 0.6667,
+      "agent_mrr": 1.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 1375.11,
-      "reduction_vs_agent": 21.73,
-      "notes": "Phase 9.1: seed+query concept case; expected from stable top-5 (query-only missed background in top 5)."
+      "reduction_vs_corpus": 5854.84,
+      "reduction_vs_agent": 92.5,
+      "notes": "Phase 9.1: seed+query concept case; expected from stable top-5 (query-only missed background in top 5).",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "backend": "bm25",
+          "prefer_bm25": true,
+          "index_present": true,
+          "bm25_empty_fallback": false,
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_concept_02",
@@ -2503,73 +2835,53 @@
         "fastapi/openapi/docs.py",
         "fastapi/encoders.py",
         "fastapi/routing.py",
-        "fastapi/datastructures.py",
         "fastapi/dependencies/utils.py",
-        "fastapi/exception_handlers.py",
+        "fastapi/datastructures.py",
         "fastapi/responses.py",
-        "fastapi/sse.py",
-        "fastapi/_compat/__init__.py",
         "fastapi/openapi/utils.py",
+        "fastapi/_compat/__init__.py",
         "fastapi/params.py",
-        "fastapi/param_functions.py",
-        "fastapi/utils.py",
-        "fastapi/__main__.py",
-        "tests/test_path.py",
-        "fastapi/__init__.py",
-        "fastapi/cli.py",
-        "fastapi/_compat/shared.py",
-        "tests/test_response_model_as_return_annotation.py",
-        "tests/test_frontend.py",
-        "fastapi/types.py",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "fastapi/exceptions.py",
-        "fastapi/applications.py",
-        "tests/test_tutorial/test_bigger_applications/test_main.py",
-        "docs/tr/docs/advanced/custom-response.md",
-        "tests/test_request_params/test_body/test_optional_list.py",
-        "tests/test_query.py",
-        "tests/test_dependency_overrides.py",
-        "tests/test_tutorial/test_security/test_tutorial005.py",
-        "tests/test_tutorial/test_body/test_tutorial001.py",
-        "docs/de/docs/tutorial/stream-json-lines.md",
-        "tests/test_tutorial/test_sql_databases/test_tutorial002.py",
-        "docs/ko/docs/how-to/separate-openapi-schemas.md",
-        "docs/fr/docs/deployment/server-workers.md",
-        "docs/fr/docs/tutorial/response-model.md",
-        "docs/de/docs/advanced/response-directly.md",
-        "docs/ko/docs/tutorial/dependencies/sub-dependencies.md",
-        "docs/en/docs/advanced/response-change-status-code.md",
-        "docs/en/docs/tutorial/response-status-code.md",
-        "tests/test_request_params/test_body/test_optional_str.py",
-        "docs/ko/docs/advanced/strict-content-type.md",
-        "docs/de/docs/how-to/extending-openapi.md",
-        "docs/de/docs/deployment/manually.md",
-        "docs/de/docs/index.md",
-        "docs/es/docs/advanced/custom-response.md",
-        "docs/en/docs/advanced/custom-response.md"
+        "fastapi/sse.py"
       ],
-      "returned_count": 50,
+      "returned_count": 12,
       "files_available": 50,
-      "files_included": 50,
-      "tokens_used": 5792,
+      "files_included": 12,
+      "tokens_used": 1774,
       "token_budget": 8000,
       "recall_at_5": 0.6667,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.6667,
       "mrr": 0.25,
-      "ndcg_at_10": 0.479,
-      "token_efficiency": 0.0005,
+      "ndcg_at_10": 0.4851,
+      "token_efficiency": 0.0017,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "fastapi/routing.py",
         "fastapi/applications.py",
         "tests/test_include_router_defaults_overrides.py"
       ],
       "agent_baseline_tokens": 230973,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 1.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 1474.83,
-      "reduction_vs_agent": 39.88,
-      "notes": "Query-first concept case: JSON response serialization encoders"
+      "reduction_vs_corpus": 4815.23,
+      "reduction_vs_agent": 130.2,
+      "notes": "Query-first concept case: JSON response serialization encoders",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "backend": "bm25",
+          "prefer_bm25": true,
+          "index_present": true,
+          "bm25_empty_fallback": false,
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_concept_03",
@@ -2588,73 +2900,54 @@
         "fastapi/openapi/docs.py",
         "fastapi/routing.py",
         "fastapi/datastructures.py",
-        ".github/workflows/pre-commit.yml",
-        "fastapi/.agents/skills/fastapi/references/other-tools.md",
-        "fastapi/.agents/skills/fastapi/SKILL.md",
-        "docs_src/request_files/tutorial002_an_py310.py",
-        "fastapi/exception_handlers.py",
-        "fastapi/__init__.py",
-        "fastapi/__main__.py",
-        "fastapi/sse.py",
-        "docs_src/request_files/tutorial002_py310.py",
-        "docs_src/request_files/tutorial003_an_py310.py",
-        "docs_src/request_files/tutorial003_py310.py",
-        "fastapi/cli.py",
-        "fastapi/openapi/models.py",
         "fastapi/openapi/utils.py",
-        "fastapi/types.py",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "tests/test_tutorial/test_static_files/test_tutorial001.py",
-        "fastapi/exceptions.py",
-        "docs/zh-hant/docs/tutorial/static-files.md",
         "fastapi/encoders.py",
-        "fastapi/dependencies/models.py",
         "fastapi/applications.py",
         "fastapi/dependencies/utils.py",
-        "docs/en/docs/how-to/custom-docs-ui-assets.md",
-        "fastapi/utils.py",
-        "docs/tr/docs/advanced/sub-applications.md",
-        "scripts/tests/test_translation_fixer/conftest.py",
-        "tests/test_frontend.py",
-        "tests/test_tutorial/test_request_files/test_tutorial002.py",
-        "docs/fr/docs/tutorial/static-files.md",
-        "docs/en/docs/tutorial/static-files.md",
-        "docs/tr/docs/tutorial/static-files.md",
-        "tests/test_prepare_release.py",
-        "docs/es/docs/tutorial/static-files.md",
-        "docs/de/docs/tutorial/static-files.md",
-        "docs/pt/docs/tutorial/static-files.md",
-        "docs/uk/docs/tutorial/static-files.md",
-        "docs/zh/docs/tutorial/static-files.md",
-        "docs/ko/docs/tutorial/static-files.md",
-        "docs/ja/docs/tutorial/static-files.md",
-        "tests/test_router_include_context.py",
-        "tests/test_optional_file_list.py",
-        "tests/test_tutorial/test_request_forms_and_files/test_tutorial001.py",
-        "tests/test_tutorial/test_request_files/test_tutorial003.py"
+        "fastapi/openapi/models.py",
+        "fastapi/__main__.py",
+        "fastapi/types.py",
+        "fastapi/exception_handlers.py"
       ],
-      "returned_count": 49,
-      "files_available": 49,
-      "files_included": 49,
-      "tokens_used": 5511,
+      "returned_count": 12,
+      "files_available": 50,
+      "files_included": 12,
+      "tokens_used": 1573,
       "token_budget": 8000,
       "recall_at_5": 0.6667,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.6667,
       "mrr": 1.0,
-      "ndcg_at_10": 0.735,
-      "token_efficiency": 0.0005,
+      "ndcg_at_10": 0.875,
+      "token_efficiency": 0.0019,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "uv.lock",
         "docs/en/docs/release-notes.md",
         "docs/en/docs/how-to/custom-docs-ui-assets.md"
       ],
       "agent_baseline_tokens": 444647,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 1550.03,
-      "reduction_vs_agent": 80.68,
-      "notes": "Query-first concept case: static files mount StaticFiles"
+      "reduction_vs_corpus": 5430.52,
+      "reduction_vs_agent": 282.67,
+      "notes": "Query-first concept case: static files mount StaticFiles",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "backend": "bm25",
+          "prefer_bm25": true,
+          "index_present": true,
+          "bm25_empty_fallback": false,
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_security_oauth2_py",
@@ -2677,30 +2970,44 @@
         "fastapi/param_functions.py",
         "fastapi/applications.py",
         "fastapi/security/utils.py",
-        "fastapi/openapi/models.py",
-        "fastapi/exceptions.py"
+        "fastapi/exceptions.py",
+        "fastapi/openapi/models.py"
       ],
       "returned_count": 8,
       "files_available": 8,
       "files_included": 8,
-      "tokens_used": 829,
+      "tokens_used": 1041,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
       "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0036,
+      "token_efficiency": 0.0029,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 10304.24,
-      "reduction_vs_agent": 349.7,
-      "notes": "Auto-generated from graph neighbours of fastapi/security/oauth2.py."
+      "reduction_vs_corpus": 8205.78,
+      "reduction_vs_agent": 278.49,
+      "notes": "Auto-generated from graph neighbours of fastapi/security/oauth2.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_fastapi_security_open_id_connect_url_py",
@@ -2726,24 +3033,38 @@
       "returned_count": 5,
       "files_available": 5,
       "files_included": 5,
-      "tokens_used": 524,
+      "tokens_used": 660,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
       "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0057,
+      "token_efficiency": 0.0045,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 16301.94,
-      "reduction_vs_agent": 553.25,
-      "notes": "Auto-generated from graph neighbours of fastapi/security/open_id_connect_url.py."
+      "reduction_vs_corpus": 12942.75,
+      "reduction_vs_agent": 439.25,
+      "notes": "Auto-generated from graph neighbours of fastapi/security/open_id_connect_url.py.",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_concept_04",
@@ -2759,65 +3080,57 @@
       ],
       "returned_paths": [
         "fastapi/openapi/constants.py",
-        "fastapi/templating.py",
-        "fastapi/openapi/docs.py",
         "fastapi/_compat/v2.py",
+        "fastapi/openapi/docs.py",
         "fastapi/applications.py",
-        "docs_src/templates/tutorial001_py310.py",
-        "tests/test_tutorial/test_templates/__init__.py",
-        "pyproject.toml",
-        "fastapi/exception_handlers.py",
+        "fastapi/templating.py",
         "fastapi/__init__.py",
-        "fastapi/__main__.py",
-        "fastapi/cli.py",
+        "fastapi/encoders.py",
         "fastapi/_compat/shared.py",
         "fastapi/openapi/models.py",
-        "fastapi/_compat/__init__.py",
-        "fastapi/openapi/utils.py",
-        "fastapi/types.py",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "docs/fr/docs/advanced/templates.md",
-        "fastapi/encoders.py",
-        "fastapi/datastructures.py",
-        "docs/en/docs/reference/templating.md",
-        "docs_src/templates/static/__init__.py",
-        "tests/test_tutorial/test_templates/test_tutorial001.py",
-        "docs/de/docs/advanced/templates.md",
-        "docs/uk/docs/advanced/templates.md",
-        "docs/ja/docs/advanced/templates.md",
-        "docs/zh-hant/docs/advanced/templates.md",
-        "docs/tr/docs/advanced/templates.md",
-        "docs/pt/docs/advanced/templates.md",
-        "docs/en/docs/advanced/templates.md",
-        "docs/es/docs/advanced/templates.md",
-        "docs/ru/docs/advanced/templates.md",
-        "docs/zh/docs/advanced/templates.md",
-        "docs/ko/docs/advanced/templates.md",
-        "docs_src/templates/__init__.py",
-        "docs_src/templates/templates/__init__.py"
+        "fastapi/__main__.py",
+        "fastapi/exception_handlers.py",
+        "fastapi/types.py"
       ],
-      "returned_count": 38,
-      "files_available": 38,
-      "files_included": 38,
-      "tokens_used": 4072,
+      "returned_count": 12,
+      "files_available": 41,
+      "files_included": 12,
+      "tokens_used": 1615,
       "token_budget": 8000,
       "recall_at_5": 0.6667,
-      "mrr": 0.5,
-      "ndcg_at_10": 0.56,
-      "token_efficiency": 0.0005,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.6667,
+      "mrr": 0.25,
+      "ndcg_at_10": 0.4246,
+      "token_efficiency": 0.0012,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/de/docs/advanced/templates.md",
         "docs/fr/docs/advanced/templates.md",
         "docs/en/docs/advanced/templates.md"
       ],
       "agent_baseline_tokens": 2908,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 2097.79,
-      "reduction_vs_agent": 0.71,
-      "notes": "Query-first concept case: Jinja2 templates TemplateResponse"
+      "reduction_vs_corpus": 5289.3,
+      "reduction_vs_agent": 1.8,
+      "notes": "Query-first concept case: Jinja2 templates TemplateResponse",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "backend": "bm25",
+          "prefer_bm25": true,
+          "index_present": true,
+          "bm25_empty_fallback": false,
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_merge_ad471307",
@@ -2830,8 +3143,7 @@
       "query": "",
       "expected_top_files": [
         "fastapi/dependencies/utils.py",
-        "fastapi/applications.py",
-        "pyproject.toml"
+        "fastapi/applications.py"
       ],
       "returned_paths": [
         "fastapi/dependencies/utils.py",
@@ -2839,99 +3151,49 @@
         "fastapi/openapi/utils.py",
         "fastapi/_compat/v2.py",
         "fastapi/encoders.py",
-        "fastapi/exceptions.py",
-        "fastapi/utils.py",
-        "fastapi/param_functions.py",
-        "fastapi/_compat/__init__.py",
         "fastapi/params.py",
-        "fastapi/datastructures.py",
-        "fastapi/exception_handlers.py",
-        "fastapi/security/api_key.py",
-        "pyproject.toml",
-        "fastapi/_compat/shared.py",
-        "fastapi/openapi/models.py",
-        "fastapi/__main__.py",
-        "fastapi/__init__.py",
-        "fastapi/sse.py",
-        "fastapi/cli.py",
-        "fastapi/types.py",
-        ".pre-commit-config.yaml",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "fastapi/dependencies/models.py"
-      ],
-      "returned_count": 25,
-      "files_available": 25,
-      "files_included": 25,
-      "tokens_used": 2555,
-      "token_budget": 6000,
-      "recall_at_5": 0.6667,
-      "mrr": 1.0,
-      "ndcg_at_10": 0.895,
-      "token_efficiency": 0.0012,
-      "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
-      "agent_baseline_paths": [
-        "docs/en/docs/release-notes.md",
-        "fastapi/applications.py",
-        "fastapi/routing.py"
-      ],
-      "agent_baseline_tokens": 289904,
-      "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 3343.33,
-      "reduction_vs_agent": 113.47,
-      "notes": "PR-sourced case from merge commit ad471307e2be (:sparkles: Additional Responses (#97))."
-    },
-    {
-      "case_id": "fastapi_pr_15808",
-      "repo_key": "fastapi",
-      "category": "pr_co_change",
-      "repo_root": "bench/fastapi",
-      "seed_files": [
-        "fastapi/__init__.py"
-      ],
-      "query": "",
-      "expected_top_files": [
-        "docs/en/docs/release-notes.md",
-        ".github/workflows/publish.yml",
-        "pyproject.toml"
-      ],
-      "returned_paths": [
-        "fastapi/exception_handlers.py",
-        "fastapi/__main__.py",
-        "fastapi/cli.py",
-        "docs/en/docs/release-notes.md",
-        "fastapi/responses.py",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
+        "fastapi/utils.py",
         "fastapi/exceptions.py",
         "fastapi/param_functions.py",
-        "fastapi/datastructures.py",
-        "fastapi/encoders.py",
-        "fastapi/routing.py",
-        "fastapi/applications.py"
+        "pyproject.toml",
+        "fastapi/_compat/__init__.py",
+        "fastapi/datastructures.py"
       ],
-      "returned_count": 13,
-      "files_available": 13,
-      "files_included": 13,
-      "tokens_used": 1325,
+      "returned_count": 12,
+      "files_available": 25,
+      "files_included": 12,
+      "tokens_used": 1486,
       "token_budget": 6000,
-      "recall_at_5": 0.3333,
-      "mrr": 0.25,
-      "ndcg_at_10": 0.2713,
-      "token_efficiency": 0.0008,
+      "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_10": 1.0,
+      "token_efficiency": 0.0013,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.5,
+      "agent_mrr": 0.5,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 6446.95,
-      "reduction_vs_agent": 218.8,
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15808 (\ud83d\udd16 Release version 0.138.0 (#15808))."
+      "reduction_vs_corpus": 5748.46,
+      "reduction_vs_agent": 195.09,
+      "notes": "PR-sourced case from merge commit ad471307e2be (:sparkles: Additional Responses (#97)). [gold cleaned: removed release/packaging/CI files]",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_pr_15800",
@@ -2948,88 +3210,53 @@
       ],
       "returned_paths": [
         "fastapi/routing.py",
-        "pyproject.toml",
         "fastapi/openapi/utils.py",
+        "fastapi/encoders.py",
         "fastapi/openapi/docs.py",
-        "docs/en/mkdocs.yml",
         "fastapi/security/api_key.py",
         "fastapi/param_functions.py",
-        "fastapi/encoders.py",
         "fastapi/security/oauth2.py",
-        "fastapi/security/http.py"
+        "fastapi/security/http.py",
+        "pyproject.toml",
+        "fastapi/params.py",
+        "fastapi/middleware/asyncexitstack.py",
+        "fastapi/exception_handlers.py"
       ],
-      "returned_count": 10,
-      "files_available": 10,
-      "files_included": 10,
-      "tokens_used": 846,
+      "returned_count": 12,
+      "files_available": 22,
+      "files_included": 12,
+      "tokens_used": 1516,
       "token_budget": 6000,
       "recall_at_5": 0.5,
+      "candidate_pool_recall": 0.5,
+      "pre_mmr_recall_at_5": 0.5,
       "mrr": 1.0,
       "ndcg_at_10": 0.7602,
-      "token_efficiency": 0.0012,
+      "token_efficiency": 0.0007,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.5,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 10097.18,
-      "reduction_vs_agent": 342.68,
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15800 (\u2728 Add support for `app.frontend(\"/\", directory=\"dist\")` and `router.frontend(\"/\")."
-    },
-    {
-      "case_id": "fastapi_pr_15790",
-      "repo_key": "fastapi",
-      "category": "pr_co_change",
-      "repo_root": "bench/fastapi",
-      "seed_files": [
-        "fastapi/__init__.py"
-      ],
-      "query": "",
-      "expected_top_files": [
-        "docs/en/docs/release-notes.md",
-        ".github/workflows/publish.yml",
-        "pyproject.toml"
-      ],
-      "returned_paths": [
-        "fastapi/exception_handlers.py",
-        "fastapi/__main__.py",
-        "fastapi/cli.py",
-        "docs/en/docs/release-notes.md",
-        "fastapi/responses.py",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "fastapi/exceptions.py",
-        "fastapi/param_functions.py",
-        "fastapi/datastructures.py",
-        "fastapi/encoders.py",
-        "fastapi/routing.py",
-        "fastapi/applications.py"
-      ],
-      "returned_count": 13,
-      "files_available": 13,
-      "files_included": 13,
-      "tokens_used": 1325,
-      "token_budget": 6000,
-      "recall_at_5": 0.3333,
-      "mrr": 0.25,
-      "ndcg_at_10": 0.2713,
-      "token_efficiency": 0.0008,
-      "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
-      "agent_baseline_paths": [
-        "docs/en/docs/release-notes.md",
-        "fastapi/applications.py",
-        "fastapi/routing.py"
-      ],
-      "agent_baseline_tokens": 289904,
-      "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 6446.95,
-      "reduction_vs_agent": 218.8,
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15790 (\ud83d\udd16 Release version 0.137.2 (#15790))."
+      "reduction_vs_corpus": 5634.71,
+      "reduction_vs_agent": 191.23,
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15800 (\u2728 Add support for `app.frontend(\"/\", directory=\"dist\")` and `router.frontend(\"/\").",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_pr_15785",
@@ -3050,99 +3277,49 @@
         "fastapi/openapi/utils.py",
         "fastapi/_compat/v2.py",
         "fastapi/encoders.py",
-        "fastapi/exceptions.py",
-        "fastapi/utils.py",
-        "fastapi/param_functions.py",
-        "fastapi/_compat/__init__.py",
         "fastapi/params.py",
-        "fastapi/datastructures.py",
-        "fastapi/exception_handlers.py",
-        "fastapi/security/api_key.py",
+        "fastapi/utils.py",
+        "fastapi/exceptions.py",
+        "fastapi/param_functions.py",
         "pyproject.toml",
-        "fastapi/_compat/shared.py",
-        "fastapi/openapi/models.py",
-        "fastapi/__main__.py",
-        "fastapi/__init__.py",
-        "fastapi/sse.py",
-        "fastapi/cli.py",
-        "fastapi/types.py",
-        ".pre-commit-config.yaml",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "fastapi/dependencies/models.py"
+        "fastapi/_compat/__init__.py",
+        "fastapi/datastructures.py"
       ],
-      "returned_count": 25,
+      "returned_count": 12,
       "files_available": 25,
-      "files_included": 25,
-      "tokens_used": 2555,
+      "files_included": 12,
+      "tokens_used": 1486,
       "token_budget": 6000,
       "recall_at_5": 0.5,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.5,
       "mrr": 0.3333,
       "ndcg_at_10": 0.3801,
-      "token_efficiency": 0.0004,
+      "token_efficiency": 0.0007,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 3343.33,
-      "reduction_vs_agent": 113.47,
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15785 (\u2728 Add `iter_route_contexts()` for advanced use cases that used to use `router.ro)."
-    },
-    {
-      "case_id": "fastapi_pr_15766",
-      "repo_key": "fastapi",
-      "category": "pr_co_change",
-      "repo_root": "bench/fastapi",
-      "seed_files": [
-        "fastapi/__init__.py"
-      ],
-      "query": "",
-      "expected_top_files": [
-        "docs/en/docs/release-notes.md",
-        ".github/workflows/publish.yml",
-        "pyproject.toml"
-      ],
-      "returned_paths": [
-        "fastapi/exception_handlers.py",
-        "fastapi/__main__.py",
-        "fastapi/cli.py",
-        "docs/en/docs/release-notes.md",
-        "fastapi/responses.py",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "fastapi/exceptions.py",
-        "fastapi/param_functions.py",
-        "fastapi/datastructures.py",
-        "fastapi/encoders.py",
-        "fastapi/routing.py",
-        "fastapi/applications.py"
-      ],
-      "returned_count": 13,
-      "files_available": 13,
-      "files_included": 13,
-      "tokens_used": 1325,
-      "token_budget": 6000,
-      "recall_at_5": 0.3333,
-      "mrr": 0.25,
-      "ndcg_at_10": 0.2713,
-      "token_efficiency": 0.0008,
-      "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
-      "agent_baseline_paths": [
-        "docs/en/docs/release-notes.md",
-        "fastapi/applications.py",
-        "fastapi/routing.py"
-      ],
-      "agent_baseline_tokens": 289904,
-      "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 6446.95,
-      "reduction_vs_agent": 218.8,
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15766 (\ud83d\udd16 Release version 0.137.1 (#15766))."
+      "reduction_vs_corpus": 5748.46,
+      "reduction_vs_agent": 195.09,
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15785 (\u2728 Add `iter_route_contexts()` for advanced use cases that used to use `router.ro).",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_pr_15763",
@@ -3164,99 +3341,49 @@
         "fastapi/openapi/utils.py",
         "fastapi/_compat/v2.py",
         "fastapi/encoders.py",
-        "fastapi/exceptions.py",
-        "fastapi/utils.py",
-        "fastapi/param_functions.py",
-        "fastapi/_compat/__init__.py",
         "fastapi/params.py",
-        "fastapi/datastructures.py",
-        "fastapi/exception_handlers.py",
-        "fastapi/security/api_key.py",
+        "fastapi/utils.py",
+        "fastapi/exceptions.py",
+        "fastapi/param_functions.py",
         "pyproject.toml",
-        "fastapi/_compat/shared.py",
-        "fastapi/openapi/models.py",
-        "fastapi/__main__.py",
-        "fastapi/__init__.py",
-        "fastapi/sse.py",
-        "fastapi/cli.py",
-        "fastapi/types.py",
-        ".pre-commit-config.yaml",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "fastapi/dependencies/models.py"
+        "fastapi/_compat/__init__.py",
+        "fastapi/datastructures.py"
       ],
-      "returned_count": 25,
+      "returned_count": 12,
       "files_available": 25,
-      "files_included": 25,
-      "tokens_used": 2555,
+      "files_included": 12,
+      "tokens_used": 1486,
       "token_budget": 6000,
       "recall_at_5": 0.6667,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.6667,
       "mrr": 1.0,
       "ndcg_at_10": 0.5525,
-      "token_efficiency": 0.0008,
+      "token_efficiency": 0.0013,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.5,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 3343.33,
-      "reduction_vs_agent": 113.47,
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15763 (\ud83d\udc1b Fix bug, allow empty path in path operation in prefixless router (#15763))."
-    },
-    {
-      "case_id": "fastapi_pr_15748",
-      "repo_key": "fastapi",
-      "category": "pr_co_change",
-      "repo_root": "bench/fastapi",
-      "seed_files": [
-        "fastapi/__init__.py"
-      ],
-      "query": "",
-      "expected_top_files": [
-        "docs/en/docs/release-notes.md",
-        ".github/workflows/publish.yml",
-        "pyproject.toml"
-      ],
-      "returned_paths": [
-        "fastapi/exception_handlers.py",
-        "fastapi/__main__.py",
-        "fastapi/cli.py",
-        "docs/en/docs/release-notes.md",
-        "fastapi/responses.py",
-        "fastapi/concurrency.py",
-        "fastapi/background.py",
-        "fastapi/exceptions.py",
-        "fastapi/param_functions.py",
-        "fastapi/datastructures.py",
-        "fastapi/encoders.py",
-        "fastapi/routing.py",
-        "fastapi/applications.py"
-      ],
-      "returned_count": 13,
-      "files_available": 13,
-      "files_included": 13,
-      "tokens_used": 1325,
-      "token_budget": 6000,
-      "recall_at_5": 0.3333,
-      "mrr": 0.25,
-      "ndcg_at_10": 0.2713,
-      "token_efficiency": 0.0008,
-      "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
-      "agent_baseline_paths": [
-        "docs/en/docs/release-notes.md",
-        "fastapi/applications.py",
-        "fastapi/routing.py"
-      ],
-      "agent_baseline_tokens": 289904,
-      "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 6446.95,
-      "reduction_vs_agent": 218.8,
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15748 (\ud83d\udd16 Release version 0.137.0 (#15748))."
+      "reduction_vs_corpus": 5748.46,
+      "reduction_vs_agent": 195.09,
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15763 (\ud83d\udc1b Fix bug, allow empty path in path operation in prefixless router (#15763)).",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_pr_15745",
@@ -3274,37 +3401,53 @@
       ],
       "returned_paths": [
         "fastapi/routing.py",
-        "pyproject.toml",
         "fastapi/openapi/utils.py",
+        "fastapi/encoders.py",
         "fastapi/openapi/docs.py",
-        "docs/en/mkdocs.yml",
         "fastapi/security/api_key.py",
         "fastapi/param_functions.py",
-        "fastapi/encoders.py",
         "fastapi/security/oauth2.py",
-        "fastapi/security/http.py"
+        "fastapi/security/http.py",
+        "pyproject.toml",
+        "fastapi/params.py",
+        "fastapi/middleware/asyncexitstack.py",
+        "fastapi/exception_handlers.py"
       ],
-      "returned_count": 10,
-      "files_available": 10,
-      "files_included": 10,
-      "tokens_used": 846,
+      "returned_count": 12,
+      "files_available": 22,
+      "files_included": 12,
+      "tokens_used": 1516,
       "token_budget": 6000,
       "recall_at_5": 0.6667,
+      "candidate_pool_recall": 0.6667,
+      "pre_mmr_recall_at_5": 0.6667,
       "mrr": 1.0,
-      "ndcg_at_10": 0.735,
-      "token_efficiency": 0.0024,
+      "ndcg_at_10": 0.8175,
+      "token_efficiency": 0.0013,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 10097.18,
-      "reduction_vs_agent": 342.68,
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15745 (\u267b\ufe0f Refactor internals to preserve `APIRouter` and `APIRoute` instances (#15745))."
+      "reduction_vs_corpus": 5634.71,
+      "reduction_vs_agent": 191.23,
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15745 (\u267b\ufe0f Refactor internals to preserve `APIRouter` and `APIRoute` instances (#15745)).",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_pr_15589",
@@ -3323,42 +3466,52 @@
       "returned_paths": [
         "fastapi/routing.py",
         "fastapi/openapi/utils.py",
-        "pyproject.toml",
         "fastapi/_compat/v2.py",
-        "fastapi/utils.py",
+        "fastapi/dependencies/models.py",
         "fastapi/params.py",
         "fastapi/encoders.py",
+        "fastapi/utils.py",
         "fastapi/_compat/__init__.py",
-        "tests/test_compat.py",
+        "pyproject.toml",
         ".pre-commit-config.yaml",
-        "fastapi/dependencies/models.py",
-        "tests/test_forms_single_model.py",
-        "docs/en/mkdocs.yml",
         "fastapi/_compat/shared.py",
-        "fastapi/param_functions.py",
-        "uv.lock"
+        "fastapi/param_functions.py"
       ],
-      "returned_count": 16,
-      "files_available": 16,
-      "files_included": 16,
-      "tokens_used": 1368,
+      "returned_count": 12,
+      "files_available": 21,
+      "files_included": 12,
+      "tokens_used": 1532,
       "token_budget": 6000,
       "recall_at_5": 0.6667,
+      "candidate_pool_recall": 0.6667,
+      "pre_mmr_recall_at_5": 0.6667,
       "mrr": 1.0,
       "ndcg_at_10": 0.5525,
-      "token_efficiency": 0.0015,
+      "token_efficiency": 0.0013,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 6244.31,
-      "reduction_vs_agent": 211.92,
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15589 (\u267b\ufe0f Do not accept underscore headers when using `convert_underscores=True` (the d)."
+      "reduction_vs_corpus": 5575.86,
+      "reduction_vs_agent": 189.23,
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15589 (\u267b\ufe0f Do not accept underscore headers when using `convert_underscores=True` (the d).",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_pr_15588",
@@ -3375,11 +3528,11 @@
         "fastapi/__main__.py"
       ],
       "returned_paths": [
+        "fastapi/__main__.py",
         "fastapi/exception_handlers.py",
         "fastapi/__init__.py",
-        "fastapi/__main__.py",
-        "fastapi/cli.py",
         "fastapi/concurrency.py",
+        "fastapi/cli.py",
         "fastapi/background.py",
         "fastapi/datastructures.py",
         "fastapi/encoders.py",
@@ -3389,24 +3542,38 @@
       "returned_count": 10,
       "files_available": 10,
       "files_included": 10,
-      "tokens_used": 1029,
+      "tokens_used": 1282,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0029,
+      "ndcg_at_10": 0.8175,
+      "token_efficiency": 0.0023,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/routing.py",
         "fastapi/applications.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 8301.47,
-      "reduction_vs_agent": 281.73,
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15588 (\u267b\ufe0f Validate Server Sent Event fields to avoid applications from sending broken d)."
+      "reduction_vs_corpus": 6663.19,
+      "reduction_vs_agent": 226.13,
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15588 (\u267b\ufe0f Validate Server Sent Event fields to avoid applications from sending broken d).",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_pr_15101",
@@ -3426,42 +3593,51 @@
         "fastapi/dependencies/utils.py",
         "fastapi/routing.py",
         "fastapi/_compat/v2.py",
-        "fastapi/datastructures.py",
-        "fastapi/exception_handlers.py",
-        "fastapi/__init__.py",
-        "fastapi/param_functions.py",
-        "fastapi/__main__.py",
         "fastapi/applications.py",
+        "fastapi/datastructures.py",
         "fastapi/utils.py",
-        "fastapi/cli.py",
-        "fastapi/types.py",
-        "fastapi/concurrency.py",
+        "fastapi/param_functions.py",
         "pyproject.toml",
-        "fastapi/background.py",
-        "fastapi/exceptions.py",
-        "tests/test_jsonable_encoder.py"
+        "fastapi/types.py",
+        "fastapi/__main__.py",
+        "fastapi/exception_handlers.py",
+        "fastapi/__init__.py"
       ],
-      "returned_count": 17,
+      "returned_count": 12,
       "files_available": 17,
-      "files_included": 17,
-      "tokens_used": 1709,
+      "files_included": 12,
+      "tokens_used": 1487,
       "token_budget": 6000,
       "recall_at_5": 0.6667,
+      "candidate_pool_recall": 0.6667,
+      "pre_mmr_recall_at_5": 0.6667,
       "mrr": 1.0,
       "ndcg_at_10": 0.42,
-      "token_efficiency": 0.0012,
+      "token_efficiency": 0.0013,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 4998.37,
-      "reduction_vs_agent": 169.63,
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15101 (\u2b06\ufe0f Update Pydantic v2 code to address deprecations (#15101))."
+      "reduction_vs_corpus": 5744.6,
+      "reduction_vs_agent": 194.96,
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15101 (\u2b06\ufe0f Update Pydantic v2 code to address deprecations (#15101)).",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_pr_15149",
@@ -3478,12 +3654,12 @@
         "fastapi/__main__.py"
       ],
       "returned_paths": [
-        "fastapi/exception_handlers.py",
-        "fastapi/__init__.py",
         "fastapi/__main__.py",
+        "fastapi/exception_handlers.py",
         "fastapi/sse.py",
-        "fastapi/cli.py",
+        "fastapi/__init__.py",
         "fastapi/concurrency.py",
+        "fastapi/cli.py",
         "fastapi/background.py",
         "fastapi/exceptions.py",
         "fastapi/datastructures.py",
@@ -3493,24 +3669,38 @@
       "returned_count": 11,
       "files_available": 11,
       "files_included": 11,
-      "tokens_used": 1142,
+      "tokens_used": 1434,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 1.0,
-      "token_efficiency": 0.0026,
+      "ndcg_at_10": 0.7884,
+      "token_efficiency": 0.0021,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 7480.05,
-      "reduction_vs_agent": 253.86,
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15149 (\u2b06\ufe0f Support free-threaded Python 3.14t (#15149))."
+      "reduction_vs_corpus": 5956.91,
+      "reduction_vs_agent": 202.16,
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15149 (\u2b06\ufe0f Support free-threaded Python 3.14t (#15149)).",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_pr_15363",
@@ -3523,42 +3713,57 @@
       "query": "",
       "expected_top_files": [
         "tests/test_vibe.py",
-        "fastapi/routing.py",
-        "pyproject.toml"
+        "fastapi/routing.py"
       ],
       "returned_paths": [
         "fastapi/routing.py",
-        "pyproject.toml",
         "fastapi/openapi/utils.py",
+        "fastapi/encoders.py",
         "fastapi/openapi/docs.py",
-        "docs/en/mkdocs.yml",
         "fastapi/security/api_key.py",
         "fastapi/param_functions.py",
-        "fastapi/encoders.py",
         "fastapi/security/oauth2.py",
-        "fastapi/security/http.py"
+        "fastapi/security/http.py",
+        "pyproject.toml",
+        "fastapi/params.py",
+        "fastapi/middleware/asyncexitstack.py",
+        "fastapi/exception_handlers.py"
       ],
-      "returned_count": 10,
-      "files_available": 10,
-      "files_included": 10,
-      "tokens_used": 846,
+      "returned_count": 12,
+      "files_available": 22,
+      "files_included": 12,
+      "tokens_used": 1516,
       "token_budget": 6000,
-      "recall_at_5": 0.6667,
+      "recall_at_5": 0.5,
+      "candidate_pool_recall": 0.5,
+      "pre_mmr_recall_at_5": 0.5,
       "mrr": 1.0,
-      "ndcg_at_10": 0.5525,
-      "token_efficiency": 0.0024,
+      "ndcg_at_10": 0.3801,
+      "token_efficiency": 0.0007,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.5,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 10097.18,
-      "reduction_vs_agent": 342.68,
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15363 (\ud83d\udd25 Remove April Fool's `@app.vibe()` \ud83e\udd2a (#15363))."
+      "reduction_vs_corpus": 5634.71,
+      "reduction_vs_agent": 191.23,
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15363 (\ud83d\udd25 Remove April Fool's `@app.vibe()` \ud83e\udd2a (#15363)). [gold cleaned: removed release/packaging/CI files]",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "fastapi_pr_15280",
@@ -3571,42 +3776,57 @@
       "query": "",
       "expected_top_files": [
         "tests/test_vibe.py",
-        "fastapi/routing.py",
-        "pyproject.toml"
+        "fastapi/routing.py"
       ],
       "returned_paths": [
         "fastapi/routing.py",
-        "pyproject.toml",
         "fastapi/openapi/utils.py",
+        "fastapi/encoders.py",
         "fastapi/openapi/docs.py",
-        "docs/en/mkdocs.yml",
         "fastapi/security/api_key.py",
         "fastapi/param_functions.py",
-        "fastapi/encoders.py",
         "fastapi/security/oauth2.py",
-        "fastapi/security/http.py"
+        "fastapi/security/http.py",
+        "pyproject.toml",
+        "fastapi/params.py",
+        "fastapi/middleware/asyncexitstack.py",
+        "fastapi/exception_handlers.py"
       ],
-      "returned_count": 10,
-      "files_available": 10,
-      "files_included": 10,
-      "tokens_used": 846,
+      "returned_count": 12,
+      "files_available": 22,
+      "files_included": 12,
+      "tokens_used": 1516,
       "token_budget": 6000,
-      "recall_at_5": 0.6667,
+      "recall_at_5": 0.5,
+      "candidate_pool_recall": 0.5,
+      "pre_mmr_recall_at_5": 0.5,
       "mrr": 1.0,
-      "ndcg_at_10": 0.5525,
-      "token_efficiency": 0.0024,
+      "ndcg_at_10": 0.3801,
+      "token_efficiency": 0.0007,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/en/docs/release-notes.md",
         "fastapi/applications.py",
         "fastapi/routing.py"
       ],
       "agent_baseline_tokens": 289904,
+      "agent_recall_at_5": 0.5,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 8542214,
-      "reduction_vs_corpus": 10097.18,
-      "reduction_vs_agent": 342.68,
-      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15280 (\u2728 Add support for `@app.vibe()` (#15280))."
+      "reduction_vs_corpus": 5634.71,
+      "reduction_vs_agent": 191.23,
+      "notes": "PR-sourced case from https://github.com/fastapi/fastapi/pull/15280 (\u2728 Add support for `@app.vibe()` (#15280)). [gold cleaned: removed release/packaging/CI files]",
+      "retrieval_confidence": {
+        "score": 1.0,
+        "level": "high",
+        "signals": [
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "httpx_httpx___init___py",
@@ -3627,95 +3847,51 @@
         "httpx/_models.py",
         "httpx/_exceptions.py",
         "httpx/_config.py",
-        "httpx/_transports/asgi.py",
         "httpx/_utils.py",
-        "httpx/_main.py",
-        "httpx/_content.py",
-        "httpx/_urls.py",
-        "httpx/_types.py",
-        "httpx/_status_codes.py",
-        "httpx/_auth.py",
-        "httpx/_decoders.py",
+        "httpx/_transports/asgi.py",
         "httpx/__version__.py",
+        "httpx/_decoders.py",
         "httpx/_api.py",
-        "tests/client/test_redirects.py",
-        "tests/test_config.py",
-        "tests/test_multipart.py",
-        "tests/client/test_client.py",
-        "tests/client/test_auth.py",
-        "tests/client/test_proxies.py",
-        "tests/client/test_async_client.py"
+        "httpx/_status_codes.py",
+        "httpx/_urls.py",
+        "httpx/_types.py"
       ],
-      "returned_count": 22,
+      "returned_count": 12,
       "files_available": 22,
-      "files_included": 22,
-      "tokens_used": 2211,
+      "files_included": 12,
+      "tokens_used": 1446,
       "token_budget": 6000,
       "recall_at_5": 0.3333,
+      "candidate_pool_recall": 0.6667,
+      "pre_mmr_recall_at_5": 0.3333,
       "mrr": 1.0,
       "ndcg_at_10": 0.63,
-      "token_efficiency": 0.0009,
+      "token_efficiency": 0.0007,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "tests/client/test_auth.py",
         "tests/client/test_redirects.py",
         "CHANGELOG.md"
       ],
       "agent_baseline_tokens": 25282,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.5,
       "corpus_tokens": 868441,
-      "reduction_vs_corpus": 392.78,
-      "reduction_vs_agent": 11.43,
-      "notes": "Auto-generated from graph neighbours of httpx/__init__.py."
-    },
-    {
-      "case_id": "httpx_httpx___version___py",
-      "repo_key": "httpx",
-      "category": "co_change",
-      "repo_root": "bench/httpx",
-      "seed_files": [
-        "httpx/__version__.py"
-      ],
-      "query": "",
-      "expected_top_files": [
-        "CHANGELOG.md",
-        "setup.py",
-        "README.md"
-      ],
-      "returned_paths": [
-        "CHANGELOG.md",
-        "httpx/_content.py",
-        "README.md",
-        "httpx/_auth.py",
-        "httpx/_api.py",
-        "httpx/_decoders.py",
-        "httpx/_exceptions.py",
-        "httpx/_config.py",
-        "httpx/_client.py",
-        "httpx/__init__.py",
-        "docs/index.md"
-      ],
-      "returned_count": 11,
-      "files_available": 11,
-      "files_included": 11,
-      "tokens_used": 1082,
-      "token_budget": 6000,
-      "recall_at_5": 0.6667,
-      "mrr": 1.0,
-      "ndcg_at_10": 0.735,
-      "token_efficiency": 0.0018,
-      "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
-      "agent_baseline_paths": [
-        "tests/client/test_auth.py",
-        "tests/client/test_redirects.py",
-        "CHANGELOG.md"
-      ],
-      "agent_baseline_tokens": 25282,
-      "corpus_tokens": 868441,
-      "reduction_vs_corpus": 802.63,
-      "reduction_vs_agent": 23.37,
-      "notes": "Auto-generated from graph neighbours of httpx/__version__.py."
+      "reduction_vs_corpus": 600.58,
+      "reduction_vs_agent": 17.48,
+      "notes": "Auto-generated from graph neighbours of httpx/__init__.py.",
+      "retrieval_confidence": {
+        "score": 0.82,
+        "level": "high",
+        "signals": [
+          "sparse_graph",
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "httpx_httpx__api_py",
@@ -3733,40 +3909,54 @@
       ],
       "returned_paths": [
         "httpx/_client.py",
-        "httpx/_types.py",
         "httpx/_config.py",
+        "httpx/_types.py",
         "httpx/_models.py",
         "httpx/_transports/default.py",
         "httpx/_urls.py",
-        "httpx/_content.py",
-        "httpx/_auth.py",
-        "httpx/_decoders.py",
-        "httpx/_exceptions.py",
-        "httpx/__version__.py",
         "httpx/__init__.py",
-        "docs/compatibility.md"
+        "httpx/__version__.py",
+        "httpx/_auth.py",
+        "httpx/_exceptions.py",
+        "httpx/_decoders.py",
+        "httpx/_content.py"
       ],
-      "returned_count": 13,
+      "returned_count": 12,
       "files_available": 13,
-      "files_included": 13,
-      "tokens_used": 1280,
+      "files_included": 12,
+      "tokens_used": 1424,
       "token_budget": 6000,
       "recall_at_5": 1.0,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 1.0,
       "mrr": 1.0,
-      "ndcg_at_10": 0.9725,
-      "token_efficiency": 0.0023,
+      "ndcg_at_10": 1.0,
+      "token_efficiency": 0.0021,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "tests/client/test_auth.py",
         "tests/client/test_redirects.py",
         "CHANGELOG.md"
       ],
       "agent_baseline_tokens": 25282,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 868441,
-      "reduction_vs_corpus": 678.47,
-      "reduction_vs_agent": 19.75,
-      "notes": "Auto-generated from graph neighbours of httpx/_api.py."
+      "reduction_vs_corpus": 609.86,
+      "reduction_vs_agent": 17.75,
+      "notes": "Auto-generated from graph neighbours of httpx/_api.py.",
+      "retrieval_confidence": {
+        "score": 0.82,
+        "level": "high",
+        "signals": [
+          "sparse_graph",
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "httpx_httpx__auth_py",
@@ -3788,35 +3978,50 @@
         "httpx/_config.py",
         "httpx/__init__.py",
         "httpx/_utils.py",
+        "httpx/__version__.py",
+        "httpx/_api.py",
         "httpx/_content.py",
         "httpx/_decoders.py",
         "httpx/_exceptions.py",
-        "httpx/__version__.py",
-        "httpx/_api.py",
-        "tests/test_auth.py",
-        "tests/client/test_auth.py"
+        "tests/client/test_auth.py",
+        "tests/test_auth.py"
       ],
       "returned_count": 12,
       "files_available": 12,
       "files_included": 12,
-      "tokens_used": 1188,
+      "tokens_used": 1437,
       "token_budget": 6000,
       "recall_at_5": 0.6667,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.6667,
       "mrr": 1.0,
       "ndcg_at_10": 0.7625,
-      "token_efficiency": 0.0025,
+      "token_efficiency": 0.0021,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "tests/client/test_auth.py",
         "tests/client/test_redirects.py",
         "CHANGELOG.md"
       ],
       "agent_baseline_tokens": 25282,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 1.0,
       "corpus_tokens": 868441,
-      "reduction_vs_corpus": 731.01,
-      "reduction_vs_agent": 21.28,
-      "notes": "Auto-generated from graph neighbours of httpx/_auth.py."
+      "reduction_vs_corpus": 604.34,
+      "reduction_vs_agent": 17.59,
+      "notes": "Auto-generated from graph neighbours of httpx/_auth.py.",
+      "retrieval_confidence": {
+        "score": 0.82,
+        "level": "high",
+        "signals": [
+          "sparse_graph",
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "httpx_httpx__client_py",
@@ -3835,51 +4040,53 @@
       "returned_paths": [
         "httpx/_models.py",
         "httpx/_utils.py",
-        "httpx/_types.py",
-        "httpx/_api.py",
         "httpx/__init__.py",
+        "httpx/_api.py",
+        "httpx/_types.py",
         "httpx/_config.py",
-        "httpx/_transports/default.py",
         "httpx/_exceptions.py",
+        "httpx/_transports/default.py",
         "httpx/_auth.py",
         "httpx/_transports/asgi.py",
         "httpx/_transports/wsgi.py",
-        "httpx/_content.py",
-        "httpx/_urls.py",
-        "CHANGELOG.md",
-        "httpx/_status_codes.py",
-        "httpx/_transports/base.py",
-        "httpx/_decoders.py",
-        "httpx/__version__.py",
-        "tests/client/test_client.py",
-        "docs/api.md",
-        "tests/test_utils.py",
-        "tests/models/test_responses.py",
-        "tests/test_config.py",
-        "tests/client/test_proxies.py",
-        "docs/compatibility.md"
+        "httpx/__version__.py"
       ],
-      "returned_count": 25,
+      "returned_count": 12,
       "files_available": 25,
-      "files_included": 25,
-      "tokens_used": 2502,
+      "files_included": 12,
+      "tokens_used": 1471,
       "token_budget": 6000,
       "recall_at_5": 0.6667,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.6667,
       "mrr": 1.0,
       "ndcg_at_10": 0.7625,
-      "token_efficiency": 0.0012,
+      "token_efficiency": 0.0014,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "tests/client/test_auth.py",
         "tests/client/test_redirects.py",
         "CHANGELOG.md"
       ],
       "agent_baseline_tokens": 25282,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 868441,
-      "reduction_vs_corpus": 347.1,
-      "reduction_vs_agent": 10.1,
-      "notes": "Auto-generated from graph neighbours of httpx/_client.py."
+      "reduction_vs_corpus": 590.37,
+      "reduction_vs_agent": 17.19,
+      "notes": "Auto-generated from graph neighbours of httpx/_client.py.",
+      "retrieval_confidence": {
+        "score": 0.82,
+        "level": "high",
+        "signals": [
+          "sparse_graph",
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "httpx_httpx__compat_py",
@@ -3891,44 +4098,58 @@
       ],
       "query": "",
       "expected_top_files": [
-        "README.md",
         "docs/index.md",
         "httpx/_config.py"
       ],
       "returned_paths": [
         "httpx/_config.py",
         "httpx/_client.py",
-        "httpx/_content.py",
-        "httpx/_auth.py",
-        "httpx/_decoders.py",
-        "httpx/_exceptions.py",
+        "httpx/__init__.py",
         "httpx/__version__.py",
         "httpx/_api.py",
-        "httpx/__init__.py",
+        "httpx/_auth.py",
+        "httpx/_content.py",
+        "httpx/_decoders.py",
+        "httpx/_exceptions.py",
         "README.md",
         "docs/index.md"
       ],
       "returned_count": 11,
       "files_available": 11,
       "files_included": 11,
-      "tokens_used": 1078,
+      "tokens_used": 1294,
       "token_budget": 6000,
-      "recall_at_5": 0.3333,
+      "recall_at_5": 0.5,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.5,
       "mrr": 1.0,
-      "ndcg_at_10": 0.3921,
-      "token_efficiency": 0.0028,
+      "ndcg_at_10": 0.3801,
+      "token_efficiency": 0.0015,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "tests/client/test_auth.py",
         "tests/client/test_redirects.py",
         "CHANGELOG.md"
       ],
       "agent_baseline_tokens": 25282,
+      "agent_recall_at_5": 0.0,
+      "agent_mrr": 0.0,
       "corpus_tokens": 868441,
-      "reduction_vs_corpus": 805.6,
-      "reduction_vs_agent": 23.45,
-      "notes": "Auto-generated from graph neighbours of httpx/_compat.py."
+      "reduction_vs_corpus": 671.13,
+      "reduction_vs_agent": 19.54,
+      "notes": "Auto-generated from graph neighbours of httpx/_compat.py. [gold cleaned: removed release/packaging/CI files]",
+      "retrieval_confidence": {
+        "score": 0.82,
+        "level": "high",
+        "signals": [
+          "sparse_graph",
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "httpx_concept_00",
@@ -3944,57 +4165,58 @@
       ],
       "returned_paths": [
         "httpx/_client.py",
-        "httpx/_transports/base.py",
-        "httpx/_urls.py",
-        "httpx/_content.py",
-        "httpx/_types.py",
-        "httpx/_transports/default.py",
-        "httpx/_status_codes.py",
-        "httpx/_auth.py",
-        "httpx/_decoders.py",
-        "httpx/_exceptions.py",
-        "httpx/_api.py",
-        "httpx/_utils.py",
-        "httpx/_config.py",
         "httpx/_models.py",
-        "httpx/__version__.py",
-        "httpx/__init__.py",
-        "tests/client/test_client.py",
-        "docs/advanced/extensions.md",
-        "tests/client/test_proxies.py",
-        "tests/client/test_redirects.py",
-        "tests/client/test_headers.py",
-        "tests/client/test_properties.py",
-        "tests/models/test_url.py",
-        "tests/client/test_auth.py",
-        "tests/test_asgi.py",
-        "docs/advanced/clients.md",
-        "docs/async.md",
-        "tests/client/test_async_client.py",
-        "docs/advanced/transports.md",
-        "docs/advanced/proxies.md"
+        "httpx/_auth.py",
+        "httpx/_status_codes.py",
+        "httpx/_transports/asgi.py",
+        "httpx/_config.py",
+        "httpx/_transports/default.py",
+        "httpx/_exceptions.py",
+        "httpx/_main.py",
+        "httpx/_urls.py",
+        "httpx/_api.py",
+        "httpx/_transports/wsgi.py"
       ],
-      "returned_count": 30,
-      "files_available": 30,
-      "files_included": 30,
-      "tokens_used": 3083,
+      "returned_count": 12,
+      "files_available": 31,
+      "files_included": 12,
+      "tokens_used": 1720,
       "token_budget": 8000,
       "recall_at_5": 0.3333,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.3333,
       "mrr": 1.0,
-      "ndcg_at_10": 0.7796,
-      "token_efficiency": 0.001,
+      "ndcg_at_10": 0.8448,
+      "token_efficiency": 0.0017,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "tests/models/whatwg.json",
         "CHANGELOG.md",
         "httpx/_client.py"
       ],
       "agent_baseline_tokens": 104812,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 868441,
-      "reduction_vs_corpus": 281.69,
-      "reduction_vs_agent": 34.0,
-      "notes": "Query-first concept case: HTTP client connection pooling"
+      "reduction_vs_corpus": 504.91,
+      "reduction_vs_agent": 60.94,
+      "notes": "Query-first concept case: HTTP client connection pooling",
+      "retrieval_confidence": {
+        "score": 0.82,
+        "level": "high",
+        "signals": [
+          "sparse_graph",
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "backend": "bm25",
+          "prefer_bm25": true,
+          "index_present": true,
+          "bm25_empty_fallback": false,
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "httpx_concept_01",
@@ -4009,63 +4231,59 @@
         "httpx/_transports/asgi.py"
       ],
       "returned_paths": [
-        "httpx/_client.py",
-        ".github/PULL_REQUEST_TEMPLATE.md",
-        ".github/ISSUE_TEMPLATE/config.yml",
-        ".github/FUNDING.yml",
-        "tests/client/test_async_client.py",
-        "httpx/_models.py",
+        "httpx/_transports/asgi.py",
         "httpx/_transports/base.py",
-        "httpx/_content.py",
-        "httpx/_types.py",
-        "httpx/_urls.py",
-        "httpx/_status_codes.py",
-        "httpx/_auth.py",
-        "httpx/_decoders.py",
-        "httpx/__version__.py",
-        "httpx/_exceptions.py",
-        "httpx/_config.py",
-        "httpx/_api.py",
-        "tests/test_content.py",
-        "httpx/_utils.py",
-        "httpx/__init__.py",
         "httpx/_transports/default.py",
-        "tests/models/test_requests.py",
-        "tests/client/test_auth.py",
-        "docs/advanced/clients.md",
-        "tests/client/test_redirects.py",
-        ".github/ISSUE_TEMPLATE/1-issue.md",
-        "tests/client/test_client.py",
-        "tests/test_asgi.py",
-        ".github/CONTRIBUTING.md",
-        "tests/test_multipart.py",
-        "docs/async.md",
-        "tests/test_auth.py",
-        "tests/models/test_responses.py",
-        "docs/advanced/authentication.md",
-        "docs/advanced/transports.md"
+        "httpx/_transports/mock.py",
+        "httpx/_client.py",
+        "httpx/_models.py",
+        "httpx/_transports/wsgi.py",
+        "httpx/_auth.py",
+        "httpx/_exceptions.py",
+        "httpx/_api.py",
+        "httpx/_status_codes.py",
+        "httpx/_content.py"
       ],
-      "returned_count": 35,
-      "files_available": 35,
-      "files_included": 35,
-      "tokens_used": 3593,
+      "returned_count": 12,
+      "files_available": 34,
+      "files_included": 12,
+      "tokens_used": 1732,
       "token_budget": 8000,
-      "recall_at_5": 0.3333,
+      "recall_at_5": 0.6667,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.6667,
       "mrr": 1.0,
-      "ndcg_at_10": 0.7796,
-      "token_efficiency": 0.0006,
+      "ndcg_at_10": 0.6033,
+      "token_efficiency": 0.0017,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "httpx/_client.py",
         "tests/client/test_auth.py",
         "tests/test_content.py"
       ],
       "agent_baseline_tokens": 30317,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 1.0,
       "corpus_tokens": 868441,
-      "reduction_vs_corpus": 241.7,
-      "reduction_vs_agent": 8.44,
-      "notes": "Query-first concept case: async client request streaming"
+      "reduction_vs_corpus": 501.41,
+      "reduction_vs_agent": 17.5,
+      "notes": "Query-first concept case: async client request streaming",
+      "retrieval_confidence": {
+        "score": 0.82,
+        "level": "high",
+        "signals": [
+          "sparse_graph",
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "backend": "bm25",
+          "prefer_bm25": true,
+          "index_present": true,
+          "bm25_empty_fallback": false,
+          "leiden_fallback": true
+        }
+      }
     },
     {
       "case_id": "httpx_concept_02",
@@ -4081,42 +4299,58 @@
       ],
       "returned_paths": [
         "httpx/_auth.py",
-        "httpx/_client.py",
-        "CHANGELOG.md",
-        "docs/advanced/authentication.md",
-        "mkdocs.yml",
-        "README.md",
-        "httpx/_status_codes.py",
-        "httpx/_exceptions.py",
-        "httpx/_config.py",
         "httpx/__init__.py",
-        "tests/client/test_auth.py",
-        "tests/models/test_requests.py",
-        "docs/quickstart.md",
-        "docs/third_party_packages.md",
-        "tests/test_auth.py"
+        "httpx/_client.py",
+        "httpx/_status_codes.py",
+        "httpx/_config.py",
+        "httpx/_exceptions.py",
+        "httpx/_api.py",
+        "httpx/__version__.py",
+        "httpx/_decoders.py",
+        "httpx/_content.py",
+        "httpx/_transports/base.py",
+        "httpx/_main.py"
       ],
-      "returned_count": 15,
-      "files_available": 15,
-      "files_included": 15,
-      "tokens_used": 1505,
+      "returned_count": 12,
+      "files_available": 20,
+      "files_included": 12,
+      "tokens_used": 1605,
       "token_budget": 8000,
       "recall_at_5": 0.6667,
+      "candidate_pool_recall": 1.0,
+      "pre_mmr_recall_at_5": 0.6667,
       "mrr": 1.0,
-      "ndcg_at_10": 0.895,
-      "token_efficiency": 0.0013,
+      "ndcg_at_10": 0.84,
+      "token_efficiency": 0.0012,
       "budget_honesty": 1.0,
-      "payload_honesty": 1.0,
+      "payload_honesty": 0.0,
       "agent_baseline_paths": [
         "docs/advanced/authentication.md",
         "tests/client/test_auth.py",
         "httpx/_auth.py"
       ],
       "agent_baseline_tokens": 12541,
+      "agent_recall_at_5": 0.3333,
+      "agent_mrr": 0.3333,
       "corpus_tokens": 868441,
-      "reduction_vs_corpus": 577.04,
-      "reduction_vs_agent": 8.33,
-      "notes": "Query-first concept case: authentication BasicAuth DigestAuth"
+      "reduction_vs_corpus": 541.08,
+      "reduction_vs_agent": 7.81,
+      "notes": "Query-first concept case: authentication BasicAuth DigestAuth",
+      "retrieval_confidence": {
+        "score": 0.82,
+        "level": "high",
+        "signals": [
+          "sparse_graph",
+          "fallback:leiden_to_components"
+        ],
+        "fallbacks": {
+          "backend": "bm25",
+          "prefer_bm25": true,
+          "index_present": true,
+          "bm25_empty_fallback": false,
+          "leiden_fallback": true
+        }
+      }
     }
   ]
 }

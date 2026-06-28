@@ -16,7 +16,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass, replace
 from pathlib import Path
 
-from .ablation import ABLATION_SIGNALS
+from .ablation import ABLATION_SIGNALS, FEATURE_ABLATION_ENV
 from .compress_stack import (
     aggregate_compress_stack,
     build_compress_stack_block,
@@ -124,6 +124,14 @@ def recall_at_k(ranked: list[str], expected: list[str], k: int) -> float:
     if not expected:
         return 1.0
     hits = len(set(ranked[:k]) & set(expected))
+    return hits / len(expected)
+
+
+def candidate_pool_recall(pool: list[str], expected: list[str]) -> float:
+    """Fraction of expected files present anywhere in the stage-1 candidate pool."""
+    if not expected:
+        return 1.0
+    hits = len(set(pool) & set(expected))
     return hits / len(expected)
 
 
@@ -285,6 +293,8 @@ def _run_case(
         raise RuntimeError(f"Case {case.case_id}: {response['error']}")
 
     ranked = [entry["path"] for entry in response.get("context_files", [])]
+    candidate_pool = list(response.get("candidate_pool_paths") or [])
+    pre_mmr = list(response.get("pre_mmr_paths") or [])
     tokens_used = int(response.get("tokens_used", 0))
     expected_hits = len(set(ranked) & set(case.expected_top_files))
 
@@ -307,6 +317,10 @@ def _run_case(
         "tokens_used": tokens_used,
         "token_budget": case.token_budget,
         "recall_at_5": round(recall_at_k(ranked, case.expected_top_files, 5), 4),
+        "candidate_pool_recall": round(
+            candidate_pool_recall(candidate_pool, case.expected_top_files), 4
+        ),
+        "pre_mmr_recall_at_5": round(recall_at_k(pre_mmr, case.expected_top_files, 5), 4),
         "mrr": round(mrr(ranked, case.expected_top_files), 4),
         "ndcg_at_10": round(ndcg_at_k(ranked, case.expected_top_files, 10), 4),
         "token_efficiency": token_efficiency(tokens_used, expected_hits),
@@ -395,8 +409,8 @@ def aggregate_results(results: list[dict]) -> dict:
             "median_reduction_vs_agent": 0.0,
         }
 
-    def mean(key: str) -> float:
-        return round(sum(r[key] for r in results) / count, 4)
+    def mean(key: str, default: float = 0.0) -> float:
+        return round(sum(float(r.get(key, default)) for r in results) / count, 4)
 
     def median(key: str) -> float:
         values = sorted(float(r[key]) for r in results)
@@ -408,6 +422,8 @@ def aggregate_results(results: list[dict]) -> dict:
     return {
         "cases": count,
         "mean_recall_at_5": mean("recall_at_5"),
+        "mean_candidate_pool_recall": mean("candidate_pool_recall"),
+        "mean_pre_mmr_recall_at_5": mean("pre_mmr_recall_at_5"),
         "mean_mrr": mean("mrr"),
         "mean_ndcg_at_10": mean("ndcg_at_10"),
         "mean_tokens_used": round(sum(r["tokens_used"] for r in results) / count, 2),
@@ -760,6 +776,40 @@ def run_evaluation(
     results: list[dict] = []
     feedback_log = not isolate_cases
 
+    # A regression gate must be deterministic. Auto co-change decay mutates the graph
+    # on the first context request (and varies with commit age / wall clock), so
+    # suppress it for the duration of the eval — we measure ranking, not graph age.
+    _decay_prev = os.environ.get("PCG_EDGE_DECAY")
+    os.environ["PCG_EDGE_DECAY"] = "0"
+    try:
+        return _run_evaluation_inner(
+            repo_overrides,
+            golden_dir,
+            results,
+            feedback_log,
+            update_golden=update_golden,
+            compress_stack=compress_stack,
+            isolate_learning=isolate_learning,
+            isolate_cases=isolate_cases,
+        )
+    finally:
+        if _decay_prev is None:
+            os.environ.pop("PCG_EDGE_DECAY", None)
+        else:
+            os.environ["PCG_EDGE_DECAY"] = _decay_prev
+
+
+def _run_evaluation_inner(
+    repo_overrides: dict[str, Path],
+    golden_dir: Path,
+    results: list[dict],
+    feedback_log: bool,
+    *,
+    update_golden: bool,
+    compress_stack: bool,
+    isolate_learning: bool,
+    isolate_cases: bool,
+) -> dict:
     for repo_key, repo_root in sorted(repo_overrides.items()):
         if isolate_learning:
             clear_learning_state(repo_root)
@@ -813,6 +863,49 @@ def ablation_env(signal: str):
             os.environ[key] = prev
 
 
+@contextmanager
+def feature_ablation_env(feature: str):
+    """Temporarily disable a default-on feature via its env var."""
+    env_key, off_value = FEATURE_ABLATION_ENV[feature]
+    prev = os.environ.get(env_key)
+    os.environ[env_key] = off_value
+    try:
+        yield
+    finally:
+        if prev is None:
+            os.environ.pop(env_key, None)
+        else:
+            os.environ[env_key] = prev
+
+
+def format_ablation_table(study: dict) -> str:
+    """Render ablation deltas as a fixed-width table for CI logs."""
+    baseline = study["baseline"]
+    lines = [
+        "Per-signal ablation (delta vs current config)",
+        f"{'signal':<18} {'recall@5':>8} {'pool':>8} {'pre_mmr':>8} {'delta':>8}",
+        f"{'baseline':<18} {baseline['recall_at_5']:8.4f} "
+        f"{baseline['candidate_pool_recall']:8.4f} "
+        f"{baseline['pre_mmr_recall_at_5']:8.4f} {'—':>8}",
+    ]
+    for row in study["ablations"]:
+        lines.append(
+            f"{row['signal']:<18} {row['recall_at_5']:8.4f} "
+            f"{row['candidate_pool_recall']:8.4f} "
+            f"{row['pre_mmr_recall_at_5']:8.4f} {row['delta']:+8.4f}"
+        )
+    return "\n".join(lines)
+
+
+def _summary_metrics(payload: dict) -> dict[str, float]:
+    summary = payload.get("summary", {})
+    return {
+        "recall_at_5": float(summary.get("mean_recall_at_5", 0.0)),
+        "candidate_pool_recall": float(summary.get("mean_candidate_pool_recall", 0.0)),
+        "pre_mmr_recall_at_5": float(summary.get("mean_pre_mmr_recall_at_5", 0.0)),
+    }
+
+
 def run_ablation_study(
     repo_overrides: dict[str, Path],
     golden_dir: Path | None = None,
@@ -820,24 +913,39 @@ def run_ablation_study(
     compress_stack: bool = False,
 ) -> dict:
     """Run golden eval with each signal ablated; report recall@5 deltas."""
-    baseline = run_evaluation(repo_overrides, golden_dir=golden_dir, compress_stack=compress_stack)
-    baseline_recall = float(baseline.get("summary", {}).get("mean_recall_at_5", 0.0))
+    baseline_run = run_evaluation(
+        repo_overrides, golden_dir=golden_dir, compress_stack=compress_stack
+    )
+    baseline = _summary_metrics(baseline_run)
     rows: list[dict] = []
+
+    def _append_row(signal: str, result: dict) -> None:
+        metrics = _summary_metrics(result)
+        rows.append(
+            {
+                "signal": signal,
+                **metrics,
+                "delta": round(metrics["recall_at_5"] - baseline["recall_at_5"], 4),
+            }
+        )
+
     for signal in ABLATION_SIGNALS:
         with ablation_env(signal):
             result = run_evaluation(
                 repo_overrides, golden_dir=golden_dir, compress_stack=compress_stack
             )
-        recall = float(result.get("summary", {}).get("mean_recall_at_5", 0.0))
-        rows.append(
-            {
-                "signal": signal,
-                "recall_at_5": recall,
-                "delta": round(recall - baseline_recall, 4),
-            }
-        )
+        _append_row(signal, result)
+
+    for signal in FEATURE_ABLATION_ENV:
+        with feature_ablation_env(signal):
+            result = run_evaluation(
+                repo_overrides, golden_dir=golden_dir, compress_stack=compress_stack
+            )
+        _append_row(signal, result)
+
     return {
-        "baseline_recall_at_5": baseline_recall,
+        "baseline_recall_at_5": baseline["recall_at_5"],
+        "baseline": baseline,
         "ablations": rows,
     }
 
@@ -915,16 +1023,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.json:
             print(json.dumps(ablation_result, indent=2))
         else:
-            print("\n" + "=" * 72)
-            print("ABLATION STUDY (recall@5 vs baseline)")
-            print("=" * 72)
-            print(f"baseline recall@5: {ablation_result['baseline_recall_at_5']:.4f}")
-            for row in ablation_result["ablations"]:
-                print(
-                    f"  PCG_ABLATE_{row['signal'].upper():8s} "
-                    f"recall@5={row['recall_at_5']:.4f} delta={row['delta']:+.4f}"
-                )
-            print("=" * 72)
+            print("\n" + format_ablation_table(ablation_result))
         return 0
 
     result = run_evaluation(
@@ -947,6 +1046,8 @@ def main(argv: list[str] | None = None) -> int:
             line = (
                 f"  {res['case_id']:32s} "
                 f"recall@5={res['recall_at_5']:.3f} "
+                f"pool={res.get('candidate_pool_recall', 0.0):.3f} "
+                f"pre_mmr@5={res.get('pre_mmr_recall_at_5', 0.0):.3f} "
                 f"mrr={res['mrr']:.3f} "
                 f"ndcg@10={res['ndcg_at_10']:.3f} "
                 f"tokens={res['tokens_used']:5d} "

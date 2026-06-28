@@ -48,12 +48,13 @@ from .metrics import METRICS, PhaseTimer
 from .policy import apply_context_policy, default_profile
 from .pool import close_store_pool, get_store_pool, open_store
 from .profiles import autodetect_profile, resolve_profile
+from .repo_caches import invalidate_caches
 from .repo_registry import RepoRegistry, build_repo_registry
+from .server_instructions import build_server_instructions
 from .session import (
     clear_session,
     merge_session_already_have,
 )
-from .server_instructions import build_server_instructions
 from .staleness import (
     catch_up_on_connect,
     format_staleness_banner,

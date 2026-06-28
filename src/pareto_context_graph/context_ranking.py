@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import re
 from collections.abc import Callable
 from pathlib import Path, PurePosixPath
 from typing import cast
 
+from .ablation import ablation_enabled
 from .blast import blast_radius, extract_imports, get_file_summary
 from .chunks import KeywordIndex, get_relevant_chunks, get_signatures
 from .deadlines import deadline_tick
@@ -22,6 +24,42 @@ from .store import Store
 from .taxonomy import file_class, is_test_file
 from .tokens import estimate_file_tokens
 from .walk import random_walk_with_restart
+
+# Degree at/below which a file is treated as ordinary (no hub penalty). Only files
+# wired into more than this many co-change partners are "hubs" worth suppressing.
+# Below this floor, raw co-change weight + locality decide the order. Tunable via env.
+HUB_DEGREE_FLOOR = int(os.environ.get("PCG_HUB_DEGREE_FLOOR", "80"))
+
+
+# Strength of the low-degree tie-breaker. Among candidates with equal co-change
+# weight (e.g. directory siblings with no edge), a lower-degree file is the more
+# specific neighbour, so it ranks first. Kept small so it never overrides a real
+# co-change weight difference — it only orders otherwise-tied candidates.
+HUB_TIEBREAK_EPS = float(os.environ.get("PCG_HUB_TIEBREAK_EPS", "0.1"))
+
+
+def hub_penalty_factor(degree: int, strength: float) -> float:
+    """Score divisor that suppresses true hubs without flattening ordinary files.
+
+    A plain ``log2(2 + degree)`` penalizes every moderately-connected file, which
+    inverts ranking when co-change weights have a narrow dynamic range (a junk
+    single-commit sibling with degree 0 then outranks a real co-change partner with
+    degree ~30). Floor the penalty so only degree above ``HUB_DEGREE_FLOOR`` counts.
+    Set ``PCG_ABLATE_HUBFLOOR=1`` to revert to the unfloored penalty for A/B testing.
+    """
+    excess = degree if ablation_enabled("hubfloor") else max(0, degree - HUB_DEGREE_FLOOR)
+    return max(1.0, math.log2(2 + excess) * strength)
+
+
+def hub_tiebreak(degree: int) -> float:
+    """Small score offset so lower-degree (more specific) files win ties.
+
+    Disabled (returns 0) when ``PCG_ABLATE_HUBFLOOR=1`` so the floored-penalty
+    behaviour can be A/B-tested as a single unit against the legacy ranking.
+    """
+    if ablation_enabled("hubfloor"):
+        return 0.0
+    return HUB_TIEBREAK_EPS * math.log2(2 + degree)
 
 
 def mirror_key(path: str) -> tuple[str, str]:
@@ -85,12 +123,13 @@ def apply_file_class_weight(base_score: float, path: str, query_intent: str) -> 
             if path_lower.endswith("openapi/models.py"):
                 multiplier = 4.5
             return base_score * multiplier
-        pure = PurePosixPath(path_lower)
-        if pure.parts and pure.parts[0] == "fastapi" and "/openapi/" not in path_lower:
-            if len(pure.parts) == 2 or (len(pure.parts) == 3 and pure.parts[1] == "_compat"):
-                return base_score * 0.35
-        if path_lower.endswith("routing.py") or kind == "route":
-            return base_score * 0.5
+        if ablation_enabled("openapi_downweight"):
+            pure = PurePosixPath(path_lower)
+            if pure.parts and pure.parts[0] == "fastapi" and "/openapi/" not in path_lower:
+                if len(pure.parts) == 2 or (len(pure.parts) == 3 and pure.parts[1] == "_compat"):
+                    return base_score * 0.35
+            if path_lower.endswith("routing.py") or kind == "route":
+                return base_score * 0.5
     elif query_intent == "test":
         if kind == "test":
             return base_score * 2.0
@@ -333,6 +372,9 @@ def similarity_for_mmr(
     return 0.7 * path_jaccard + 0.3 * sym_jaccard
 
 
+RECALL_PROTECT_RANKS = 5
+
+
 def mmr_select(
     candidates: list[dict],
     limit: int,
@@ -375,14 +417,144 @@ def mmr_select(
     return selected
 
 
+def mmr_select_with_protected_head(
+    candidates: list[dict],
+    limit: int,
+    mmr_lambda: float,
+    *,
+    protect_top: int = RECALL_PROTECT_RANKS,
+    expired_check: Callable[[], bool] | None = None,
+) -> list[dict]:
+    """Keep the top relevance ranks intact; diversify only the tail."""
+    if not candidates:
+        return []
+    if protect_top <= 0 or ablation_enabled("mmr_top5"):
+        return mmr_select(
+            candidates,
+            limit,
+            mmr_lambda,
+            expired_check=expired_check,
+        )
+
+    ranked = sorted(
+        candidates,
+        key=lambda row: -float(row.get("_relevance", row.get("weight", 0))),
+    )
+    head_count = min(protect_top, len(ranked), limit)
+    head = ranked[:head_count]
+    tail_limit = max(0, min(limit, len(ranked)) - head_count)
+    if tail_limit <= 0:
+        return head
+    tail = mmr_select(
+        ranked[head_count:],
+        tail_limit,
+        mmr_lambda,
+        expired_check=expired_check,
+    )
+    return head + tail
+
+
+# Phase 4.3 experiment: rank-phase signal fusion mode. "weighted" (default) is the
+# tuned additive scorer; "rrf" fuses the same signals by reciprocal rank (scale-free,
+# fewer hand weights). Select with PCG_RANK_FUSION=rrf to A/B on the eval.
+RRF_RANK_K = 60
+
+
+def rank_fusion_mode() -> str:
+    return os.environ.get("PCG_RANK_FUSION", "weighted").strip().lower()
+
+
+def rrf_rank_relevance(
+    candidates: list[dict],
+    *,
+    files: list[str],
+    node_degrees: dict[str, int],
+    embed_scores: dict[str, float],
+    query: str,
+    k: int = RRF_RANK_K,
+) -> dict[str, float]:
+    """Reciprocal-rank fusion over the rank-phase signals (4.3 experiment).
+
+    Each signal ranks the candidates independently; a candidate's score is the sum of
+    ``1/(k+rank)`` across signals. Scale-free, so no per-signal magic weights — the
+    A/B counterpart to the tuned additive scorer in ``run_rank_phase``.
+    """
+    paths = [str(c["path"]) for c in candidates]
+    terms = {t for t in (query or "").lower().split() if t}
+
+    def term_hits(path: str) -> float:
+        low = path.lower()
+        return float(sum(1 for t in terms if t in low))
+
+    signals: dict[str, dict[str, float]] = {
+        "co_change": {str(c["path"]): float(c.get("weight", 1) or 0.0) for c in candidates},
+        "locality": {p: locality_multiplier(p, files) for p in paths},
+        "term": {p: term_hits(p) for p in paths},
+        "embed": {p: float(embed_scores.get(p, 0.0)) for p in paths},
+        # Lower degree = more specific neighbour → rank ascending by degree (negate).
+        "specificity": {p: -float(node_degrees.get(p, 0)) for p in paths},
+    }
+    fused = {p: 0.0 for p in paths}
+    for values in signals.values():
+        for rank, path in enumerate(sorted(paths, key=lambda p: -values[p]), start=1):
+            fused[path] += 1.0 / (k + rank)
+    return fused
+
+
 PRIVATE_SIGNATURE = re.compile(
     r"\bdef _\w|\bclass _\w|\bprivate\b|\bprotected\b",
     re.IGNORECASE,
 )
 
+# Declared-name extractor for collapsing overload/dup clusters in tier-2 signatures.
+_SIG_NAME_RE = re.compile(
+    r"^\s*(?:async\s+)?(?:def|class|func|function|fn|sub|method|public|private|"
+    r"protected|static|export|pub)?\s*([A-Za-z_]\w*)"
+)
+# Keep at most this many declarations per name before collapsing the rest into a
+# single "+N more" marker. 0 disables collapsing. Tunable via env.
+TIER2_MAX_PER_NAME = int(os.environ.get("PCG_TIER2_MAX_PER_NAME", "2"))
+
+
+def collapse_signatures(signatures: list[str], *, max_per_name: int = TIER2_MAX_PER_NAME) -> list[str]:
+    """Collapse duplicate / overloaded tier-2 signatures to save token budget.
+
+    Exact duplicates are dropped. When one declared name has more than
+    ``max_per_name`` signatures (overload clusters — common with typing.overload,
+    or C++/Java/TS overloads), keep the first few and append a single
+    ``# … +N more <name>(...) overloads`` marker. Order and unnamed lines are kept.
+    """
+    if max_per_name <= 0:
+        return signatures
+    uniq: list[str] = []
+    seen: set[str] = set()
+    for sig in signatures:
+        s = sig.strip()
+        if s and s not in seen:
+            seen.add(s)
+            uniq.append(s)
+    names = [m.group(1) if (m := _SIG_NAME_RE.match(s)) else None for s in uniq]
+    total: dict[str, int] = {}
+    for nm in names:
+        if nm:
+            total[nm] = total.get(nm, 0) + 1
+    out: list[str] = []
+    kept: dict[str, int] = {}
+    for s, nm in zip(uniq, names):
+        if nm is None:
+            out.append(s)
+            continue
+        if kept.get(nm, 0) < max_per_name:
+            out.append(s)
+            kept[nm] = kept.get(nm, 0) + 1
+            if kept[nm] == max_per_name and total[nm] > max_per_name:
+                out.append(f"# … +{total[nm] - max_per_name} more {nm}(...) overloads")
+    return out
+
 
 def filter_signatures(signatures: list[str], compression: str) -> list[str]:
-    capped = signatures[:20]
+    collapsed = collapse_signatures(signatures)
+    capped = collapsed[:20]
     if compression != "lossy":
         return capped
     public = [sig for sig in capped if not PRIVATE_SIGNATURE.search(sig)]
@@ -460,6 +632,9 @@ def entry_diagnostics(
 ) -> dict:
     path = r["path"]
     degree = node_degrees.get(path, 0)
+    # Raw degree signal for diagnostics and the learned ranker feature — the floored
+    # penalty is applied only in hand-scoring (see hub_penalty_factor), so the ranker
+    # still sees full node degree to learn from.
     hub_penalty = math.log2(2 + degree)
     diag: dict = {
         "co_change": r.get("weight"),

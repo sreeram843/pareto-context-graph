@@ -25,8 +25,8 @@ def format_doctor_text(report: dict[str, Any]) -> str:
         )
     lines.extend(
         [
-        f"Build strategy:  {report.get('build_strategy') or 'unknown'}",
-        f"Build since:     {report.get('last_build_since') or '(none)'}",
+            f"Build strategy:  {report.get('build_strategy') or 'unknown'}",
+            f"Build since:     {report.get('last_build_since') or '(none)'}",
         ]
     )
     age = report.get("graph_age_hours")

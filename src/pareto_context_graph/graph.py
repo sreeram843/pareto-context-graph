@@ -19,8 +19,8 @@ from .indexing import (
     update_search_indexes,
 )
 from .neighbour_cache import compute_top_neighbours_from_merged
-from .repo_config import SearchIndexMode, filter_paths, load_repo_config, resolve_search_index_mode
 from .profiles import resolve_profile
+from .repo_config import SearchIndexMode, filter_paths, load_repo_config, resolve_search_index_mode
 from .spec_index import rebuild_spec_indexes, update_spec_indexes
 from .store import Store
 
@@ -305,9 +305,7 @@ def _finalize_store(
         store.rebuild_top_neighbours(k=50)
     timings.stop("top_neighbours", started)
 
-    mode = search_index_mode or resolve_search_index_mode(
-        repo_root, profile_name=profile_name
-    )
+    mode = search_index_mode or resolve_search_index_mode(repo_root, profile_name=profile_name)
     if mode == "eager":
         started = timings.start("search_indexes")
         index_stats = rebuild_search_indexes(
@@ -455,7 +453,12 @@ def build_graph(
         timings=timings,
     )
     commits = [
-        (commit_hash, commit_ts, subject, _filter_commit_files(repo_root, files, profile_name=profile_name))
+        (
+            commit_hash,
+            commit_ts,
+            subject,
+            _filter_commit_files(repo_root, files, profile_name=profile_name),
+        )
         for commit_hash, commit_ts, subject, files in commits
     ]
 
@@ -609,7 +612,12 @@ def build_graph_sharded(
 
     chunk_size = max(1, math.ceil(len(commits) / shards))
     commits = [
-        (commit_hash, commit_ts, subject, _filter_commit_files(repo_root, files, profile_name=profile_name))
+        (
+            commit_hash,
+            commit_ts,
+            subject,
+            _filter_commit_files(repo_root, files, profile_name=profile_name),
+        )
         for commit_hash, commit_ts, subject, files in commits
     ]
     chunks = [commits[i : i + chunk_size] for i in range(0, len(commits), chunk_size)]

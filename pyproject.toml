@@ -55,6 +55,7 @@ treesitter = [
 igraph = ["igraph"]
 ranker = ["lightgbm>=4.0"]
 watcher = ["watchfiles>=0.21"]
+embeddings = ["fastembed>=0.3"]
 
 [tool.ruff]
 line-length = 100

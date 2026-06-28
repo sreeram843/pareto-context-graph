@@ -10,7 +10,9 @@ from .profiles import autodetect_profile
 from .store import Store
 
 
-def build_architecture_report(repo_root: Path, *, top_hubs: int = 10, top_communities: int = 8) -> str:
+def build_architecture_report(
+    repo_root: Path, *, top_hubs: int = 10, top_communities: int = 8
+) -> str:
     """Markdown report from graph stats, communities, and hubs."""
     store = Store(repo_root)
     try:

@@ -204,7 +204,7 @@ result = cg.context(files=["src/main.py"], query="add logging", tier=1)
 | Architecture + C4 diagrams | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | Run golden eval / regression gate | [tests/eval/README.md](../tests/eval/README.md) |
 | Agent A/B harness (PCG vs grep+read) | [BENCHMARKS.md](BENCHMARKS.md) |
-| OSS benchmark clones | [BENCHMARK_REPOS.md](BENCHMARK_REPOS.md) |
+| OSS benchmark clones | [BENCHMARKS.md](BENCHMARKS.md) |
 | Feedback + `learn` loop | [FEEDBACK.md](FEEDBACK.md) |
 
 ```bash

@@ -86,7 +86,9 @@ def run_pcg_arm(case: EvalCase, repo_root: Path) -> AgentArmResult:
     )
 
 
-def run_baseline_arm(case: EvalCase, repo_root: Path, *, read_limit: int = BASELINE_READ_LIMIT) -> AgentArmResult:
+def run_baseline_arm(
+    case: EvalCase, repo_root: Path, *, read_limit: int = BASELINE_READ_LIMIT
+) -> AgentArmResult:
     query = case.query or " ".join(case.seed_files)
     started = time.perf_counter()
     grep_calls = 0
@@ -189,11 +191,15 @@ def summarize_agent_ab(rows: list[dict]) -> dict:
             "file_reads_reduction_pct": pct_reduction(
                 baseline_summary["file_reads"], pcg_summary["file_reads"]
             ),
-            "tokens_reduction_pct": pct_reduction(baseline_summary["tokens"], pcg_summary["tokens"]),
+            "tokens_reduction_pct": pct_reduction(
+                baseline_summary["tokens"], pcg_summary["tokens"]
+            ),
             "wall_time_reduction_pct": pct_reduction(
                 baseline_summary["wall_time_ms"], pcg_summary["wall_time_ms"]
             ),
-            "recall_at_5_delta": round(pcg_summary["recall_at_5"] - baseline_summary["recall_at_5"], 4),
+            "recall_at_5_delta": round(
+                pcg_summary["recall_at_5"] - baseline_summary["recall_at_5"], 4
+            ),
         },
     }
 

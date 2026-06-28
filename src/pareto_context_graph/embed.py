@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 import struct
 from pathlib import Path
 from typing import Protocol
@@ -92,6 +93,58 @@ class OllamaBackend:
         return vectors
 
 
+class LocalBackend:
+    """Local sentence-embedding model via the optional ``fastembed`` package.
+
+    Not bundled — the default install stays stdlib-only. Enable with
+    ``pip install 'pareto-context-graph[embeddings]'`` (or ``pip install fastembed``)
+    and ``PCG_EMBED_BACKEND=local``. Phase 4.2 ships the selector + A/B harness; the
+    model itself is opt-in.
+    """
+
+    def __init__(self, model: str = "BAAI/bge-small-en-v1.5") -> None:
+        self.model = model
+        self._embedder: object | None = None
+
+    def _load(self) -> object:
+        if self._embedder is None:
+            try:
+                from fastembed import TextEmbedding
+            except ImportError as exc:  # pragma: no cover - exercised only when opted in
+                raise RuntimeError(
+                    "PCG_EMBED_BACKEND=local needs the optional 'fastembed' package: "
+                    "pip install 'pareto-context-graph[embeddings]'"
+                ) from exc
+            self._embedder = TextEmbedding(model_name=self.model)
+        return self._embedder
+
+    def encode(self, texts: list[str]) -> list[list[float]]:
+        embedder = self._load()
+        return [[float(x) for x in vec] for vec in embedder.embed(list(texts))]  # type: ignore[attr-defined]
+
+
+# Registry of named backends. Default stays the dependency-free hash backend so the
+# stdlib-only promise holds; openai/ollama/local are opt-in via PCG_EMBED_BACKEND.
+_BACKEND_ALIASES = {"": "noop", "none": "noop", "hash": "noop", "deterministic": "noop"}
+
+
+def select_embeddings_backend(
+    name: str | None = None, *, dims: int = 32
+) -> EmbeddingsBackend:
+    """Resolve an embeddings backend by name (env ``PCG_EMBED_BACKEND`` by default)."""
+    raw = (name if name is not None else os.environ.get("PCG_EMBED_BACKEND", "noop")).strip().lower()
+    resolved = _BACKEND_ALIASES.get(raw, raw)
+    if resolved == "noop":
+        return DeterministicNoopBackend(dims=dims)
+    if resolved == "openai":
+        return OpenAIBackend()
+    if resolved == "ollama":
+        return OllamaBackend()
+    if resolved in ("local", "fastembed"):
+        return LocalBackend()
+    raise ValueError(f"unknown PCG_EMBED_BACKEND: {raw!r}")
+
+
 def _paths(repo_root: Path) -> list[str]:
     paths: list[str] = []
     for path in repo_root.rglob("*"):
@@ -105,7 +158,11 @@ def _paths(repo_root: Path) -> list[str]:
 
 
 def build_embeddings(repo_root: Path, backend: EmbeddingsBackend | None = None) -> dict:
-    backend = backend or DeterministicNoopBackend()
+    backend_name = os.environ.get("PCG_EMBED_BACKEND", "noop").strip().lower() or "noop"
+    if backend is None:
+        backend = select_embeddings_backend(backend_name)
+    else:
+        backend_name = type(backend).__name__
     paths = _paths(repo_root)
 
     texts: list[str] = []
@@ -134,6 +191,7 @@ def build_embeddings(repo_root: Path, backend: EmbeddingsBackend | None = None) 
             {
                 "dims": dims,
                 "count": len(paths),
+                "backend": backend_name,
                 "paths": paths,
             },
             indent=2,
@@ -190,7 +248,14 @@ def query_embedding_scores(repo_root: Path, query: str, paths: list[str]) -> dic
     if not vec_path.exists():
         return {}
 
-    backend = DeterministicNoopBackend(dims=max(1, dims or 32))
+    # Encode the query with the SAME backend used at build time (recorded in the index)
+    # so the query vector lives in the same space as the stored file vectors. Older
+    # indexes without a recorded backend fall back to the hash backend.
+    backend_name = str(index.get("backend", "noop"))
+    if backend_name in ("noop", "DeterministicNoopBackend"):
+        backend: EmbeddingsBackend = DeterministicNoopBackend(dims=max(1, dims or 32))
+    else:
+        backend = select_embeddings_backend(backend_name, dims=max(1, dims or 32))
     qvec = backend.encode([query])[0]
 
     pos_by_path = {p: i for i, p in enumerate(all_paths)}

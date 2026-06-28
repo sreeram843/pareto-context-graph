@@ -6,10 +6,12 @@ BENCH_DIR ?= $(CURDIR)/bench
 T1_REPOS  ?= fastapi=$(BENCH_DIR)/fastapi httpx=$(BENCH_DIR)/httpx
 BASELINE  ?= tests/eval/baseline.json
 COMPRESS_BASELINE ?= tests/eval/baseline-compress.json
+AGENT_MODEL ?= sonnet
+N_RUNS ?= 4
 PCG     ?= $(shell if [ -x "$(CURDIR)/.venv/bin/pareto-context-graph" ]; then echo "$(CURDIR)/.venv/bin/pareto-context-graph"; else echo pareto-context-graph; fi)
 PYTHON    ?= $(shell if [ -x "$(CURDIR)/.venv/bin/python" ]; then echo "$(CURDIR)/.venv/bin/python"; else echo python3; fi)
 
-.PHONY: help deploy build-image build-graph serve eval eval-baseline eval-check eval-compress-baseline eval-compress-check eval-check-kubernetes eval-audit eval-audit-kubernetes eval-agent-ab-baseline eval-agent-ab-check profile-build render-diagrams bench-setup-t1 bench-setup bench-huge bench-linux bench-smoke bench-stress pre-bench
+.PHONY: help deploy build-image build-graph serve eval eval-baseline eval-check eval-ablation eval-compress-baseline eval-compress-check eval-check-kubernetes eval-audit eval-audit-kubernetes eval-agent-ab-baseline eval-agent-ab-check agent-bench agent-bench-gate memory-probe profile-build render-diagrams bench-setup-t1 bench-setup bench-huge bench-linux bench-smoke bench-stress pre-bench
 
 help:
 	@echo "Targets:"
@@ -20,6 +22,7 @@ help:
 	@echo "  make eval           Run eval (REPOS=fastapi=$(BENCH_DIR)/fastapi)"
 	@echo "  make eval-baseline  Refresh tests/eval/baseline.json (BASELINE= to override)"
 	@echo "  make eval-check     Fail if metrics regress vs baseline (default T1: fastapi + httpx)"
+	@echo "  make eval-ablation  Print per-signal ablation table (pool / pre-MMR / recall@5)"
 	@echo "  make eval-compress-check  Phase C: recall + tier-3 compression gates"
 	@echo "  make eval-compress-baseline  Refresh tests/eval/baseline-compress.json"
 	@echo "  make eval-agent-ab-baseline  Refresh tests/eval/baseline-agent-ab.json"
@@ -58,6 +61,10 @@ eval-baseline:
 
 eval-check:
 	$(PCG) eval $(foreach r,$(if $(REPOS),$(REPOS),$(T1_REPOS)),--repo-map $(r)) --baseline $(BASELINE) --check-baseline
+
+eval-ablation:
+	@export PCG_EDGE_DECAY=0; \
+	$(PCG) eval $(foreach r,$(if $(REPOS),$(REPOS),$(T1_REPOS)),--repo-map $(r)) --ablation
 
 eval-compress-baseline:
 	@if [ -z "$(REPOS)" ]; then echo "Usage: make eval-compress-baseline REPOS='fastapi=$(BENCH_DIR)/fastapi httpx=$(BENCH_DIR)/httpx'"; exit 1; fi
@@ -100,6 +107,17 @@ eval-agent-ab-check:
 eval-audit:
 	@if [ -z "$(REPOS)" ]; then echo "Usage: make eval-audit REPOS='fastapi=$(BENCH_DIR)/fastapi httpx=$(BENCH_DIR)/httpx'"; exit 1; fi
 	PYTHONPATH=. $(PYTHON) scripts/audit_golden_cases.py $(foreach r,$(REPOS),--repo-map $(r))
+
+# Phase 1.3/1.5 — real agent A/B from claude -p transcripts (needs `claude` CLI + jq).
+# agent-bench runs the live arms; agent-bench-gate fails if pcg loses to baseline.
+agent-bench:
+	N_RUNS="$(N_RUNS)" ./scripts/agent_bench.sh $(N_RUNS) $(AGENT_MODEL)
+
+agent-bench-gate:
+	PYTHONPATH=. $(PYTHON) scripts/agent_ab_check.py tests/eval/agent-ab.json
+
+memory-probe:
+	./scripts/memory_probe.sh $(AGENT_MODEL)
 
 bench-setup-t1:
 	BENCH_DIR="$(BENCH_DIR)" PCG="$(PCG)" ./scripts/bench_setup.sh --tier 1

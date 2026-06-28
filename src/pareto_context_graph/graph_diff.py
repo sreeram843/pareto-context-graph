@@ -77,7 +77,10 @@ def detect_changes(
                 ),
             }
             for r in affected_rows
-            if any(h["path"] == r["path"] and h["degree"] >= hub_threshold for h in stats.get("top_hubs", []))
+            if any(
+                h["path"] == r["path"] and h["degree"] >= hub_threshold
+                for h in stats.get("top_hubs", [])
+            )
         ][:top_hubs]
 
         profile = autodetect_profile(repo_root) or "medium"

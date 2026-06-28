@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path
 
 from .repo_config import file_too_large, load_repo_config, path_excluded
-from .spec_index import rebuild_spec_indexes, update_spec_indexes
+from .spec_index import update_spec_indexes
 from .store import Store
 from .structural import extract_structural_edges
 from .symbols import CODE_EXTENSIONS, extract_symbol_records

@@ -16,12 +16,45 @@ from pareto_context_graph.eval import (
 )
 
 
+def test_candidate_pool_recall():
+    from pareto_context_graph.eval import candidate_pool_recall
+
+    pool = ["a.py", "b.py", "c.py"]
+    assert candidate_pool_recall(pool, ["a.py", "x.py"]) == 0.5
+    assert candidate_pool_recall(pool, ["a.py", "b.py", "c.py"]) == 1.0
+
+
 def test_recall_at_k():
     ranked = ["a.py", "b.py", "c.py", "d.py", "e.py"]
     expected = ["b.py", "z.py"]
     assert recall_at_k(ranked, expected, 5) == 0.5
     assert recall_at_k(ranked, expected, 1) == 0.0
     assert recall_at_k(ranked, [], 5) == 1.0
+
+
+def test_format_ablation_table():
+    from pareto_context_graph.eval import format_ablation_table
+
+    table = format_ablation_table(
+        {
+            "baseline": {
+                "recall_at_5": 0.7,
+                "candidate_pool_recall": 0.9,
+                "pre_mmr_recall_at_5": 0.72,
+            },
+            "ablations": [
+                {
+                    "signal": "prf",
+                    "recall_at_5": 0.71,
+                    "candidate_pool_recall": 0.9,
+                    "pre_mmr_recall_at_5": 0.73,
+                    "delta": 0.01,
+                }
+            ],
+        }
+    )
+    assert "prf" in table
+    assert "0.7100" in table
 
 
 def test_mrr():

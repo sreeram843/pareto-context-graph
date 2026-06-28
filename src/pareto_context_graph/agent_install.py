@@ -12,7 +12,9 @@ PCG_MARKER_END = "<!-- PCG:END -->"
 INSTALL_TARGETS = frozenset(
     {"auto", "all", "cursor", "copilot", "vscode", "claude", "codex", "gemini", "windsurf"}
 )
-MCP_TARGETS = frozenset({"cursor", "copilot", "vscode", "claude", "codex", "gemini", "windsurf", "all", "auto"})
+MCP_TARGETS = frozenset(
+    {"cursor", "copilot", "vscode", "claude", "codex", "gemini", "windsurf", "all", "auto"}
+)
 
 
 def mcp_server_entry(repo: Path, *, watch: bool = False) -> dict[str, Any]:
@@ -132,7 +134,9 @@ def _remove_marked_block(path: Path) -> bool:
     return True
 
 
-def print_agent_config(repo: Path, target: str, *, location: str = "local", watch: bool = False) -> dict[str, Any]:
+def print_agent_config(
+    repo: Path, target: str, *, location: str = "local", watch: bool = False
+) -> dict[str, Any]:
     entry = mcp_server_entry(repo, watch=watch)
     if target == "cursor":
         return {"mcpServers": {"pareto-context-graph": entry}}
@@ -204,7 +208,11 @@ def uninstall_agent(
             if _remove_mcp_json(path, servers_key="servers"):
                 messages.append(f"removed Copilot MCP entry from {path}")
 
-    for path in (repo / "AGENTS.md", repo / ".cursor/rules/pcg.mdc", repo / ".github/copilot-instructions.md"):
+    for path in (
+        repo / "AGENTS.md",
+        repo / ".cursor/rules/pcg.mdc",
+        repo / ".github/copilot-instructions.md",
+    ):
         if _remove_marked_block(path):
             messages.append(f"removed steering markers from {path}")
     return messages

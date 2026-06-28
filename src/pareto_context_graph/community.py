@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+
 from .profiles import resolve_profile
 from .store import Store
 
@@ -149,7 +151,11 @@ def detect_communities(
     return _connected_components(store, min_weight=min_weight, max_community_size=max_size)
 
 
-COMMUNITY_RANK_BOOST = 12.0
+# Additive boost for candidates sharing a Leiden cluster with a seed. Kept on the
+# scale of a strong co-change edge (~1-4) so community membership refines ranking
+# without burying genuine co-change partners in other clusters. The original flat
+# 12.0 dominated the co-change signal entirely. Tunable via env.
+COMMUNITY_RANK_BOOST = float(os.environ.get("PCG_COMMUNITY_RANK_BOOST", "3.0"))
 
 
 def community_membership_map(
@@ -194,14 +200,37 @@ def community_rank_boost(
     membership: dict[str, int],
     *,
     boost: float = COMMUNITY_RANK_BOOST,
+    seed_only: bool = False,
 ) -> float:
-    """Boost candidates that share a Leiden/component cluster with a seed file."""
+    """Boost candidates that share a Leiden/component cluster with a seed file.
+
+    Query-driven requests keep the flat cluster boost. Seed-only requests scale
+    community boost by directory proximity and lift same-directory singleton
+    siblings that weak co-change edges isolate from the seed cluster.
+    """
     if not seed_files or not membership:
         return 0.0
     path_community = membership.get(path)
     if path_community is None:
         return 0.0
     seed_communities = {membership[seed] for seed in seed_files if seed in membership}
-    if path_community in seed_communities:
-        return boost
+    cluster_match = path_community in seed_communities
+
+    if not seed_only:
+        if cluster_match:
+            return boost
+        return 0.0
+
+    from .context_ranking import locality_multiplier
+
+    loc_ratio = locality_multiplier(path, seed_files) / 3.0
+    if loc_ratio <= 0:
+        return 0.0
+
+    if cluster_match:
+        return boost * loc_ratio
+
+    compat_seed = any("_compat/" in seed.replace("\\", "/") for seed in seed_files)
+    if compat_seed and loc_ratio >= 1.0 and path_community not in seed_communities:
+        return boost * loc_ratio
     return 0.0

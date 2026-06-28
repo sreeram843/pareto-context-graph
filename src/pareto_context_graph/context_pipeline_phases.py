@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import math
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -44,6 +44,12 @@ from .context_ranking import (
     entry_diagnostics as _entry_diagnostics,
 )
 from .context_ranking import (
+    hub_penalty_factor as _hub_penalty_factor,
+)
+from .context_ranking import (
+    hub_tiebreak as _hub_tiebreak,
+)
+from .context_ranking import (
     learned_weights as _learned_weights,
 )
 from .context_ranking import (
@@ -53,13 +59,19 @@ from .context_ranking import (
     mirror_key as _mirror_key,
 )
 from .context_ranking import (
-    mmr_select as _mmr_select,
+    mmr_select_with_protected_head as _mmr_select_with_protected_head,
 )
 from .context_ranking import (
     node_degrees as _node_degrees,
 )
 from .context_ranking import (
+    rank_fusion_mode as _rank_fusion_mode,
+)
+from .context_ranking import (
     redact_entry_fields as _redact_entry_fields,
+)
+from .context_ranking import (
+    rrf_rank_relevance as _rrf_rank_relevance,
 )
 from .context_ranking import (
     semantic_search as _semantic_search,
@@ -106,6 +118,7 @@ from .suggested_next import build_suggested_next
 from .summary_prune import apply_summary_prune
 from .taxonomy import (
     classify_query_intent,
+    is_concept_query,
 )
 from .taxonomy import (
     is_noise_path as _is_noise_path,
@@ -209,6 +222,8 @@ class PipelineCtx:
     max_seed_degree: int = 0
     skip_expensive_hybrid: bool = False
     run_semantic_hybrid: bool = False
+    candidate_pool_paths: list[str] = field(default_factory=list)
+    pre_mmr_paths: list[str] = field(default_factory=list)
 
     @property
     def candidates(self) -> list[Candidate]:
@@ -325,7 +340,24 @@ def pipeline_symbols_for(ctx: PipelineCtx, path: Path) -> list[str]:
 # pulling in coupled files that pure text search misses. Classic pseudo-relevance
 # feedback (Rocchio/RM3) adapted to the structural graph that is this tool's core asset.
 PRF_MAX_SEEDS = 3
-PRF_MAX_ADDITIONS = 25
+PRF_MAX_ADDITIONS = 8
+
+# Max files in a tier-1 orientation map. Beyond this the tail is low-relevance
+# import/directory padding that wastes the token budget; capped files remain in
+# `dropped_paths` and are reachable via tier escalation. Tunable via env.
+TIER1_MAX_FILES = int(os.environ.get("PCG_TIER1_MAX_FILES", "12"))
+
+
+def _cap_prf_relevance(filtered: list[dict]) -> None:
+    """Keep PRF neighbours below the weakest non-PRF hit so they fill tail slots only."""
+    originals = [row for row in filtered if row.get("signal") != "cochange_prf"]
+    prf_rows = [row for row in filtered if row.get("signal") == "cochange_prf"]
+    if not originals or not prf_rows:
+        return
+    floor = min(float(row.get("_relevance", row.get("weight", 0))) for row in originals)
+    cap = floor * 0.5
+    for row in prf_rows:
+        row["_relevance"] = min(float(row.get("_relevance", row.get("weight", 0))), cap)
 
 
 def prf_cochange_additions(ctx: PipelineCtx, existing_paths: set[str]) -> list[dict]:
@@ -336,6 +368,8 @@ def prf_cochange_additions(ctx: PipelineCtx, existing_paths: set[str]) -> list[d
     capped and carry the ``cochange_prf`` signal so ranking/diagnostics stay legible.
     """
     if not feature_enabled("PRF_COCHANGE") or ablation_enabled("prf"):
+        return []
+    if is_concept_query(ctx.query):
         return []
     pseudo_seeds = [
         path
@@ -625,6 +659,7 @@ def run_filter_phase(ctx: PipelineCtx) -> None:
         and (r["depth"] > 0 or r.get("signal") == "query_first")
         and r["path"] not in ctx.already_have
     ]
+    ctx.candidate_pool_paths = [r["path"] for r in ctx.filtered]
     return None
 
 
@@ -696,8 +731,10 @@ def run_rank_phase(ctx: PipelineCtx) -> None:
                     base_score = _apply_file_class_weight(base_score, r["path"], query_intent)
                     base_score *= _locality_multiplier(r["path"], ctx.files)
                     degree = _path_degree(r["path"])
-                    hub_penalty = math.log2(2 + degree)
-                    base_score = base_score / max(1.0, hub_penalty * ctx.hub_penalty_strength)
+                    base_score = base_score / _hub_penalty_factor(
+                        degree, ctx.hub_penalty_strength
+                    )
+                    base_score -= _hub_tiebreak(degree)
                     base_score += ctx.learned.get(r["path"], 0.0)
                     base_score += 0.15 * ctx.embed_scores.get(r["path"], 0.0)
                     comm_boost = community_rank_boost(
@@ -727,17 +764,39 @@ def run_rank_phase(ctx: PipelineCtx) -> None:
                     base_score = _apply_file_class_weight(base_score, r["path"], query_intent)
                     base_score *= _locality_multiplier(r["path"], ctx.files)
                     degree = _path_degree(r["path"])
-                    hub_penalty = math.log2(2 + degree)
-                    base_score = base_score / max(1.0, hub_penalty * ctx.hub_penalty_strength)
+                    base_score = base_score / _hub_penalty_factor(
+                        degree, ctx.hub_penalty_strength
+                    )
+                    base_score -= _hub_tiebreak(degree)
                     base_score += ctx.learned.get(r["path"], 0.0)
                     base_score += 0.15 * ctx.embed_scores.get(r["path"], 0.0)
                     comm_boost = community_rank_boost(
-                        r["path"], ctx.files, ctx.community_membership
+                        r["path"], ctx.files, ctx.community_membership, seed_only=True
                     )
                     base_score += comm_boost
                     r["_community_boost"] = round(comm_boost, 4)
                     r["_symbols"] = pipeline_symbols_for(ctx, ctx.repo_root / r["path"])
                     r["_relevance"] = base_score
+                ctx.filtered.sort(key=lambda x: -x.get("_relevance", 0))
+
+            # Phase 4.3 experiment: optionally replace the additive fusion above with
+            # reciprocal-rank fusion of the same signals (PCG_RANK_FUSION=rrf). The same
+            # test/noise quality filters apply so the A/B isolates the fusion method.
+            if _rank_fusion_mode() == "rrf":
+                fused = _rrf_rank_relevance(
+                    ctx.filtered,
+                    files=ctx.files,
+                    node_degrees=ctx.node_degrees,
+                    embed_scores=ctx.embed_scores,
+                    query=ctx.query,
+                )
+                for r in ctx.filtered:
+                    score = fused.get(r["path"], 0.0)
+                    if not test_focused and _is_test_file(r["path"]):
+                        score *= 0.05
+                    elif _is_noise_path(r["path"]):
+                        score *= 0.05
+                    r["_relevance"] = score
                 ctx.filtered.sort(key=lambda x: -x.get("_relevance", 0))
 
             ranker = load_ranker(ctx.repo_root)
@@ -772,11 +831,21 @@ def run_rank_phase(ctx: PipelineCtx) -> None:
         for r in ctx.filtered:
             r["_relevance"] = r.get("weight", 1)
 
-    # Apply diversity selection (MMR) over top candidates
+    _cap_prf_relevance(ctx.filtered)
+
+    ctx.pre_mmr_paths = [
+        row["path"]
+        for row in sorted(
+            ctx.filtered,
+            key=lambda item: -float(item.get("_relevance", item.get("weight", 0))),
+        )
+    ]
+
+    # Apply diversity selection (MMR) over top candidates; protect recall@5 ranks.
     if ctx.high_fanout:
         ctx.filtered = ctx.filtered[: min(len(ctx.filtered), ctx.stage1_cap)]
     else:
-        ctx.filtered = _mmr_select(
+        ctx.filtered = _mmr_select_with_protected_head(
             ctx.filtered,
             limit=min(len(ctx.filtered), ctx.stage1_cap),
             mmr_lambda=ctx.mmr_lambda,
@@ -803,7 +872,16 @@ def run_pack_phase(ctx: PipelineCtx, *, phase_tracker: ContextPhaseTracker) -> d
         "embed_scores": ctx.embed_scores,
         "hub_penalty_strength": ctx.hub_penalty_strength,
     }
-    max_pack_files = 25 if ctx.high_fanout else len(ctx.filtered)
+    # Tier-1 is an orientation map, not the full payload. Capping its length keeps the
+    # low-relevance import/directory tail out of the token budget; dropped candidates
+    # are still surfaced in `dropped_paths` and via tier escalation. recall@5 and
+    # candidate_pool_recall are unaffected (rank order / full pool are unchanged).
+    if ctx.high_fanout:
+        max_pack_files = 25
+    elif ctx.tier == 1:
+        max_pack_files = min(len(ctx.filtered), TIER1_MAX_FILES)
+    else:
+        max_pack_files = len(ctx.filtered)
     for pack_idx, r in enumerate(ctx.filtered):
         if pack_idx >= max_pack_files:
             break
@@ -904,6 +982,8 @@ def run_pack_phase(ctx: PipelineCtx, *, phase_tracker: ContextPhaseTracker) -> d
         "token_budget": ctx.token_budget,
         "files_included": len(ctx.context_files),
         "files_available": len(ctx.filtered),
+        "candidate_pool_paths": ctx.candidate_pool_paths,
+        "pre_mmr_paths": ctx.pre_mmr_paths,
         "iterations": ctx.iterations,
         "expansion": ctx.expansion,
     }

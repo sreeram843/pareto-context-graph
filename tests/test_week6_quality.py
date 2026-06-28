@@ -10,7 +10,11 @@ from pareto_context_graph.daemon import GraphWatcher
 from pareto_context_graph.repo_registry import RepoRegistry, build_repo_registry
 from pareto_context_graph.route_edges import extract_route_edges
 from pareto_context_graph.structural import extract_structural_edges
-from pareto_context_graph.symbols import symbol_index_mode, treesitter_installed, use_treesitter_for_symbols
+from pareto_context_graph.symbols import (
+    symbol_index_mode,
+    treesitter_installed,
+    use_treesitter_for_symbols,
+)
 from pareto_context_graph.watcher_health import mark_error, reset_for_tests, snapshot
 
 

@@ -19,24 +19,6 @@
       "notes": "Auto-generated from graph neighbours of httpx/__init__.py."
     },
     {
-      "case_id": "httpx_httpx___version___py",
-      "repo_key": "httpx",
-      "seed_files": [
-        "httpx/__version__.py"
-      ],
-      "query": "",
-      "expected_top_files": [
-        "CHANGELOG.md",
-        "setup.py",
-        "README.md"
-      ],
-      "tier": 1,
-      "token_budget": 6000,
-      "max_depth": 1,
-      "category": "co_change",
-      "notes": "Auto-generated from graph neighbours of httpx/__version__.py."
-    },
-    {
       "case_id": "httpx_httpx__api_py",
       "repo_key": "httpx",
       "seed_files": [
@@ -98,7 +80,6 @@
       ],
       "query": "",
       "expected_top_files": [
-        "README.md",
         "docs/index.md",
         "httpx/_config.py"
       ],
@@ -106,7 +87,7 @@
       "token_budget": 6000,
       "max_depth": 1,
       "category": "co_change",
-      "notes": "Auto-generated from graph neighbours of httpx/_compat.py."
+      "notes": "Auto-generated from graph neighbours of httpx/_compat.py. [gold cleaned: removed release/packaging/CI files]"
     },
     {
       "case_id": "httpx_concept_00",

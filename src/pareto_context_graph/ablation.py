@@ -13,6 +13,9 @@ ABLATION_SIGNALS = (
     "semantic",
     "import",
     "prf",
+    "mmr_top5",
+    "openapi_downweight",
+    "hubfloor",
 )
 
 _TRUTHY = frozenset({"1", "true", "yes", "on"})
@@ -26,3 +29,9 @@ def ablation_enabled(signal: str) -> bool:
 
 def active_ablations() -> list[str]:
     return [name for name in ABLATION_SIGNALS if ablation_enabled(name)]
+
+
+# Feature opt-out env vars for ablation studies (not PCG_ABLATE_*).
+FEATURE_ABLATION_ENV: dict[str, tuple[str, str]] = {
+    "community_rank": ("PCG_FEATURE_COMMUNITY_RANK", "0"),
+}

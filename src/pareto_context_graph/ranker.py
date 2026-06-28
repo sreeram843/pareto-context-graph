@@ -18,6 +18,10 @@ FEATURE_KEYS = (
     "hub_penalty",
     "learned_boost",
     "rank_score",
+    # Phase 4.1 experiment (file_class_prior as a learned feature) was reverted: at
+    # current feedback volume it overfit and regressed holdout MRR (0.635 -> 0.563 on
+    # the fastapi replay). The file-class/intent prior stays a scoring multiplier
+    # (apply_file_class_weight) until there is enough feedback to fit it. See BENCHMARKS.md.
     "was_in_already_have",
     "dwell_seconds",
     "rejected",

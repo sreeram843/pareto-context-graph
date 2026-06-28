@@ -378,7 +378,7 @@
       "token_budget": 6000,
       "max_depth": 2,
       "category": "community",
-      "notes": "Community cluster: cmd/kube-proxy ↔ pkg/proxy"
+      "notes": "Community cluster: cmd/kube-proxy \u2194 pkg/proxy"
     },
     {
       "case_id": "k8s_community_kubelet_00",

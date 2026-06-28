@@ -4,7 +4,7 @@ Query-aware payload pruning after graph retrieval — built into the MCP server.
 
 **North star:** same `recall@5`, fewer tier-3 tokens, verbatim restore via `content_hash`.
 
-See also: [COMMANDS.md](COMMANDS.md) · [ARCHITECTURE.md](ARCHITECTURE.md) · Phase 11 in [PHASES.md](PHASES.md).
+See also: [COMMANDS.md](COMMANDS.md) · [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ---
 
@@ -109,7 +109,7 @@ Response fields: `learned_prune: true`, `learned_prune_paths` (count).
 
 Disable with `PCG_FEATURE_LEARNED_PRUNE=0`. Force enable before weights exist with `=1`.
 
-## Learned tier-1 prune (Phase 11.6)
+## Learned tier-1 prune
 
 When `prune_weights.json` exists, tier-1 `context` can drop ranked rows with strongly
 negative feedback bias (default: bias `< -0.3`) after pack, before optional summary prune.

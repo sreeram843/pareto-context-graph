@@ -21,7 +21,7 @@ The codebase is an existing, working prototype being hardened for production.
 
 Given the roadmap task identified in `$input` (or ask the user if not provided):
 
-1. **Read the roadmap** — [docs/PHASES.md](../../docs/PHASES.md)
+1. **Read the roadmap** — [docs/ROADMAP.md](../../docs/ROADMAP.md)
 2. **Explore existing code** — find every file that the task will touch (use `grep_search`, `file_search`, `semantic_search`)
 3. **Produce the spec** in the structure below
 

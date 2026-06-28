@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "description": "Hand-verified call-path ground truth for end-to-end flow/architecture questions. Unlike the recall@5 golden set (which scores file retrieval), these feed the agent A/B + LLM judge scorecard: did an agent, helped by pcg, actually trace the real call path? Each flow lists the verified file:line steps, the symbols a correct answer MUST hit, and explicit dynamic boundaries (callbacks, data-driven dispatch) where naive static tracing breaks. `memory_probe_required: true` means the repo must FAIL scripts/memory_probe.sh (model cannot trace it unaided) before it counts toward accuracy — famous repos like the two below are illustrative of the schema and should be replaced with lesser-known repos that pass the probe gate.",
+  "flows": [
+    {
+      "flow_id": "fastapi_request_to_response",
+      "repo_key": "fastapi",
+      "repo_sha": "219ac634ab82b6321492ef97fb223b618ce13948",
+      "size": "medium",
+      "memory_probe_required": true,
+      "question": "Trace how an incoming HTTP request to a FastAPI route reaches the user's endpoint function and is turned into a serialized HTTP response. Name the functions in order and the file:line of each.",
+      "call_path": [
+        {
+          "symbol": "APIRoute.get_route_handler",
+          "file": "fastapi/routing.py",
+          "line": 1185,
+          "note": "Per-route handler factory; delegates to get_request_handler(...)."
+        },
+        {
+          "symbol": "get_request_handler",
+          "file": "fastapi/routing.py",
+          "line": 367,
+          "note": "Builds the inner async app(request) Starlette route callback."
+        },
+        {
+          "symbol": "get_request_handler.app",
+          "file": "fastapi/routing.py",
+          "line": 398,
+          "note": "The inner async app(request) is the actual Starlette route callback."
+        },
+        {
+          "symbol": "solve_dependencies",
+          "file": "fastapi/dependencies/utils.py",
+          "line": 598,
+          "note": "Resolves the Depends() graph for the endpoint (called at routing.py:473)."
+        },
+        {
+          "symbol": "run_endpoint_function",
+          "file": "fastapi/routing.py",
+          "line": 336,
+          "note": "Invokes the user's endpoint coroutine/function (called at routing.py:690)."
+        },
+        {
+          "symbol": "serialize_response",
+          "file": "fastapi/routing.py",
+          "line": 293,
+          "note": "Validates and serializes the return value against the response_field (called ~routing.py:712)."
+        },
+        {
+          "symbol": "actual_response_class",
+          "file": "fastapi/routing.py",
+          "line": 731,
+          "note": "Constructs the final Response object from the serialized content."
+        }
+      ],
+      "must_hit_symbols": [
+        "get_request_handler",
+        "solve_dependencies",
+        "run_endpoint_function",
+        "serialize_response"
+      ],
+      "dynamic_boundaries": [
+        "The inner app(request) (routing.py:398) is registered as a Starlette route callback and invoked by the ASGI server, not called directly from get_route_handler.",
+        "Dependency resolution in solve_dependencies is data-driven from the endpoint signature (the Depends() graph), so concrete call targets vary per route.",
+        "response_class may be a DefaultPlaceholder resolved at runtime into actual_response_class (routing.py:389-391)."
+      ]
+    },
+    {
+      "flow_id": "httpx_get_to_transport",
+      "repo_key": "httpx",
+      "repo_sha": "b5addb64f0161ff6bfe94c124ef76f6a1fba5254",
+      "size": "small",
+      "memory_probe_required": true,
+      "question": "Trace how a top-level httpx.get(url) call reaches the network transport layer that actually performs the request. Name the functions in order and the file:line of each.",
+      "call_path": [
+        {
+          "symbol": "get",
+          "file": "httpx/_api.py",
+          "line": 174,
+          "note": "Top-level convenience wrapper; delegates to request()."
+        },
+        {
+          "symbol": "request",
+          "file": "httpx/_api.py",
+          "line": 39,
+          "note": "Opens a Client in a context manager and calls client.send(...)."
+        },
+        {
+          "symbol": "Client.send",
+          "file": "httpx/_client.py",
+          "line": 879,
+          "note": "Entry to the sync send pipeline."
+        },
+        {
+          "symbol": "Client._send_handling_auth",
+          "file": "httpx/_client.py",
+          "line": 930,
+          "note": "Auth flow loop; delegates to redirect handling."
+        },
+        {
+          "symbol": "Client._send_handling_redirects",
+          "file": "httpx/_client.py",
+          "line": 964,
+          "note": "Redirect loop; delegates to the single-request sender."
+        },
+        {
+          "symbol": "Client._send_single_request",
+          "file": "httpx/_client.py",
+          "line": 1001,
+          "note": "Selects the transport and calls transport.handle_request (client.py:1014)."
+        }
+      ],
+      "must_hit_symbols": [
+        "send",
+        "_send_handling_auth",
+        "_send_handling_redirects",
+        "_send_single_request"
+      ],
+      "dynamic_boundaries": [
+        "_transport_for_url (client.py:1005) picks the transport at runtime from the mounts map, so transport.handle_request dispatches to whichever transport (default HTTPTransport, or a test/mock transport) is mounted.",
+        "The async path (AsyncClient.send at _client.py:1594) mirrors this chain with awaited equivalents; a correct trace should note the sync/async split."
+      ]
+    }
+  ]
+}

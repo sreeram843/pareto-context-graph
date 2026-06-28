@@ -78,7 +78,7 @@ When a returned path was rejected **≥3 times in the last 7 days**, `feedback_h
 }
 ```
 
-(Phase 15.7 — closes the loop from feedback to durable codified context.)
+(closes the loop from feedback to durable codified context.)
 
 ### Hook policy (optional)
 
@@ -104,7 +104,7 @@ pareto-context-graph update --repo "$(git rev-parse --show-toplevel)" &
 This runs the incremental update in the background so it doesn't slow
 down your commit workflow.
 
-## Pre/post-change hooks (Phase 15)
+## Pre/post-change hooks
 
 Examples for codified-context workflow:
 
@@ -116,9 +116,8 @@ Optional repo config (copy into `.pareto-context-graph/`):
 - [`docs/examples/context-map.json`](examples/context-map.json) — subsystem → spec paths for `doctor` drift checks
 - [`docs/examples/routing.json`](examples/routing.json) — intent/path → specialist hints on `context`
 
-See [PHASES_CODIFIED_CONTEXT.md](PHASES_CODIFIED_CONTEXT.md).
 
-### Spec search (Phase 15.5)
+### Spec search
 
 Indexed on every `build` / `update` (when markdown changes):
 
@@ -138,7 +137,7 @@ Indexed on every `build` / `update` (when markdown changes):
 
 Response includes `spec_context.snippets` (path, kind, title, snippet, score). The `search` command also returns `spec_hits`.
 
-### Subsystems (Phase 15.6)
+### Subsystems
 
 ```json
 { "command": "list_subsystems" }

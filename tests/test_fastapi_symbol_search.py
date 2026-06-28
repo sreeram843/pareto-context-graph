@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from pareto_context_graph.context_pipeline_phases import TIER1_MAX_FILES
 from pareto_context_graph.server import _handle_tool_call
 from pareto_context_graph.store import Store
 
@@ -58,3 +59,27 @@ def test_fastapi_query_first_context_surfaces_oauth2_file(fastapi_repo: Path):
     assert "error" not in payload
     paths = [entry["path"] for entry in payload.get("context_files", [])]
     assert "fastapi/security/oauth2.py" in paths[:10]
+
+
+def test_tier1_map_is_capped(fastapi_repo: Path):
+    """Tier-1 is a lean orientation map: a generous budget must not flood it with the
+    low-relevance import/directory tail. Capped candidates stay in dropped_paths."""
+    payload = json.loads(
+        _handle_tool_call(
+            fastapi_repo,
+            "pareto_context_graph",
+            {
+                "command": "context",
+                "files": ["fastapi/applications.py"],
+                "tier": 1,
+                "token_budget": 50_000,
+                "query_first": False,
+                "session_memory": False,
+                "feedback_log": False,
+            },
+        )
+    )
+    assert "error" not in payload
+    # Far more candidates than the cap are available, but the map stays capped.
+    assert payload["files_available"] > TIER1_MAX_FILES
+    assert payload["files_included"] <= TIER1_MAX_FILES

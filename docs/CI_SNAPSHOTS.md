@@ -130,9 +130,9 @@ pareto-context-graph build --profile huge-full \
   --shards 8
 ```
 
-Phase 2 search index is lazy by default — run `pareto-context-graph index` when you need symbol search.
+The search index is lazy by default — run `pareto-context-graph index` when you need symbol search.
 
-See [BENCHMARK_REPOS.md](BENCHMARK_REPOS.md) for measured timings.
+See [BENCHMARKS.md](BENCHMARKS.md) for measured timings.
 
 ---
 
@@ -198,5 +198,5 @@ Recorded breakdowns: [BENCHMARKS.md](BENCHMARKS.md).
 ## Related docs
 
 - [QUICKSTART.md](QUICKSTART.md) — `init`, `sync`, editor wiring
-- [BENCHMARK_REPOS.md](BENCHMARK_REPOS.md) — tier recipes and disk estimates
+- [BENCHMARKS.md](BENCHMARKS.md) — tier recipes and disk estimates
 - [COMMANDS.md](COMMANDS.md) — `init`, `build --from-snapshot`, `sync`, `snapshot export|import`
