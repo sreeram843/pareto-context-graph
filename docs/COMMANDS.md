@@ -9,7 +9,7 @@ See also: [QUICKSTART.md](QUICKSTART.md) · [ARCHITECTURE.md](ARCHITECTURE.md)
 
 ## `context` — primary command
 
-![Context request sequence](diagrams/context-sequence.svg)
+![How a context request flows](diagrams/context-pipeline.svg)
 
 ### Example calls
 
@@ -36,8 +36,6 @@ See also: [QUICKSTART.md](QUICKSTART.md) · [ARCHITECTURE.md](ARCHITECTURE.md)
 
 ### Progressive tiers
 
-![Tier escalation](diagrams/tier-escalation.svg)
-
 | Tier | Returns | Use case | Tokens/file |
 |------|---------|----------|-------------|
 | **1** (default) | Path + 1-line summary | Orientation, triage | ~30 |
@@ -47,8 +45,6 @@ See also: [QUICKSTART.md](QUICKSTART.md) · [ARCHITECTURE.md](ARCHITECTURE.md)
 Start at tier 1. Escalate to tier 2/3 only for files you need deeply.
 
 ### Follow-up turns (`already_have`)
-
-![Follow-up delta](diagrams/follow-up-delta.svg)
 
 Pass files already in the conversation to skip re-sending them. Session memory
 (`.pareto-context-graph/session.json`) merges recent paths automatically unless

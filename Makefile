@@ -11,7 +11,7 @@ N_RUNS ?= 4
 PCG     ?= $(shell if [ -x "$(CURDIR)/.venv/bin/pareto-context-graph" ]; then echo "$(CURDIR)/.venv/bin/pareto-context-graph"; else echo pareto-context-graph; fi)
 PYTHON    ?= $(shell if [ -x "$(CURDIR)/.venv/bin/python" ]; then echo "$(CURDIR)/.venv/bin/python"; else echo python3; fi)
 
-.PHONY: help deploy build-image build-graph serve eval eval-baseline eval-check eval-ablation eval-compress-baseline eval-compress-check eval-check-kubernetes eval-audit eval-audit-kubernetes eval-agent-ab-baseline eval-agent-ab-check agent-bench agent-bench-gate memory-probe profile-build render-diagrams bench-setup-t1 bench-setup bench-huge bench-linux bench-smoke bench-stress pre-bench
+.PHONY: help deploy build-image build-graph serve eval eval-baseline eval-check eval-ablation eval-compress-baseline eval-compress-check eval-check-kubernetes eval-audit eval-audit-kubernetes eval-agent-ab-baseline eval-agent-ab-check agent-bench agent-bench-gate memory-probe profile-build bench-setup-t1 bench-setup bench-huge bench-linux bench-smoke bench-stress pre-bench
 
 help:
 	@echo "Targets:"
@@ -28,7 +28,6 @@ help:
 	@echo "  make eval-agent-ab-baseline  Refresh tests/eval/baseline-agent-ab.json"
 	@echo "  make eval-agent-ab-check     Agent A/B gate (tool calls + recall vs baseline)"
 	@echo "  make profile-build  Show or run build phase profile (REPO=, SHOW=1, REPLAY=1)"
-	@echo "  make render-diagrams Regenerate docs/diagrams/*.svg from .mmd sources"
 	@echo "  make bench-setup-t1 Phase 0: clone + build fastapi + httpx"
 	@echo "  make bench-setup    Phase 0: clone + build + pin SHAs (TIER=1|2|3|all)"
 	@echo "                      Skip clone: make bench-setup TIER=2 SKIP_CLONE=1"
@@ -90,9 +89,6 @@ profile-build:
 	elif [ -n "$(REPLAY)" ]; then PYTHONPATH=. $(PYTHON) scripts/profile_build.py --repo $(REPO) --replay-index; \
 	elif [ -n "$(BUILD)" ]; then PYTHONPATH=. $(PYTHON) scripts/profile_build.py --repo $(REPO) --build --commits $(or $(COMMITS),5000) --shards $(or $(SHARDS),1) $(if $(SINCE),--since '$(SINCE)',); \
 	else PYTHONPATH=. $(PYTHON) scripts/profile_build.py --repo $(REPO) --show; fi
-
-render-diagrams:
-	./scripts/render_diagrams.sh
 
 AGENT_AB_BASELINE ?= tests/eval/baseline-agent-ab.json
 

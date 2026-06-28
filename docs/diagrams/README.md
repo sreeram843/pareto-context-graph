@@ -1,38 +1,19 @@
 # Diagrams
 
-Rendered **SVG/PNG** assets for the README and docs. Cursor and many local Markdown
-previews do **not** execute Mermaid in fenced blocks — embedded images always show.
+Hand-authored **SVG** assets for the README and docs. They use a shared palette
+(amber = person, blue = call surfaces, green = engine, purple = datastore, gray =
+external) on a light card so they read on both light and dark GitHub themes.
 
-## Regenerate
-
-```bash
-./scripts/render_diagrams.sh
-# or
-make render-diagrams
-```
-
-Requires [Node.js](https://nodejs.org/) (`npx @mermaid-js/mermaid-cli`).
+These are plain SVG — edit the file directly, no toolchain or build step. Embedded
+images always render (Markdown previews don't execute Mermaid).
 
 ## Files
 
-| Source (`.mmd`) | Output | Used in |
-|-----------------|--------|---------|
-| `c4-context.mmd` | C4 **System Context** | README |
-| `c4-container.mmd` | C4 **Containers** | README |
-| `c4-component-context.mmd` | C4 **Components** (`context` path) | README |
-| `north-star.mmd` | Four measurable layers | README |
-| `before-after.mmd` | With vs without tool | README |
-| `token-layers.mmd` | Five savings layers | README |
-| `problem-flow.mmd` | File selection decision | README |
-| `build-query.mmd` | Build vs query split | README, ARCHITECTURE |
-| `context-sequence.mmd` | `context` request sequence | README |
-| `tier-escalation.mmd` | Tier 1 → 2 → 3 | README |
-| `follow-up-delta.mmd` | `already_have` / session | README |
-| `editor-integration.mmd` | IDE + MCP | README |
-
-Edit the `.mmd` file, re-run the render script, commit both `.mmd` and `.svg`.
-
-## C4 model
-
-[C4](https://c4model.com/) diagrams use Mermaid's built-in `C4Context`, `C4Container`,
-and `C4Component` syntax. See [c4-context.mmd](c4-context.mmd) for the template.
+| File | Shows | Used in |
+|------|-------|---------|
+| `c4-context.svg` | System context — 3 call surfaces → engine → git + graph | ARCHITECTURE |
+| `c4-container.svg` | Containers — surfaces drive select → rank → pack | ARCHITECTURE |
+| `build-query.svg` | Build-time vs query-time split | ARCHITECTURE |
+| `context-pipeline.svg` | A `context` request, phase by phase | ARCHITECTURE |
+| `before-after.svg` | Value prop — grep & guess vs ranked context | README |
+| `token-layers.svg` | The five layers that reduce tokens | README |

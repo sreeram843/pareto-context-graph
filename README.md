@@ -13,6 +13,8 @@ detail only where needed.
 - **No external service** — Python 3.10+ stdlib (SQLite + git CLI). Embeddings, a learned
   ranker, and OpenTelemetry are optional extras.
 
+![Why it helps — grep & guess vs ranked, budgeted context](docs/diagrams/before-after.svg)
+
 ---
 
 ## Install
@@ -62,6 +64,10 @@ files. The server:
    hubs and near-duplicates.
 3. **Packs** the top files into a token budget as a tier-1 map, escalating to tier-2
    signatures or tier-3 chunks on request.
+
+Each layer removes work before the agent reads a file:
+
+![How the tokens drop — five layers](docs/diagrams/token-layers.svg)
 
 Architecture, pipeline phases, and storage: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 

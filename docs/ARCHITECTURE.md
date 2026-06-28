@@ -1,27 +1,25 @@
 # Architecture
 
 Technical reference for how **pareto-context-graph** is built and how a `context` request flows.
-
-User-facing story + C4 zoom levels: [README § C4 model](../README.md#c4-model) ·
-[diagram sources](diagrams/).
-
-> Diagrams are embedded SVGs (editable `.mmd` in [`diagrams/`](diagrams/)).
+High-level overview: [README](../README.md).
 
 ---
 
-## C4 model (summary)
+## C4 model
+
+System context — one engine, three call surfaces (IDE agent via MCP, CLI/CI, Python library):
 
 ![C4 system context](diagrams/c4-context.svg)
 
-![C4 containers](diagrams/c4-container.svg)
+Containers — every surface drives the same select → rank → pack pipeline over the graph:
 
-![C4 component — context path](diagrams/c4-component-context.svg)
+![C4 containers](diagrams/c4-container.svg)
 
 ---
 
-## System overview
+## Build vs query
 
-![System overview — inputs, build, query](diagrams/system-overview.svg)
+The graph is built once (then synced incrementally); each request only reads it.
 
 ![Build time vs query time](diagrams/build-query.svg)
 

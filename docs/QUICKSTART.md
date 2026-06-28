@@ -128,7 +128,7 @@ Signing: [CI_SNAPSHOTS.md](CI_SNAPSHOTS.md).
 
 ## Editor integration
 
-![Editor, MCP servers, and repo](diagrams/editor-integration.svg)
+![How the IDE, MCP, and repo connect](diagrams/c4-context.svg)
 
 Compression after tier 3: [CONTEXT_COMPRESSION.md](CONTEXT_COMPRESSION.md) (`compression: prune`, `retrieve`).
 
